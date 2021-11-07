@@ -40,13 +40,15 @@
 #define msl multiset<ll>
 #define mspll multiset<pll>
 #define vb vector<bool>
-#define vvb vector<vector<bool>>
+#define vvb vector<vb>
 #define mll map<ll, ll>
 #define mlll map<ll, mll>
 #define mlvl map<ll, vl>
 #define mlsl map<ll, sl>
+#define mpllb map<pll, bool>
 #define vmll vector<mll>
 #define ql queue<ll>
+#define qpll queue<pll>
 #define str string
 #define vstr vector<str>
 #define mstrl map<str, ll>
@@ -71,10 +73,5 @@ using namespace std;
 
 int main()
 {
-    ll W, H, N;
-    cin >> W >> H >> N;
-    vpll P(N);
-    FOR(n, N) { cin >> P[n].first >> P[n].second; }
-    W++; H++;
-    vvl dp(H, vl(W));
+    // ^_^
 }

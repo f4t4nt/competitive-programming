@@ -67,36 +67,27 @@
 #define FOI(x, e, i) for(ll x = 0; x < (ll) (e); x += (ll) (i))
 #define FORE(x, C) for(auto& x : C)
 
-#define LLONG_MAX 9223372036854775807
-
 using namespace std;
 
-// http://www.usaco.org/index.php?page=viewproblem2&cpid=945
+// https://dmoj.ca/problem/ioi04p4
 
 int main()
 {
-    ifstream cin("snakes.in");
-    ofstream cout("snakes.out");
-
-    ll N, K;
-    cin >> N >> K;
-    vl A(N), S(N + 1);
-    FOR(n, N) { cin >> A[n]; S[n + 1] = S[n] + A[n]; }
-    vvl maxa(N, vl(N));
-    FOR(i, N) { maxa[i][i] = A[i]; }
-    FOB(s, 1, N) { FOR(i, N - s) { maxa[i][s + i] = max(maxa[i + 1][s + i], maxa[i][s + i - 1]); } }
-    N++; K++;
-    // total, length, height
-    vvl dp(N, vl(K));
-    FOB(n, 1, N)
+    ll W, H, N;
+    cin >> W >> H >> N;
+    vpll P(N);
+    FOR(n, N) { cin >> P[n].first >> P[n].second; }
+    W++; H++;
+    vvl dp(H, vl(W));
+    FOR(h, H) { FOR(w, W) { dp[h][w] = h * w; } }
+    FOR(n, N) { dp[P[n].second][P[n].first] = 0; }
+    FOB(h, 1, H)
     {
-        dp[n][0] = n * maxa[0][n - 1] - S[n];
-        FOB(k, 1, K)
+        FOB(w, 1, W)
         {
-            ll mindp = LLONG_MAX;
-            FOE(m, n + 1, 1) { mindp = min(dp[m - 1][k - 1] + maxa[m - 1][n - 1] * (n - m + 1) - S[n] + S[m - 1], mindp); }
-            dp[n][k] = mindp;
+            FOB(y, 1, h + 1) { dp[h][w] = min(dp[h][w], dp[y][w] + dp[h - y][w]); }
+            FOB(x, 1, w + 1) { dp[h][w] = min(dp[h][w], dp[h][x] + dp[h][w - x]); }
         }
     }
-    cout << dp[N - 1][K - 1] << endl;
+    cout << dp[H - 1][W - 1] << endl;
 }

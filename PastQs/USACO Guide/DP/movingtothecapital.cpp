@@ -40,13 +40,15 @@
 #define msl multiset<ll>
 #define mspll multiset<pll>
 #define vb vector<bool>
-#define vvb vector<vector<bool>>
+#define vvb vector<vb>
 #define mll map<ll, ll>
 #define mlll map<ll, mll>
 #define mlvl map<ll, vl>
 #define mlsl map<ll, sl>
+#define mpllb map<pll, bool>
 #define vmll vector<mll>
 #define ql queue<ll>
+#define qpll queue<pll>
 #define str string
 #define vstr vector<str>
 #define mstrl map<str, ll>
@@ -67,36 +69,66 @@
 #define FOI(x, e, i) for(ll x = 0; x < (ll) (e); x += (ll) (i))
 #define FORE(x, C) for(auto& x : C)
 
-#define LLONG_MAX 9223372036854775807
-
 using namespace std;
 
-// http://www.usaco.org/index.php?page=viewproblem2&cpid=945
+// https://codeforces.com/contest/1472/problem/G
 
 int main()
 {
-    ifstream cin("snakes.in");
-    ofstream cout("snakes.out");
-
-    ll N, K;
-    cin >> N >> K;
-    vl A(N), S(N + 1);
-    FOR(n, N) { cin >> A[n]; S[n + 1] = S[n] + A[n]; }
-    vvl maxa(N, vl(N));
-    FOR(i, N) { maxa[i][i] = A[i]; }
-    FOB(s, 1, N) { FOR(i, N - s) { maxa[i][s + i] = max(maxa[i + 1][s + i], maxa[i][s + i - 1]); } }
-    N++; K++;
-    // total, length, height
-    vvl dp(N, vl(K));
-    FOB(n, 1, N)
+    ll T;
+    cin >> T;
+    FOR(t, T)
     {
-        dp[n][0] = n * maxa[0][n - 1] - S[n];
-        FOB(k, 1, K)
+        ll N, M;
+        cin >> N >> M;
+        mlvl R, S;
+        FOR(m, M)
         {
-            ll mindp = LLONG_MAX;
-            FOE(m, n + 1, 1) { mindp = min(dp[m - 1][k - 1] + maxa[m - 1][n - 1] * (n - m + 1) - S[n] + S[m - 1], mindp); }
-            dp[n][k] = mindp;
+            ll U, V;
+            cin >> U >> V;
+            R[U].pb(V);
+            S[V].pb(U);
         }
+        qpll bfs1, bfs2;
+        bfs1.push({ 1, 0 });
+        bfs2.push({ 1, 0 });
+        vl D(N, N + 1);
+        while(sz(bfs1) > 0)
+        {
+            if(D[bfs1.front().first - 1] > bfs1.front().second)
+            {
+                D[bfs1.front().first - 1] = bfs1.front().second;
+                bfs1.front().second++;
+                vl &Cr = R[bfs1.front().first];
+                FORE(c, Cr) { bfs1.push({ c, bfs1.front().second }); }
+            }
+            bfs1.pop();
+        }
+        vl dp = D;
+        qpll bfs2;
+        // id, closest w action 2
+        bfs2.push({ 1, 0 });
+        mpllb states;
+        while(sz(bfs2) > 0)
+        {
+            if(!states[bfs2.front()] && dp[bfs2.front().first - 1] >= bfs2.front().second)
+            {
+                dp[bfs2.front().first - 1] = bfs2.front().second;
+                vl &Cs = S[bfs2.front().first];
+                FORE(c, Cs)
+                {
+                    if(D[c - 1] >= D[bfs2.front().first - 1])
+                    { bfs2.push({ c, D[bfs2.front().first - 1] }); }
+                    else
+                    { bfs2.push({ c, dp[bfs2.front().first - 1] }); }            
+                }
+                vl &Cr = R[bfs2.front().first];
+                FORE(c, Cr) { bfs2.push({ c, D[c - 1] }); }
+                states[bfs2.front()] = true;
+            }
+            bfs2.pop();
+        }
+        FORE(rv, dp) { cout << rv << " "; }
+        cout << endl;
     }
-    cout << dp[N - 1][K - 1] << endl;
 }
