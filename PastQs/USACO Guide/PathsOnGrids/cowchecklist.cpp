@@ -69,22 +69,54 @@
 #define FOI(x, e, i) for(ll x = 0; x < (ll) (e); x += (ll) (i))
 #define FORE(x, C) for(auto& x : C)
 
-#define MOD (1e9 + 7)
-
 using namespace std;
+
+// http://www.usaco.org/index.php?page=viewproblem2&cpid=670
+
+ll calcE(pll &c1, pll &c2)
+{
+    ll dx = c1.first - c2.first, dy = c1.second - c2.second;
+    return dx * dx + dy * dy;
+}
 
 int main()
 {
-    ll N;
-    cin >> N;
-    vvl G(N, vl(N));
-    FOR(n, N)
+    ifstream cin("checklist.in");
+    ofstream cout("checklist.out");
+
+    ll H, G;
+    cin >> H >> G;
+    vpll Hc(H), Gc(G);
+    FOR(h, H) { cin >> Hc[h].first >> Hc[h].second; }
+    FOR(g, G) { cin >> Gc[g].first >> Gc[g].second; }
+    H++; G++;
+    vvl E(H, vl(G));
+    FOR(h, H)
     {
-        FOR(m, N)
+        FOR(g, G)
         {
-            char g;
-            cin >> g;
-            G[n][m] = g - 'A';
+            if(h > 0 && g > 0)
+            { E[h][g] = calcE(Hc[h - 1], Gc[g - 1]); }
+            elif(g > 0)
+            { E[0][g] = calcE(Gc[g - 1], Gc[g - 2]); }
+            elif(h > 0)
+            { E[h][0] = calcE(Hc[h - 1], Hc[h - 2]); }
         }
     }
+    vvvl dp(2, vvl(H, vl(G, 1e18)));
+    dp[0][1][0] = 0;
+    FOR(h, H)
+    {
+        FOR(g, G)
+        {
+            if(h > 0 && g > 0)
+            {
+                dp[0][h][g] = min(dp[0][h][g], dp[1][h - 1][g] + E[h][g]);
+                dp[1][h][g] = min(dp[1][h][g], dp[0][h][g - 1] + E[h][g]);
+            }
+            if(h > 1) { dp[0][h][g] = min(dp[0][h][g], dp[0][h - 1][g] + E[h][0]); }
+            if(g > 1) { dp[1][h][g] = min(dp[1][h][g], dp[1][h][g - 1] + E[0][g]); }
+        }
+    }
+    cout << dp[0][H - 1][ G - 1] << endl;
 }

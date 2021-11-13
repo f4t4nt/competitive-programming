@@ -69,22 +69,25 @@
 #define FOI(x, e, i) for(ll x = 0; x < (ll) (e); x += (ll) (i))
 #define FORE(x, C) for(auto& x : C)
 
-#define MOD (1e9 + 7)
-
 using namespace std;
+
+// https://cses.fi/problemset/task/1639/
 
 int main()
 {
-    ll N;
-    cin >> N;
-    vvl G(N, vl(N));
-    FOR(n, N)
+    str N, M;
+    cin >> N >> M;
+    vvl dp(sz(N) + 1, vl(sz(M) + 1));
+    FOR(n, sz(dp)) { dp[n][0] = n; }
+    FOR(m, sz(dp[0])) { dp[0][m] = m; }
+    FOB(n, 1, sz(dp))
     {
-        FOR(m, N)
+        FOB(m, 1, sz(dp[0]))
         {
-            char g;
-            cin >> g;
-            G[n][m] = g - 'A';
+            ll sub = 0;
+            if(N[n - 1] != M[m - 1]) { sub++; }
+            dp[n][m] = min(dp[n - 1][m] + 1, min(dp[n][m - 1] + 1, dp[n - 1][m - 1] + sub));
         }
     }
+    cout << dp[sz(N)][sz(M)] << endl;
 }

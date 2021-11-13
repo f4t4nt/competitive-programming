@@ -69,22 +69,29 @@
 #define FOI(x, e, i) for(ll x = 0; x < (ll) (e); x += (ll) (i))
 #define FORE(x, C) for(auto& x : C)
 
-#define MOD (1e9 + 7)
+#define MOD 1000000007
 
 using namespace std;
 
+// https://cses.fi/problemset/task/1746/
+
 int main()
 {
-    ll N;
-    cin >> N;
-    vvl G(N, vl(N));
-    FOR(n, N)
+    ll N, M, rv = 0;
+    cin >> N >> M;
+    vl X(N);
+    FOR(n, N) { cin >> X[n]; }
+    M++;
+    vvl dp(N, vl(M + 1));
+    if(X[0] == 0) { FOB(m, 1, M) { dp[0][m] = 1; } }
+    else { dp[0][X[0]] = 1; }
+    FOB(n, 1, N)
     {
-        FOR(m, N)
-        {
-            char g;
-            cin >> g;
-            G[n][m] = g - 'A';
-        }
+        if(X[n] == 0)
+        { FOB(m, 1, M) { dp[n][m] = (dp[n - 1][m - 1] + dp[n - 1][m] + dp[n - 1][m + 1]) % MOD; } }
+        else
+        { dp[n][X[n]] = (dp[n - 1][X[n] - 1] + dp[n - 1][X[n]] + dp[n - 1][X[n] + 1]) % MOD; }
     }
+    FOR(m, M) { rv += dp[N - 1][m]; }
+    cout << rv % MOD << endl;
 }

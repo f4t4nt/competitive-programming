@@ -69,22 +69,32 @@
 #define FOI(x, e, i) for(ll x = 0; x < (ll) (e); x += (ll) (i))
 #define FORE(x, C) for(auto& x : C)
 
-#define MOD (1e9 + 7)
-
 using namespace std;
+
+// http://www.usaco.org/index.php?page=viewproblem2&cpid=718
 
 int main()
 {
+    ifstream cin("nocross.in");
+    ofstream cout("nocross.out");
+
     ll N;
     cin >> N;
-    vvl G(N, vl(N));
-    FOR(n, N)
+    vl A(N), B(N);
+    FOR(n, N) { cin >> A[n]; }
+    FOR(n, N) { cin >> B[n]; }
+    N++;
+    vvl dp(N, vl(N));
+    FOB(n, 1, N)
     {
-        FOR(m, N)
+        FOB(m, 1, N)
         {
-            char g;
-            cin >> g;
-            G[n][m] = g - 'A';
+            if(abs(A[n - 1] - B[m - 1]) < 5)
+            { dp[n][m] = 1 + dp[n - 1][m - 1]; }
+            else
+            { dp[n][m] = max(dp[n - 1][m], dp[n][m - 1]); }
         }
     }
+    N--;
+    cout << dp[N][N] << endl;
 }

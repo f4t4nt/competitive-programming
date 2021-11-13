@@ -69,22 +69,49 @@
 #define FOI(x, e, i) for(ll x = 0; x < (ll) (e); x += (ll) (i))
 #define FORE(x, C) for(auto& x : C)
 
-#define MOD (1e9 + 7)
-
 using namespace std;
+
+// http://www.usaco.org/index.php?page=viewproblem2&cpid=598
+
+ll calcE(pll &c1, pll &c2)
+{
+    ll dx = c1.first - c2.first, dy = c1.second - c2.second;
+    return dx * dx + dy * dy;
+}
 
 int main()
 {
-    ll N;
-    cin >> N;
-    vvl G(N, vl(N));
-    FOR(n, N)
+    ifstream cin("radio.in");
+    ofstream cout("radio.out");
+
+    ll N, M;
+    cin >> N >> M;
+    N++; M++;
+    vpll F(N), B(M);
+    str Fseq, Bseq;
+    cin >> F[0].first >> F[0].second >> B[0].first >> B[0].second >> Fseq >> Bseq;
+    FOB(n, 1, N)
     {
-        FOR(m, N)
-        {
-            char g;
-            cin >> g;
-            G[n][m] = g - 'A';
-        }
+        F[n] = F[n - 1];
+        char &c = Fseq[n - 1];
+        if(c == 'N') { F[n].second++; }
+        elif(c == 'E') { F[n].first++; }
+        elif(c == 'W') { F[n].first--; }
+        elif(c == 'S') { F[n].second--; }
     }
+    FOB(m, 1, M)
+    {
+        B[m] = B[m - 1];
+        char &c = Bseq[m - 1];
+        if(c == 'N') { B[m].second++; }
+        elif(c == 'E') { B[m].first++; }
+        elif(c == 'W') { B[m].first--; }
+        elif(c == 'S') { B[m].second--; }
+    }
+    N++; M++;
+    vvl dp(N, vl(M, 1e18));
+    FOB(n, 1, N) { FOB(m, 1, M) { dp[n][m] = calcE(F[n - 1], B[m - 1]); } }
+    dp[0][0] = 0; dp[1][1] = 0;
+    FOB(n, 1, N) { FOB(m, 1, M) { dp[n][m] += min(dp[n - 1][m], min(dp[n][m - 1], dp[n - 1][m - 1])); } }
+    cout << dp[N - 1][M - 1] << endl;
 }
