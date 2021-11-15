@@ -69,9 +69,43 @@
 #define FOI(x, e, i) for(ll x = 0; x < (ll) e; x += (ll) i)
 #define FORE(x, C) for(auto& x : C)
  
+#define MAX (2e7 + 1)
+ 
 using namespace std;
+
+// https://codeforces.com/contest/1499/problem/D
  
 int main()
 {
-    // (>^.^)>
+    ll T;
+    cin >> T;
+    vl P(MAX), cP(MAX);
+    FOB(i, 2, MAX) { if(P[i] == 0) { FOI(j, MAX, i) { P[j] = i; } } }
+    P[0] = 0; P[1] = 1;
+    FOB(i, 2, MAX)
+    {
+        ll j = i / P[i];
+        cP[i] = cP[j];
+        if(P[j] != P[i]) { cP[i]++; }
+    }
+    FOR(t, T)
+    {
+        ll C, D, X, rv = 0;
+        cin >> C >> D >> X;
+        ll sqrtX = sqrt(X) + 1;
+        FOB(i, 1, sqrtX)
+        {
+            if(X % i == 0)
+            {
+                ll Y = i + D;
+                if(Y % C == 0) { rv += 1 << cP[Y / C]; }
+                if(i * i < X)
+                {
+                    Y = X / i + D;
+                    if(Y % C == 0) { rv += 1 << cP[Y / C]; }
+                }
+            }
+        }
+        cout << rv << endl;
+    }
 }
