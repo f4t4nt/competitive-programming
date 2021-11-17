@@ -71,7 +71,64 @@
  
 using namespace std;
 
+// http://www.usaco.org/index.php?page=viewproblem2&cpid=553
+
+constexpr ll MOD = (1e9 + 7);
+
 int main()
 {
-    
+    ifstream cin("palpath.in");
+    ofstream cout("palpath.out");
+
+    ll N;
+    cin >> N;
+    vvl G(N, vl(N));
+    FOR(n, N)
+    {
+        FOR(m, N)
+        {
+            char c;
+            cin >> c;
+            G[n][m] = c - 'A';
+        }
+    }
+    vvl dp0(N, vl(N));
+    FOR(n, N) { dp0[n][n] = 1; }
+    // vvvl dp(N, vvl(N, vl(N)));
+    // FOR(n, N) { dp[0][n][n] = 1; }
+    FOB(n, 1, N)
+    {
+        vvl dp1(N, vl(N));
+
+        FOR(r1, N)
+        {
+            // bool equal = dp[n - 1] == dp0;
+            ll c1 = N - 1 - r1 - n;
+            if(c1 < 0) { continue; }
+            FOR(r2, N)
+            {
+                ll c2 = N - 1 - r2 + n;
+                if(c2 >= N || G[r1][c1] != G[r2][c2]) { continue; }
+                dp1[r1][r2] = dp0[r1][r2];
+                if(r1 < N - 1)
+                { dp1[r1][r2] += dp0[r1 + 1][r2]; }
+                if(r2 > 0)
+                { dp1[r1][r2] += dp0[r1][r2 - 1]; }
+                if(r1 < N - 1 && r2 > 0)
+                { dp1[r1][r2] += dp0[r1 + 1][r2 - 1]; }
+                dp1[r1][r2] %= MOD;
+                // dp[n][r1][r2] = dp[n - 1][r1][r2];
+                // if(r1 < N - 1)
+                // { dp[n][r1][r2] += dp[n - 1][r1 + 1][r2]; }
+                // if(r2 > 0)
+                // { dp[n][r1][r2] += dp[n - 1][r1][r2 - 1]; }
+                // if(r1 < N - 1 && r2 > 0)
+                // { dp[n][r1][r2] += dp[n - 1][r1 + 1][r2 - 1]; }
+                // dp[n][r1][r2] %= MOD;
+            }
+        }
+        swap(dp0, dp1);
+    }
+    N--;
+    cout << dp0[0][N] << endl;
 }
