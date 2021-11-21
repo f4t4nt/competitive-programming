@@ -5,7 +5,6 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
-#include <iomanip>
 #include <iterator>
 #include <list>
 #include <map>
@@ -45,16 +44,11 @@
 #define mll map<ll, ll>
 #define mlll map<ll, mll>
 #define mlvl map<ll, vl>
-#define mlpll map<ll, pll>
-#define mlvpll map<ll, vpll>
 #define mlsl map<ll, sl>
 #define mpllb map<pll, bool>
 #define vmll vector<mll>
 #define ql queue<ll>
 #define qpll queue<pll>
-#define fl float
-#define vf vector<fl>
-#define vvf vector<vf>
 #define str string
 #define vstr vector<str>
 #define mstrl map<str, ll>
@@ -75,10 +69,38 @@
 #define FOE(x, e, b) for(auto x = (ll) e - 1; x >= (ll) b; x--)
 #define FOI(x, e, i) for(ll x = 0; x < (ll) e; x += (ll) i)
 #define FORE(x, C) for(auto& x : C)
-
+ 
 using namespace std;
 
 int main()
 {
-    // <(T_T<)
+    // ifstream cin("cbarn2.in");
+    // ofstream cout("cbarn2.out");
+
+    ll N, K, rv = 1e18;
+    cin >> N >> K;
+    vl R(N);
+    FOR(n, N) { cin >> R[n]; }
+    FOR(n, N)
+    {
+        vvpll dp(N, vpll(K, { 1e18, 1e18 }));
+        dp[0][0] = { 0, 0 };
+        FOB(m, 1, N)
+        {
+            dp[m][0] = {
+                dp[m - 1][0].first - (dp[m - 1][0].second - 1) * R[m],
+                dp[m - 1][0].second - 1 };
+            FOB(k, 1, K)
+            {
+                dp[m][k] = min(
+                     mp(dp[m - 1][k].first - (dp[m - 1][k].second - 1) * R[m],
+                        dp[m - 1][k].second - 1),
+                     mp(dp[m - 1][k - 1].first,
+                        (ll) 0));
+            }
+        }
+        rv = min(rv, dp[N - 1][K - 1].first);
+        rotate(R.begin(), R.begin() + 1, R.end());
+    }
+    cout << rv << endl;
 }

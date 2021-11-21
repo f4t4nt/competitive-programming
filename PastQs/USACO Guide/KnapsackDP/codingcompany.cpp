@@ -5,7 +5,6 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
-#include <iomanip>
 #include <iterator>
 #include <list>
 #include <map>
@@ -52,9 +51,6 @@
 #define vmll vector<mll>
 #define ql queue<ll>
 #define qpll queue<pll>
-#define fl float
-#define vf vector<fl>
-#define vvf vector<vf>
 #define str string
 #define vstr vector<str>
 #define mstrl map<str, ll>
@@ -78,7 +74,36 @@
 
 using namespace std;
 
+// https://cses.fi/problemset/task/1665/
+
+constexpr ll MOD = (1e9 + 7);
+
 int main()
 {
-    // <(T_T<)
+    ll N, X, rv = 0;
+    cin >> N >> X;
+    vl T(N);
+    FOR(n, N) { cin >> T[n]; }
+    vsort(T);
+    vvl dp0(51, vl(10001));
+    dp0[0][5000] = 1;
+    FORE(t, T)
+    {
+        vvl dp1(51, vl(10001));
+        FOR(m, 51)
+        {
+            FOR(o, 10001)
+            {
+                if(dp0[m][o])
+                {
+                    if(m + 1 < 51) { dp1[m + 1][o - t] += dp0[m][o]; dp1[m + 1][o - t] %= MOD; }
+                    dp1[m][o] += (m + 1) * dp0[m][o]; dp1[m][o] %= MOD;
+                    if(m > 0) { dp1[m - 1][o + t] += m * dp0[m][o]; dp1[m - 1][o + t] %= MOD; }
+                }
+            }
+        }
+        swap(dp0, dp1);
+    }
+    FOB(i, 5000, 5000 + X + 1) { rv += dp0[0][i]; rv %= MOD; }
+    cout << rv << endl;
 }

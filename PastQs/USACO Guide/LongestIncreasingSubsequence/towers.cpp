@@ -78,7 +78,20 @@
 
 using namespace std;
 
+// https://cses.fi/problemset/task/1073/
+
 int main()
 {
-    // <(T_T<)
+    ll N;
+    cin >> N;
+    msl T;
+    FOR(n, N)
+    {
+        ll k;
+        cin >> k;
+        auto it = T.upper_bound(k);
+        if(it == T.end()) { T.insert(k); }
+        else { T.erase(it); T.insert(k); }
+    }
+    cout << sz(T);
 }

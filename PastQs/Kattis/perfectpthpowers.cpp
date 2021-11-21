@@ -5,7 +5,6 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
-#include <iomanip>
 #include <iterator>
 #include <list>
 #include <map>
@@ -52,9 +51,6 @@
 #define vmll vector<mll>
 #define ql queue<ll>
 #define qpll queue<pll>
-#define fl float
-#define vf vector<fl>
-#define vvf vector<vf>
 #define str string
 #define vstr vector<str>
 #define mstrl map<str, ll>
@@ -78,7 +74,28 @@
 
 using namespace std;
 
+// https://open.kattis.com/problems/perfectpowers
+
 int main()
 {
-    // <(T_T<)
+    vmll ref1(33);
+    vsl ref2(33);
+    FOB(b, 2, 65536) { ref1[0][b] = 1; }
+    FOB(p, 1, 33)
+    {
+        FOB(b, 2, 63356)
+        {
+            ref1[p][b] = ref1[p - 1][b] * b;
+            if(ref1[p][b] > 4294967295) { break; }
+        }
+    }
+    FOB(p, 2, 33) { FORE(x, ref1[p]) { ref2[p].insert(x.second); } }
+    ll X;
+    while(cin >> X && X)
+    {
+        bool one = true;
+        if(X < 0) { X = -X; FORR(p, 33) { if(p % 2 == 1 && ref2[p].count(X)) { cout << p << endl; one = false; break; } } }
+        else { FORR(p, 33) { if(ref2[p].count(X)) { cout << p << endl; one = false; break; } } }
+        if(one) { cout << 1 << endl; }
+    }
 }
