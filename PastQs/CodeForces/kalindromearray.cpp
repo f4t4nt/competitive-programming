@@ -78,31 +78,42 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1610/problem/B
+
 int main()
 {
-    ll N;
-    cin >> N;
-    vl A(N), B(N);
-    FOR(n, N)
+    ll T;
+    cin >> T;
+    FOR(t, T)
     {
-        ll a;
-        cin >> a;
-        A[a - 1] = n;
+        ll N;
+        cin >> N;
+        vl A(N);
+        FOR(n, N) { cin >> A[n]; }
+        ll l1 = 0, r1 = N - 1, x, y;
+        while(l1 < r1)
+        {
+            if(A[l1] == A[r1]) { l1++; r1--; }
+            else { x = A[l1]; y = A[r1]; break; }
+        }
+        if(l1 >= r1) { cout << "YES" << endl; continue; }
+        ll l2 = l1, r2 = r1;
+        while(l2 < r2)
+        {
+            if(A[l2] == x) { l2++; }
+            elif(A[r2] == x) { r2--; }
+            elif(A[l2] == A[r2]) { l2++; r2--; }
+            else { break; }
+        }
+        if(l2 >= r2) { cout << "YES" << endl; continue; }
+        while(l1 < r1)
+        {
+            if(A[l1] == y) { l1++; }
+            elif(A[r1] == y) { r1--; }
+            elif(A[l1] == A[r1]) { l1++; r1--; }
+            else { break; }
+        }
+        if(l1 >= r1) { cout << "YES" << endl; continue; }
+        cout << "NO" << endl;
     }
-    FOR(n, N)
-    {
-        ll b;
-        cin >> b;
-        B[n] = A[b - 1];
-    }
-    vl dp;
-    FORE(b, B)
-    {
-        ll i = lower_bound(dp.begin(), dp.end(), b) - dp.begin();
-        if(i == sz(dp))
-        { dp.pb(b); }
-        else
-        { dp[i] = b; }
-    }
-    cout << sz(dp) << endl;
 }

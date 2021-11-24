@@ -78,31 +78,37 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1610/problem/C
+
+bool verify(ll &mid, ll &N, vl &A, vl &B)
+{
+    pll ref = { 0, mid - 1 };
+    ll ans = 0;
+    FOR(n, N)
+    {
+        if(ref.first <= B[n] && ref.second <= A[n])
+        { ans++; ref.first++; ref.second--; }
+    }
+    return ans >= mid;
+}
+
 int main()
 {
-    ll N;
-    cin >> N;
-    vl A(N), B(N);
-    FOR(n, N)
+    ll T;
+    cin >> T;
+    FOR(t, T)
     {
-        ll a;
-        cin >> a;
-        A[a - 1] = n;
+        ll N;
+        cin >> N;
+        vl A(N), B(N);
+        FOR(n, N) { cin >> A[n] >> B[n]; }
+        ll lo = 0, hi = N;
+        while(lo < hi)
+        {
+            ll mid = lo + (hi - lo + 1) / 2;
+            if(verify(mid, N, A, B)) { lo = mid; }
+            else { hi = mid - 1; }
+        }
+        cout << lo << endl;
     }
-    FOR(n, N)
-    {
-        ll b;
-        cin >> b;
-        B[n] = A[b - 1];
-    }
-    vl dp;
-    FORE(b, B)
-    {
-        ll i = lower_bound(dp.begin(), dp.end(), b) - dp.begin();
-        if(i == sz(dp))
-        { dp.pb(b); }
-        else
-        { dp[i] = b; }
-    }
-    cout << sz(dp) << endl;
 }

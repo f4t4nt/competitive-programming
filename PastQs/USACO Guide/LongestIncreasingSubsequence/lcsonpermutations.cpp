@@ -78,6 +78,8 @@
 
 using namespace std;
 
+// https://codeforces.com/gym/102951/problem/C
+
 int main()
 {
     ll N;

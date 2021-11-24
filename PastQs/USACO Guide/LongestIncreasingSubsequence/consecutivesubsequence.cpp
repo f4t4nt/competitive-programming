@@ -78,31 +78,39 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/977/problem/F
+
 int main()
 {
     ll N;
     cin >> N;
-    vl A(N), B(N);
+    msl S;
+    vl A(N);
+    mlpll ref;
     FOR(n, N)
     {
         ll a;
         cin >> a;
-        A[a - 1] = n;
-    }
-    FOR(n, N)
-    {
-        ll b;
-        cin >> b;
-        B[n] = A[b - 1];
-    }
-    vl dp;
-    FORE(b, B)
-    {
-        ll i = lower_bound(dp.begin(), dp.end(), b) - dp.begin();
-        if(i == sz(dp))
-        { dp.pb(b); }
+        A[n] = a;
+        auto it = S.find(a - 1);
+        if(it == S.end())
+        {
+            S.insert(a);
+            if(ref[a].first < 1)
+            { ref[a] = { 1, a }; }
+        }
         else
-        { dp[i] = b; }
+        {
+            if(ref[a].first < ref[a - 1].first + 1)
+            { ref[a] = { ref[a - 1].first + 1, a }; }
+            S.erase(it);
+            S.insert(a);        
+        }
     }
-    cout << sz(dp) << endl;
+    pll rv = { 0, 0 };
+    FORE(r, ref) { rv = max(rv, r.second); }
+    cout << rv.first << endl;
+    ll a = rv.second - rv.first + 1;
+    FOR(n, N) { if(A[n] == a) { a++; cout << n + 1 << " "; } }
+    cout << endl;
 }
