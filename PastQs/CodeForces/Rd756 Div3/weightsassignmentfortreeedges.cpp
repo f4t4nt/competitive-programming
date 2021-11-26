@@ -78,7 +78,31 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1611/problem/D
+
 int main()
 {
-    // [>*.*]>
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N;
+        cin >> N;
+        vl B(N), P(N), W(N), D(N, -1);
+        FOR(n, N) { cin >> B[n]; B[n]--; }
+        FOR(n, N) { cin >> P[n]; P[n]--; }
+        bool valid = true;
+        D[P[0]] = 0;
+        FOB(n, 1, N)
+        {
+            ll &pD = D[P[n - 1]], &cD = D[B[P[n]]];
+            if(pD < 0 || cD < 0) { valid = false; break; }
+            W[P[n]] = pD - cD + 1;
+            D[P[n]] = cD + W[P[n]];
+        }
+        if(valid)
+        { FOR(n, N) { cout << W[n] << ' '; } cout << endl; }
+        else
+        { cout << -1 << endl; }
+    }
 }

@@ -78,7 +78,23 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1611/problem/B
+
 int main()
 {
-    // [>*.*]>
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll A, B;
+        cin >> A >> B;
+        ll lo = 0, hi = min(A, B);
+        while(lo < hi)
+        {
+            ll mid = (lo + hi + 1) / 2;
+            if(A + B >= mid * 4) { lo = mid; }
+            else { hi = mid - 1; }
+        }
+        cout << lo << endl;
+    }
 }

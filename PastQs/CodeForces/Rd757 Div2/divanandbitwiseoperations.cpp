@@ -78,7 +78,40 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1614/problem/C
+
+constexpr ll MOD = 1e9 + 7;
+
+ll power2(ll x)
+{
+    if(x == 0)
+    { return 1; }
+    elif(x == 1)
+    { return 2; }
+    else
+    {
+        ll y = x / 2;
+        return (power2(y) * power2(x - y)) % MOD;
+    }
+}
+
 int main()
 {
-    // [>*.*]>
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N, M;
+        cin >> N >> M;
+        vector<pair<ll, pll>> XLR(M);
+        FOR(m, M)
+        {
+            cin >> XLR[m].second.first >> XLR[m].second.second >> XLR[m].first;
+            XLR[m].second.first--;
+            XLR[m].second.second--;
+        }
+        ll rv = 0;
+        FOR(m, M) { rv |= XLR[m].first; }
+        cout << (rv * power2(N - 1)) % MOD << endl;
+    }
 }

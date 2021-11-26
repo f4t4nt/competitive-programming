@@ -78,7 +78,28 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1611/problem/A
+
 int main()
 {
-    // [>*.*]>
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N;
+        cin >> N;
+        if(N % 2 == 0) { cout << 0 << endl; continue; }
+        bool possible = false;
+        vl D;
+        while(N > 0)
+        {
+            ll n = N % 10;
+            if(n % 2 == 0) { possible = true; }
+            D.pb(n);
+            N /= 10;
+        }
+        if(!possible) { cout << -1 << endl; }
+        elif(D[sz(D) - 1] % 2 == 0) { cout << 1 << endl; }
+        else { cout << 2 << endl; }
+    }
 }

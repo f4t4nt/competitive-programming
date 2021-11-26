@@ -78,7 +78,31 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1614/problem/A
+
 int main()
 {
-    // [>*.*]>
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N, L, R, K;
+        cin >> N >> L >> R >> K;
+        vl A;
+        FOR(n, N)
+        {
+            ll a;
+            cin >> a;
+            if(L <= a && a <= R) { A.pb(a); }
+        }
+        vsort(A);
+        ll rv = 0, total = 0;
+        FORE(a, A)
+        {
+            if(total + a > K) { break; }
+            total += a;
+            rv++;
+        }
+        cout << rv << endl;
+    }
 }

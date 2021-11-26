@@ -78,7 +78,43 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1614/problem/B
+
 int main()
 {
-    // [>*.*]>
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N;
+        cin >> N;
+        vpll A(N);
+        FOR(n, N)
+        {
+            ll a;
+            cin >> a;
+            A[n] = { a, n };
+        }
+        vsort(A);
+        ll rv1 = 0, lo = -1, hi = 1;
+        vl rv2(N);
+        FORR(n, N)
+        {
+            if(-lo < hi)
+            {
+                rv2[A[n].second] = lo;
+                rv1 += 2 * A[n].first * -lo;
+                lo--;
+            }
+            else
+            {
+                rv2[A[n].second] = hi;
+                rv1 += 2 * A[n].first * hi;
+                hi++;
+            }
+        }
+        cout << rv1 << endl << 0 << ' ';
+        FOR(n, N) { cout << rv2[n] << ' '; }
+        cout << endl;
+    }
 }
