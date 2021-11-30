@@ -78,7 +78,36 @@
     
 using namespace std;
 
+// http://www.usaco.org/index.php?page=viewproblem2&cpid=622
+
 int main()
 {
-    // (>^.^<)
+    ifstream cin("cbarn2.in");
+    ofstream cout("cbarn2.out");
+
+    ll N, K, rv = 1e18;
+    cin >> N >> K;
+    vl R(N);
+    FOR(n, N) { cin >> R[n]; }
+    N++; K++;
+    FOR(n, N)
+    {
+        vvl dp(K, vl(N, 1e18));
+        dp[0][N - 1] = 0;
+        FOB(k, 1, K)
+        {
+            FOR(n, N)
+            {
+                ll tmp = 0;
+                FOB(m, n + 1, N)
+                {
+                    tmp += R[m - 1] * (m - n - 1);
+                    dp[k][n] = min(dp[k][n], tmp + dp[k - 1][m]);
+                }
+            }
+        }
+        rv = min(rv, dp[K - 1][0]);
+        rotate(R.begin(), R.begin() + 1, R.end());
+    }
+    cout << rv << endl;
 }

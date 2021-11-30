@@ -5,6 +5,7 @@
 #include <fstream>
 #include <functional>
 #include <iostream>
+#include <iomanip>
 #include <iterator>
 #include <list>
 #include <map>
@@ -21,7 +22,7 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
- 
+
 #define ll long long
 #define pll pair<ll, ll>
 #define vi vector<int>
@@ -44,15 +45,20 @@
 #define mll map<ll, ll>
 #define mlll map<ll, mll>
 #define mlvl map<ll, vl>
+#define mlpll map<ll, pll>
+#define mlvpll map<ll, vpll>
 #define mlsl map<ll, sl>
 #define mpllb map<pll, bool>
 #define vmll vector<mll>
 #define ql queue<ll>
 #define qpll queue<pll>
+#define fl float
+#define vf vector<fl>
+#define vvf vector<vf>
 #define str string
 #define vstr vector<str>
 #define mstrl map<str, ll>
- 
+    
 #define pb push_back
 #define mp make_pair
 #define elif else if
@@ -61,7 +67,7 @@
 #define last_elem(C) (*(C.rbegin()))
 #define max_elem(C) (*max_element(C.begin(), C.end()))
 #define min_elem(C) (*min_element(C.begin(), C.end()))
- 
+    
 #define FIND(x, v) find(x.begin(), x.end(), v)
 #define FOR(x, e) for(ll  x = 0; x < (ll) e; x++)
 #define FORR(x, e) for(ll x = (ll) e - 1; x >= (ll) 0; x--)
@@ -69,38 +75,30 @@
 #define FOE(x, e, b) for(auto x = (ll) e - 1; x >= (ll) b; x--)
 #define FOI(x, e, i) for(ll x = 0; x < (ll) e; x += (ll) i)
 #define FORE(x, C) for(auto& x : C)
- 
+    
 using namespace std;
+
+// https://codeforces.com/contest/1614/problem/D1
+
+constexpr ll MAX = 5 * 1e6 + 1;
 
 int main()
 {
-    // ifstream cin("cbarn2.in");
-    // ofstream cout("cbarn2.out");
-
-    ll N, K, rv = 1e18;
-    cin >> N >> K;
-    vl R(N);
-    FOR(n, N) { cin >> R[n]; }
+    ll N, rv = 0;
+    cin >> N;
+    vl ref(MAX), dp(MAX);
     FOR(n, N)
     {
-        vvpll dp(N, vpll(K, { 1e18, 1e18 }));
-        dp[0][0] = { 0, 0 };
-        FOB(m, 1, N)
-        {
-            dp[m][0] = {
-                dp[m - 1][0].first - (dp[m - 1][0].second - 1) * R[m],
-                dp[m - 1][0].second - 1 };
-            FOB(k, 1, K)
-            {
-                dp[m][k] = min(
-                     mp(dp[m - 1][k].first - (dp[m - 1][k].second - 1) * R[m],
-                        dp[m - 1][k].second - 1),
-                     mp(dp[m - 1][k - 1].first,
-                        (ll) 0));
-            }
-        }
-        rv = min(rv, dp[N - 1][K - 1].first);
-        rotate(R.begin(), R.begin() + 1, R.end());
+        ll a;
+        cin >> a;
+        ref[a]++;
+    }
+    FOB(i, 1, MAX) { for(ll j = 2 * i; j <= MAX; j += i) { ref[i] += ref[j]; } }
+    dp[1] = ref[1];
+    FOB(i, 1, MAX)
+    {
+        for(ll j = 2 * i; j <= MAX; j += i) { dp[j] = max(dp[j], ref[j] * (j - i) + dp[i]); }
+        rv = max(rv, dp[i]);
     }
     cout << rv << endl;
 }

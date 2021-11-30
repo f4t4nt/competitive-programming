@@ -78,7 +78,48 @@
     
 using namespace std;
 
+// https://codeforces.com/contest/837/problem/D
+
+constexpr ll MAX = 5001;
+    
+ll numPow(ll &a, ll x)
+{
+    ll rv = 0;
+    while(a % x == 0) { a /= x; rv++; }
+    return rv;
+}
+    
 int main()
 {
-    // (>^.^<)
+    ll N, K;
+    cin >> N >> K;
+    vpll A(N);
+    FOR(n, N)
+    {
+        ll a;
+        cin >> a;
+        A[n] = { numPow(a, 2), numPow(a, 5) };
+    }
+    K++;
+    ll rv = 0;
+    vvl dp0(K, vl(MAX, -1e18));
+    dp0[0][0] = 0;
+    FOR(n, N)
+    {
+        vvl dp1 = dp0;
+        FOR(k, min(n + 1, K))
+        {
+            FOR(i, MAX)
+            {
+                ll k2 = k + 1, i2 = i + A[n].second;
+                if(k2 < K && i2 < MAX)
+                {
+                    dp1[k2][i2] = max(dp1[k2][i2], dp0[k][i] + A[n].first);
+                    rv = max(rv, min(i2, dp1[k2][i2]));
+                }
+            }
+        }        
+        swap(dp0, dp1);
+    }
+    cout << rv << endl;
 }

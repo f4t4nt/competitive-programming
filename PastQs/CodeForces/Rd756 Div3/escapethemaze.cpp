@@ -78,7 +78,65 @@
     
 using namespace std;
 
+// https://codeforces.com/contest/1611/problem/E1
+
 int main()
 {
-    // (>^.^<)
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N, K;
+        cin >> N >> K;
+        vl T(N);
+        T[0] = 1;
+        vl bfs1, bfs2;
+        bfs1.pb(0);
+        FOR(k, K)
+        {
+            ll x;
+            cin >> x;
+            T[x - 1] = 2;
+            bfs2.pb(x - 1);
+        }
+        vvl R(N);
+        N--;
+        FOR(n, N)
+        {
+            ll u, v;
+            cin >> u >> v;
+            R[u - 1].pb(v - 1);
+            R[v - 1].pb(u - 1);
+        }
+        bool possible = false;
+        while(sz(bfs1) && sz(bfs2) && !possible)
+        {
+            vl tmp1, tmp2;
+            FORE(b, bfs2)
+            {
+                FORE(n, R[b])
+                {
+                    if(T[n] < 2) { T[n] = 2; tmp2.pb(n); }
+                }
+            }
+            swap(bfs2, tmp2);
+            FORE(b, bfs1)
+            {
+                FORE(n, R[b])
+                {
+                    if(T[n] == 0)
+                    {
+                        T[n] = 1;
+                        tmp1.pb(n);
+                        if(sz(R[n]) == 1) { possible = true; }
+                    }
+                }
+            }
+            swap(bfs1, tmp1);
+        }
+        if(possible)
+        { cout << "yes" << endl; }
+        else
+        { cout << "no" << endl; }
+    }
 }
