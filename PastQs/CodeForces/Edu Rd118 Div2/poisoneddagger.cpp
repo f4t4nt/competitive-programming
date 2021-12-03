@@ -78,12 +78,38 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1613/problem/C
+
+bool verify(ll &mid, ll &N, ll &H, vl &B, vl &C)
+{
+    ll i = lower_bound(B.begin(), B.end(), mid) - B.begin();
+    return H > mid * (N - i) + C[i];
+}
+
 int main()
 {
-//                                              _             _                     
-//   ___    ___      _ __ ___    _   _    ___  | |__       __| |  _ __              
-//  / __|  / _ \    | '_ ` _ \  | | | |  / __| | '_ \     / _` | | '_ \             
-//  \__ \ | (_) |   | | | | | | | |_| | | (__  | | | |   | (_| | | |_) |  _   _   _ 
-//  |___/  \___/    |_| |_| |_|  \__,_|  \___| |_| |_|    \__,_| | .__/  (_) (_) (_)
-//                                                               |_|                
+    ll T;
+    cin >> T;
+    FOR(t, T)
+    {
+        ll N, H;
+        cin >> N >> H;
+        vl A(N), B(N), C(N + 1);
+        FOR(n, N)
+        {
+            cin >> A[n];
+            if(n > 0) { B[n - 1] = A[n] - A[n - 1]; }
+        }
+        B[N - 1] = 1e18;
+        vsort(B);
+        FOR(n, N) { C[n + 1] = C[n] + B[n]; }
+        ll lo = 0, hi = 1e18 + 1;
+        while(lo < hi)
+        {
+            ll mid = lo + (hi - lo + 1) / 2;
+            if(verify(mid, N, H, B, C)) { lo = mid; }
+            else { hi = mid - 1; }
+        }
+        cout << lo + 1 << endl;
+    }
 }

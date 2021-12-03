@@ -78,12 +78,41 @@
 
 using namespace std;
 
+// http://www.usaco.org/index.php?page=viewproblem2&cpid=815
+
 int main()
 {
-//                                              _             _                     
-//   ___    ___      _ __ ___    _   _    ___  | |__       __| |  _ __              
-//  / __|  / _ \    | '_ ` _ \  | | | |  / __| | '_ \     / _` | | '_ \             
-//  \__ \ | (_) |   | | | | | | | |_| | | (__  | | | |   | (_| | | |_) |  _   _   _ 
-//  |___/  \___/    |_| |_| |_|  \__,_|  \___| |_| |_|    \__,_| | .__/  (_) (_) (_)
-//                                                               |_|                
+    ifstream cin("taming.in");
+    ofstream cout("taming.out");
+
+    ll N;
+    cin >> N;
+    vl A(N);
+    FOR(n, N) { cin >> A[n]; }
+    vvvl dp(N, vvl(N, vl(N + 1, 1e18)));
+    dp[0][0][1] = 0;
+    FOR(n, N)
+    {
+        FOR(m1, n + 1)
+        {
+            FOB(o, 1, n + 2)
+            {
+                if(m1 < n)
+                { dp[n][m1][o] = dp[n - 1][m1][o]; }
+                else
+                {
+                    FOR(m2, n)
+                    { dp[n][m1][o] = min(dp[n][m1][o], dp[n - 1][m2][o - 1]); }
+                }
+                if(A[n] != n - m1)
+                { dp[n][m1][o]++; }
+            }
+        }
+    }
+    FOB(o, 1, N + 1)
+    {
+        ll rv = 1e18;
+        FOR(m, N) { rv = min(rv, dp[N - 1][m][o]); }
+        cout << rv << endl;
+    }
 }

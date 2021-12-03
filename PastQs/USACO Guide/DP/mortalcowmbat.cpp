@@ -78,12 +78,40 @@
 
 using namespace std;
 
+// http://www.usaco.org/index.php?page=viewproblem2&cpid=971
+
 int main()
 {
-//                                              _             _                     
-//   ___    ___      _ __ ___    _   _    ___  | |__       __| |  _ __              
-//  / __|  / _ \    | '_ ` _ \  | | | |  / __| | '_ \     / _` | | '_ \             
-//  \__ \ | (_) |   | | | | | | | |_| | | (__  | | | |   | (_| | | |_) |  _   _   _ 
-//  |___/  \___/    |_| |_| |_|  \__,_|  \___| |_| |_|    \__,_| | .__/  (_) (_) (_)
-//                                                               |_|                
+    ifstream cin("cowmbat.in");
+    ofstream cout("cowmbat.out");
+
+    ll N, M, K;
+    cin >> N >> M >> K;
+    vl S(N);
+    FOR(n, N)
+    {
+        char c;
+        cin >> c;
+        S[n] = c - 'a';
+    }
+    vvl A(M, vl(M));
+    FOR(m1, M) { FOR(m2, M) { cin >> A[m1][m2]; } }
+    FOR(m1, M) { FOR(m2, M) { FOR(m3, M) { A[m2][m3] = min(A[m2][m3], A[m2][m1] + A[m1][m3]); } } }
+    N++;
+    vvl ref(M, vl(N));
+    FOR(m, M) { FOB(n, 1, N) { ref[m][n] = ref[m][n - 1] + A[S[n - 1]][m]; } }
+    M++;
+    vvl dp(N, vl(M, 1e18));
+    dp[0][0] = 0;
+    FOB(n, K, N)
+    {
+        FOB(m, 1, M)
+        {
+            dp[n][m] = min(dp[n][m],
+                min(dp[n - K][0] + ref[m - 1][n] - ref[m - 1][n - K],
+                    dp[n - 1][m] + A[S[n - 1]][m - 1]));
+            dp[n][0] = min(dp[n][0], dp[n][m]);
+        }
+    }
+    cout << dp[N - 1][0] << endl;
 }

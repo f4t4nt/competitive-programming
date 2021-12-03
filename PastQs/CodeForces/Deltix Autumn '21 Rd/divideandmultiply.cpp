@@ -75,15 +75,26 @@
 #define FOE(x, e, b) for(auto x = (ll) e - 1; x >= (ll) b; x--)
 #define FOI(x, e, i) for(ll x = 0; x < (ll) e; x += (ll) i)
 #define FORE(x, C) for(auto& x : C)
-
+    
 using namespace std;
+
+// https://codeforces.com/contest/1609/problem/A
 
 int main()
 {
-//                                              _             _                     
-//   ___    ___      _ __ ___    _   _    ___  | |__       __| |  _ __              
-//  / __|  / _ \    | '_ ` _ \  | | | |  / __| | '_ \     / _` | | '_ \             
-//  \__ \ | (_) |   | | | | | | | |_| | | (__  | | | |   | (_| | | |_) |  _   _   _ 
-//  |___/  \___/    |_| |_| |_|  \__,_|  \___| |_| |_|    \__,_| | .__/  (_) (_) (_)
-//                                                               |_|                
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N, rv = 1;
+        cin >> N;
+        vl A(N);
+        FOR(n, N) { cin >> A[n]; }
+        FOR(n, N) { while(A[n] % 2 == 0) { A[n] /= 2; rv *= 2; } }
+        vsort(A);
+        N--;
+        rv *= A[N];
+        FOR(n, N) { rv += A[n]; }
+        cout << rv << endl;
+    }
 }

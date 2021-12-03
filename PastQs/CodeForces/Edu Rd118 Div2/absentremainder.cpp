@@ -78,12 +78,30 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1613/problem/B
+
 int main()
 {
-//                                              _             _                     
-//   ___    ___      _ __ ___    _   _    ___  | |__       __| |  _ __              
-//  / __|  / _ \    | '_ ` _ \  | | | |  / __| | '_ \     / _` | | '_ \             
-//  \__ \ | (_) |   | | | | | | | |_| | | (__  | | | |   | (_| | | |_) |  _   _   _ 
-//  |___/  \___/    |_| |_| |_|  \__,_|  \___| |_| |_|    \__,_| | .__/  (_) (_) (_)
-//                                                               |_|                
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N;
+        cin >> N;
+        vl A(N);
+        sl S;
+        FOR(n, N) { cin >> A[n]; S.insert(A[n]); }
+        vsort(A);
+        ll l = 0, r = N - 1, n = 0;
+        while(l < r && n < N / 2)
+        {
+            if(S.find(A[r] % A[l]) == S.end())
+            {
+                cout << A[r] << ' ' << A[l] << endl;
+                n++;
+            }
+            if(S.find(A[r - 1] % A[l]) == S.end()) { r--; }
+            else { l++; }
+        }
+    }
 }
