@@ -77,8 +77,34 @@
 #define FORE(x, C) for(auto& x : C)
 
 using namespace std;
- 
+
+// https://codeforces.com/contest/1614/problem/D2
+
+constexpr ll MAX = 2 * 1e7 + 1;
+
 int main()
 {
-    // (^o.O)>
+    ll N, rv = 0;
+    cin >> N;
+    vb refp(MAX, true);
+    FOB(i, 2, sqrt(MAX) + 1) { if(refp[i]) { for(ll j = 2 * i; j <= MAX; j += i) { refp[j] = false; } } }
+    vl p, ref(MAX), dp(MAX);
+    FOB(i, 2, MAX) { if(refp[i]) { p.pb(i); } }
+    FOR(n, N)
+    {
+        ll a;
+        cin >> a;
+        ref[a]++;
+    }
+    FORE(i, p) { FORR(j, MAX / i + 1) { if(!j) { break; } ref[j] += ref[i * j]; } }
+    FORR(i, MAX)
+    {
+        if(!i) { break; }
+        dp[i] = i * ref[i];
+        // for(ll j = 2 * i; j < MAX; j += i) { dp[i] = max(dp[i], dp[j] + i * (ref[i] - ref[j])); }
+        ll j = 0;
+        while(j < sz(p) && p[j] * i < MAX) { dp[i] = max(dp[i], dp[p[j] * i] + i * (ref[i] - ref[p[j] * i])); j++; }
+        rv = max(rv, dp[i]);
+    }
+    cout << rv << endl;
 }

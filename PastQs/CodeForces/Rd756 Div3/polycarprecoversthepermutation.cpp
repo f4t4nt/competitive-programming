@@ -77,8 +77,22 @@
 #define FORE(x, C) for(auto& x : C)
 
 using namespace std;
- 
+
+// https://codeforces.com/contest/1611/problem/C
+
 int main()
 {
-    // (^o.O)>
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N;
+        cin >> N;
+        vl A(N);
+        FOR(n, N) { cin >> A[n]; }
+        if(A[0] != N && A[N - 1] != N)
+        { cout << -1 << endl; }
+        else
+        { FORR(n, N) { cout << A[n] << ' '; } cout << endl; }
+    }
 }
