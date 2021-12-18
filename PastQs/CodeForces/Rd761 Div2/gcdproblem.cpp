@@ -79,7 +79,25 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1617/problem/B
+
+ll gcd(ll x, ll y)
+{
+	if(!y) { return x; }
+	else { return gcd(y, x % y); }
+}
+
 int main()
 {
-	
+	ll T;
+	cin >> T;
+	while(T--)
+	{
+		ll N;
+		cin >> N;
+		ll a = 2, b = N - 3;
+		while(gcd(a, b) - 1)
+		{ a++; b--; }
+		cout << a << ' ' << b << " 1\n";
+	}
 }

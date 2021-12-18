@@ -63,8 +63,7 @@
 #define mp make_pair
 #define elif else if
 #define sz(x) (ll) x.size()
-#define ssort(x) sort(x.begin(), x.end())
-#define rsort(x) sort(x.begin(), x.end(), greater<>())
+#define vsort(x) sort(x.begin(), x.end())
 #define last_elem(C) (*(C.rbegin()))
 #define max_elem(C) (*max_element(C.begin(), C.end()))
 #define min_elem(C) (*min_element(C.begin(), C.end()))
@@ -79,7 +78,33 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1612/problem/C
+
+bool verify(ll &mid, ll &K, ll &X)
+{
+    ll rv;
+    if(mid <= K)
+    { rv = mid * (mid + 1) / 2; }
+    else
+    { rv = K * K - (2 * K - 1 - mid) * (2 * K - mid) / 2; }
+    return rv < X;
+}
+
 int main()
 {
-	
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll K, X;
+        cin >> K >> X;
+        ll lo = 0, hi = 2 * K;
+        while(lo < hi)
+        {
+            ll mid = (hi + lo + 1) / 2;
+            if(verify(mid, K, X)) { lo = mid; }
+            else { hi = mid - 1; }
+        }
+        cout << min(2 * K - 1, lo + 1) << '\n';
+    }
 }

@@ -79,7 +79,48 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1617/problem/C
+
 int main()
 {
-	
+	ll T;
+	cin >> T;
+	while(T--)
+	{
+		ll N;
+		cin >> N;
+		ll rv = N;
+		vl A(N);
+		msl B;
+		vb ref(N);
+		FOR(n, N)
+		{
+			cin >> A[n];
+			if(A[n] <= N && !ref[A[n] - 1])
+			{ ref[A[n] - 1] = true; rv--; }
+			else
+			{ B.insert(A[n]); }
+		}
+		FORR(n, N)
+		{
+			if(ref[n]) { continue; }
+			else
+			{
+				auto it = B.rbegin();
+				while(it != B.rend())
+				{
+					if(*it > n * 2 + 2)
+					{ ref[n] = true; B.erase(B.find(*it)); break; }
+					it++;
+				}
+			}
+		}
+		bool valid = true;
+		FOR(n, N)
+		{ valid = valid && ref[n]; }
+		if(valid)
+		{ cout << rv << '\n'; }
+		else
+		{ cout << -1 << '\n'; }
+	}
 }

@@ -79,7 +79,22 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1620/problem/A
+
 int main()
 {
-	
+	ll T;
+	cin >> T;
+	while(T--)
+	{
+		str S;
+		cin >> S;
+		ll N = sz(S), rv = 0;
+		FOR(n, N)
+		{ if(S[n] == 'N') { rv++; } }
+		if(rv == 1)
+		{ cout << "NO\n"; }
+		else
+		{ cout << "YES\n"; }
+	}
 }

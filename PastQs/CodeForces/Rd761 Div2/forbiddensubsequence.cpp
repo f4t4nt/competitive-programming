@@ -79,7 +79,65 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1617/problem/A
+
+void printStr(vl &S)
+{
+	FOR(s, sz(S))
+	{
+		cout << (char) ('a' + S[s]);
+	}
+	cout << '\n';
+	return;
+}
+
+bool subseq(vl &S, vl &T)
+{
+	ll t = 0;
+	FOR(s, sz(S))
+	{
+		if(t == sz(T)) { return true; }
+		if(S[s] == T[t]) { t++; }
+	}
+	if(t == sz(T)) { return true; }
+	return false;
+}
+
 int main()
 {
-	
+	ll T;
+	cin >> T;
+	while(T--)
+	{
+		str S, T;
+		cin >> S >> T;
+		vl Sv1, Tv1, Tv2;
+		FOR(s, sz(S)) { Sv1.pb(S[s] - 'a'); }
+		FOR(t, sz(T)) { Tv1.pb(T[t] - 'a'); }
+		Tv2 = Tv1;
+		ssort(Sv1);
+		ssort(Tv2);
+		if(Tv1 != Tv2) { printStr(Sv1); }
+		else
+		{
+			bool x = subseq(Sv1, Tv2);
+			if(!x) { printStr(Sv1); }
+			else
+			{
+				vl Sv2;
+				ll bCnt = 0, s = 0;
+				while(s < sz(Sv1) && Sv1[s] <= 2)
+				{
+					if(Sv1[s] == 1) { bCnt++; }
+					else { Sv2.pb(Sv1[s]); }
+					s++;
+				}
+				FOR(b, bCnt)
+				{ Sv2.pb(1); }
+				while(s < sz(Sv1))
+				{ Sv2.pb(Sv1[s]); s++; }
+				printStr(Sv2);
+			}
+		}
+	}
 }

@@ -63,8 +63,7 @@
 #define mp make_pair
 #define elif else if
 #define sz(x) (ll) x.size()
-#define ssort(x) sort(x.begin(), x.end())
-#define rsort(x) sort(x.begin(), x.end(), greater<>())
+#define vsort(x) sort(x.begin(), x.end())
 #define last_elem(C) (*(C.rbegin()))
 #define max_elem(C) (*max_element(C.begin(), C.end()))
 #define min_elem(C) (*min_element(C.begin(), C.end()))
@@ -79,7 +78,23 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1612/problem/B
+ 
 int main()
 {
-	
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N, A, B;
+        cin >> N >> A >> B;
+        vl rv;
+        rv.pb(A);
+        FORR(n, N) { if(n + 1 != A && n + 1 != B) { rv.pb(n + 1); } }
+        rv.pb(B);
+        if(rv[N / 2 - 1] < A || rv[N / 2] > B)
+        { cout << - 1 << endl; }
+        else
+        { FORE(r, rv) { cout << r << ' '; } cout << '\n'; }
+    }
 }

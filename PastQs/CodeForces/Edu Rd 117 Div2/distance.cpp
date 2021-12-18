@@ -63,8 +63,7 @@
 #define mp make_pair
 #define elif else if
 #define sz(x) (ll) x.size()
-#define ssort(x) sort(x.begin(), x.end())
-#define rsort(x) sort(x.begin(), x.end(), greater<>())
+#define vsort(x) sort(x.begin(), x.end())
 #define last_elem(C) (*(C.rbegin()))
 #define max_elem(C) (*max_element(C.begin(), C.end()))
 #define min_elem(C) (*min_element(C.begin(), C.end()))
@@ -79,7 +78,24 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1612/problem/A
+ 
 int main()
 {
-	
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll X, Y;
+        cin >> X >> Y;
+        if((X + Y) % 2)
+        { cout << "-1 -1\n";}
+        else
+        {
+            if(X > Y)
+            { cout << (X + Y) / 2 - Y << ' ' << Y << '\n'; }
+            else
+            { cout << X << ' ' << (X + Y) / 2 - X << '\n'; }
+        }
+    }
 }

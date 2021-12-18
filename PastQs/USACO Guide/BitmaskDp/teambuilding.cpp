@@ -79,7 +79,38 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1316/problem/E
+
+ll bitcount(ll x)
+{
+	ll rv = 0;
+	while(x > 0) { rv++; x &= (x - 1); }
+	return rv;
+}
+
 int main()
 {
-	
+	ll N, P, K;
+	cin >> N >> P >> K;
+	vpll A(N);
+	FOR(n, N) { cin >> A[n].first; A[n].second = n; }
+	rsort(A);
+	vvl S(N, vl(P));
+	FOR(n, N) { FOR(p, P) { cin >> S[n][p]; } }
+	N++;
+	vvl dp(N, vl(1 << P, -1e18));
+	dp[0][0] = 0;
+	FOB(n, 1, N)
+	{
+		FOR(x, 1 << P)
+		{
+			dp[n][x] = dp[n - 1][x];
+			if(n - bitcount(x) <= K)
+			{ dp[n][x] += A[n - 1].first; }
+			FOR(p, P)
+			{ if(x & (1 << p)) { dp[n][x] = max(dp[n - 1][x ^ (1 << p)] + S[A[n - 1].second][p], dp[n][x]); } }
+		}
+	}
+	N--;
+	cout << dp[N][(1 << P) - 1] << '\n';
 }

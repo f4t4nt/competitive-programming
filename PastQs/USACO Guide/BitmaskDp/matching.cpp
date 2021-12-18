@@ -63,8 +63,7 @@
 #define mp make_pair
 #define elif else if
 #define sz(x) (ll) x.size()
-#define ssort(x) sort(x.begin(), x.end())
-#define rsort(x) sort(x.begin(), x.end(), greater<>())
+#define vsort(x) sort(x.begin(), x.end())
 #define last_elem(C) (*(C.rbegin()))
 #define max_elem(C) (*max_element(C.begin(), C.end()))
 #define min_elem(C) (*min_element(C.begin(), C.end()))
@@ -79,7 +78,44 @@
 
 using namespace std;
 
+// https://atcoder.jp/contests/dp/tasks/dp_o?lang=en
+
+constexpr ll MOD = 1e9 + 7;
+
+ll bitcount(ll x)
+{
+	ll rv = 0;
+	while(x > 0) { rv++; x &= (x - 1); }
+	return rv;
+}
+
 int main()
 {
-	
+	ll N;
+	cin >> N;
+	vvb ref(N, vb(N));
+	vl dp(1 << N);
+	FOR(n, N)
+	{
+		FOR(m, N)
+		{
+			ll tmp;
+			cin >> tmp;
+			ref[n][m] = tmp;
+		}
+	}
+	dp[0] = 1;
+	FOR(x, 1 << N)
+	{
+		ll n = bitcount(x);
+		FOR(m, N)
+		{
+			if(!(x & (1 << m)) && ref[n][m])
+			{
+				dp[x | (1 << m)] += dp[x];
+				dp[x | (1 << m)] %= MOD;
+			}
+		}
+	}
+	cout << dp[(1 << N) - 1] << '\n';
 }

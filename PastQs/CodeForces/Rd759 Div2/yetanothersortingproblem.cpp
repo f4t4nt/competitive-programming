@@ -63,8 +63,7 @@
 #define mp make_pair
 #define elif else if
 #define sz(x) (ll) x.size()
-#define ssort(x) sort(x.begin(), x.end())
-#define rsort(x) sort(x.begin(), x.end(), greater<>())
+#define vsort(x) sort(x.begin(), x.end())
 #define last_elem(C) (*(C.rbegin()))
 #define max_elem(C) (*max_element(C.begin(), C.end()))
 #define min_elem(C) (*min_element(C.begin(), C.end()))
@@ -79,7 +78,55 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1591/problem/D
+
+ll mergeInv(vl &A0, vl &A1, ll lo, ll mid, ll hi)
+{
+	ll i = lo, j = mid, k = lo, rv = 0;
+	while(i < mid && j < hi)
+	{
+		if(A0[i] > A0[j])
+		{
+			A1[k++] = A0[j++];
+			rv += mid - i;
+		}
+		else
+		{ A1[k++] = A0[i++]; }
+	}
+	while(i < mid)
+	{ A1[k++] = A0[i++]; }
+	while(j < hi)
+	{ A1[k++] = A0[j++]; }
+	FOB(n, lo, hi)
+	{ A0[n] = A1[n]; }
+	return rv;
+}
+
+ll numInv(vl &A0, vl &A1, ll lo, ll hi)
+{
+	ll rv = 0;
+	if(hi > lo)
+	{
+		ll mid = (lo + hi) / 2;
+		rv += numInv(A0, A1, lo, mid);
+		rv += numInv(A0, A1, mid + 1, hi);
+		rv += mergeInv(A0, A1, lo, mid + 1, hi + 1);
+	}
+	return rv;
+}
+
 int main()
 {
-	
+	ll T;
+	cin >> T;
+	while(T--)
+	{
+		ll N;
+		cin >> N;
+		sl S;
+		vl A0(N), A1(N);
+		FOR(n, N) { cin >> A0[n]; S.insert(A0[n]); }
+		if(numInv(A0, A1, 0, N - 1) % 2 && sz(A0) == sz(S)) { cout << "NO\n"; }
+		else { cout << "YES\n"; }
+	}
 }

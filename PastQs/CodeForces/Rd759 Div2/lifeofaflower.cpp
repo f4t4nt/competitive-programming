@@ -63,8 +63,7 @@
 #define mp make_pair
 #define elif else if
 #define sz(x) (ll) x.size()
-#define ssort(x) sort(x.begin(), x.end())
-#define rsort(x) sort(x.begin(), x.end(), greater<>())
+#define vsort(x) sort(x.begin(), x.end())
 #define last_elem(C) (*(C.rbegin()))
 #define max_elem(C) (*max_element(C.begin(), C.end()))
 #define min_elem(C) (*min_element(C.begin(), C.end()))
@@ -79,7 +78,32 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1591/problem/A
+
 int main()
 {
-	
+	ll T;
+	cin >> T;
+	while(T--)
+	{
+		ll N, rv = 1, ref1 = 0, ref2 = 0;
+		cin >> N;
+		vl A(N);
+		FOR(n, N) { cin >> A[n]; }
+		FOR(n, N)
+		{
+			if(A[n])
+			{ ref1 = 0; ref2++; }
+			else
+			{ ref1++; ref2 = 0; }
+			if(ref1 > 1)
+			{ cout << -1 << '\n'; break; }
+			elif(ref2 == 1)
+			{ rv++; }
+			elif(ref2 > 1)
+			{ rv += 5; }
+		}
+		if(ref1 < 2)
+		{ cout << rv << '\n'; }
+	}
 }

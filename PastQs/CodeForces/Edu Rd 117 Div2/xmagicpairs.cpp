@@ -63,8 +63,7 @@
 #define mp make_pair
 #define elif else if
 #define sz(x) (ll) x.size()
-#define ssort(x) sort(x.begin(), x.end())
-#define rsort(x) sort(x.begin(), x.end(), greater<>())
+#define vsort(x) sort(x.begin(), x.end())
 #define last_elem(C) (*(C.rbegin()))
 #define max_elem(C) (*max_element(C.begin(), C.end()))
 #define min_elem(C) (*min_element(C.begin(), C.end()))
@@ -79,7 +78,27 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1612/problem/D
+
 int main()
 {
-	
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll A, B, X;
+        cin >> A >> B >> X;
+        while(B)
+        {
+            if(A == X || B == X) { break; }
+            if(A < B) { swap(A, B); }
+            if(B > A - B) { B = A - B; }
+            if(X > A || !B) { break; }
+            A -= B * max(1ll, (A - max(B, X)) / (2 * B));
+        }
+        if(A == X || B == X)
+        { cout << "YES\n"; }
+        else
+        { cout << "NO\n"; }
+    }
 }

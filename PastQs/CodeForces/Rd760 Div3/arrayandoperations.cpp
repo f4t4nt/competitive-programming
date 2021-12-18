@@ -79,7 +79,24 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1618/problem/D
+
 int main()
 {
-	
+	ll T;
+	cin >> T;
+	while(T--)
+	{
+		ll N, K, rv = 0;
+		cin >> N >> K;
+		vl A(N);
+		FOR(n, N) { cin >> A[n]; }
+		ssort(A);
+		vb ref(N);
+		FOR(n, N - 2 * K)
+		{ rv += A[n]; }
+		FOB(n, N - 2 * K, N - K)
+		{ rv += A[n] / A[n + K]; }
+		cout << rv << '\n';
+	}
 }

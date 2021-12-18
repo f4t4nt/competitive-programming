@@ -79,7 +79,39 @@
 
 using namespace std;
 
+// http://www.usaco.org/index.php?page=viewproblem2&cpid=673
+
+constexpr ll MOD = 1e9 + 9;
+
 int main()
 {
-	
+    ifstream cin("team.in");
+    ofstream cout("team.out");
+
+	ll N, M, K;
+	cin >> N >> M >> K;
+	vl J(N), P(M);
+	FOR(n, N) { cin >> J[n]; }
+	FOR(m, M) { cin >> P[m]; }
+	ssort(J);
+	ssort(P);
+	N++; M++; K++;
+	vvvl dp(K, vvl(N, vl(M, MOD)));
+	FOR(n, N) { FOR(m, M) { dp[0][n][m] = 1; } }
+	FOB(k, 1, K)
+	{
+		FOB(n, 1, N)
+		{
+			FOB(m, 1, M)
+			{
+				dp[k][n][m] += dp[k][n - 1][m];
+				dp[k][n][m] += dp[k][n][m - 1];
+				dp[k][n][m] -= dp[k][n - 1][m - 1];
+				if(J[n - 1] > P[m - 1])
+				{ dp[k][n][m] += dp[k - 1][n - 1][m - 1]; }
+				dp[k][n][m] %= MOD;
+			}
+		}
+	}
+	cout << dp[K - 1][N - 1][M - 1] << '\n';
 }

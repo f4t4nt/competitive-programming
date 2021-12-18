@@ -79,7 +79,41 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1617/problem/D1
+
 int main()
 {
-	
+	ll T;
+	cin >> T;
+	while(T--)
+	{
+		ll N, x, y;
+		vl rv;
+		cin >> N;
+		ll prev = 2, curr = 0;
+		FOB(n, 1, N - 1)
+		{
+			cout << "? " << n << ' ' << n + 1 << ' ' << n + 2 << endl;
+			cin >> curr;
+			if(!prev && curr && prev < 2)
+			{ x = n - 1; y = n + 2; break; }
+			elif(prev && !curr && prev < 2)
+			{ x = n + 2; y = n - 1; break; }
+			prev = curr;
+		}
+		rv.pb(x);
+		FOB(n, 1, N + 1)
+		{
+			if(x == n || y == n)
+			{ continue; }
+			cout << "? " << x << ' ' << y << ' ' << n << endl;
+			cin >> curr;
+			if(!curr)
+			{ rv.pb(n); }
+		}
+		cout << "! " << sz(rv) << ' ';
+		FOR(i, sz(rv))
+		{ cout << rv[i] << ' '; }
+		cout << endl;
+	}
 }

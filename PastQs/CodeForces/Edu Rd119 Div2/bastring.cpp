@@ -79,7 +79,65 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1620/problem/C
+
 int main()
 {
-	
+	ll T;
+	cin >> T;
+	while(T--)
+	{
+		bool error = false;
+		ll N, K, X;
+		cin >> N >> K >> X;
+		str S, rv;
+		cin >> S;
+		vl cntA, cntB;
+		cntA.pb(-1);
+		FOR(n, N)
+		{
+			if(S[n] == 'a' && (n == 0 || S[n - 1] == '*'))
+			{ cntA.pb(1); }
+			elif(S[n] == 'a')
+			{ cntA[sz(cntA) - 1]++; }
+			elif(S[n] == '*' && (n == 0 || S[n - 1] == 'a'))
+			{ cntA.pb(0); cntB.pb(K); }
+			elif(S[n] == '*')
+			{ cntB[sz(cntB) - 1] += K; }
+		}
+		vl ref1(sz(cntB), 1e18 + 1), ref2(sz(cntB));
+		if(cntB.size() > 0)
+		{
+			ref1[sz(ref1) - 1] = 1;
+			FORR(i, sz(cntB) - 1)
+			{
+				if(log10((fl) (cntB[i + 1] + 1)) + log10((fl) (ref1[i + 1])) <= 18)
+				{ ref1[i] = min(ref1[i], (cntB[i + 1] + 1) * ref1[i + 1]); }
+				else
+				{ break; }
+			}
+			X--;
+			FOR(i, sz(ref1))
+			{
+				ref2[i] = X / ref1[i];
+				X %= ref1[i];
+				if(ref2[i] > cntB[i])
+				{ cout << "ERROR\n"; error = true; break; }
+			}
+		}
+		ll i = 0, j = 0;
+		while(i < sz(cntA) && !error)
+		{
+			if(cntA[i] > 0)
+			{ rv += string(cntA[i], 'a'); }
+			elif(cntA[i] == 0 && j < sz(ref2))
+			{
+				rv += string(ref2[j], 'b');
+				j++;
+			}
+			i++;
+		}
+		if(!error && j == sz(ref2))
+		{ cout << rv << '\n'; }
+	}
 }

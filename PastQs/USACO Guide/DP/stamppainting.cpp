@@ -79,7 +79,26 @@
 
 using namespace std;
 
+// http://www.usaco.org/index.php?page=viewproblem2&cpid=791
+
+constexpr ll MOD = 1e9 + 7;
+
 int main()
 {
-	
+    ifstream cin("spainting.in");
+    ofstream cout("spainting.out");
+
+	ll N, M, K, pow = 1;
+	cin >> N >> M >> K;
+	FOR(n, N)
+	{ pow *= M; pow %= MOD; }
+	pow += MOD;
+	N++;
+	vl ref(N);
+	FOB(n, 1, K)
+	{ ref[n] += M * (ref[n - 1] + 1); ref[n] %= MOD; }
+	FOB(n, K, N)
+	{ ref[n] += M * ref[n - 1] - (M - 1) * ref[n - K]; ref[n] += MOD; ref[n] %= MOD; }
+	N--;
+	cout << (pow - ref[N] + ref[N - 1]) % MOD << '\n';
 }
