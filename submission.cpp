@@ -30,6 +30,7 @@
 #define vl vector<ll>
 #define vvl vector<vl>
 #define vvvl vector<vvl>
+#define vvvvl vector<vvvl>
 #define vpll vector<pll>
 #define vvpll vector<vpll>
 #define sl set<ll>
@@ -58,18 +59,14 @@
 #define str string
 #define vstr vector<str>
 #define mstrl map<str, ll>
-    
+
 #define pb push_back
 #define mp make_pair
 #define elif else if
 #define sz(x) (ll) x.size()
 #define ssort(x) sort(x.begin(), x.end())
 #define rsort(x) sort(x.begin(), x.end(), greater<>())
-#define last_elem(C) (*(C.rbegin()))
-#define max_elem(C) (*max_element(C.begin(), C.end()))
-#define min_elem(C) (*min_element(C.begin(), C.end()))
-    
-#define FIND(x, v) find(x.begin(), x.end(), v)
+
 #define FOR(x, e) for(ll  x = 0; x < (ll) e; x++)
 #define FORR(x, e) for(ll x = (ll) e - 1; x >= (ll) 0; x--)
 #define FOB(x, b, e) for(auto x = (ll) b; x != (ll) e; x++)
@@ -81,5 +78,5 @@ using namespace std;
 
 int main()
 {
-	
+
 }
