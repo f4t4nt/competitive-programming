@@ -78,7 +78,44 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1619/problem/D
+
+bool verify(ll &mid, vvl &P, ll &M, ll &N)
+{
+    sl ref;
+    bool valid = false;
+    FOR(m, M)
+    {
+        ll tmp = 0;
+        FOR(n, N)
+        {
+            if(P[m][n] >= mid)
+            { tmp++; ref.insert(n); }
+        }
+        valid = valid || (tmp > 1); 
+    }
+    return (sz(ref) == N) && valid;
+}
+
 int main()
 {
-    // t-t
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll M, N;
+        cin >> M >> N;
+        vvl P(M, vl(N));
+        FOR(m, M) { FOR(n, N) { cin >> P[m][n]; } }
+        ll lo = 0, hi = 1e9;
+        while(lo < hi)
+        {
+            ll mid = lo + (hi - lo + 1) / 2;
+            if(verify(mid, P, M, N))
+            { lo = mid; }
+            else
+            { hi = mid - 1; }
+        }
+        cout << lo << '\n';
+    }
 }
