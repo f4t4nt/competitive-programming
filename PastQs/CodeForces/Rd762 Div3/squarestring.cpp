@@ -67,7 +67,6 @@
 #define sz(x) (ll) x.size()
 #define ssort(x) sort(x.begin(), x.end())
 #define rsort(x) sort(x.begin(), x.end(), greater<>())
-#define flip(x) reverse(x.begin(), x.end())
 
 #define FOR(x, e) for(ll  x = 0; x < (ll) e; x++)
 #define FORR(x, e) for(ll x = (ll) e - 1; x >= (ll) 0; x--)
@@ -78,7 +77,26 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1619/problem/A
+
 int main()
 {
-// ヽ(ಠ_ಠ)ノ
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        str S, l, r;
+        cin >> S;
+        ll N = sz(S);
+        if(N % 2)
+        { cout << "NO\n"; continue; }
+        FOR(n, N / 2)
+        { l += S[n]; }
+        FOB(n, N / 2, N)
+        { r += S[n]; }
+        if(l == r)
+        { cout << "YES\n"; }
+        else
+        { cout << "NO\n"; }
+    }    
 }

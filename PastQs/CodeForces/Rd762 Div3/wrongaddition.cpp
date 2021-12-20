@@ -78,7 +78,57 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1619/problem/C
+
 int main()
 {
-// ヽ(ಠ_ಠ)ノ
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        str A, B, S, R;
+        cin >> A >> S;
+        flip(A);
+        flip(S);
+        while(sz(A) < sz(S))
+        { A+= '0'; }
+        ll a = 0, b = 0, s = 0;
+        while(a < sz(A) && s < sz(S))
+        {
+            if(A[a] > S[s])
+            {
+                B += to_string(S[s] - A[a] + 10);
+                s += 2;
+            }
+            else
+            {
+                B += to_string(S[s] - A[a]);
+                s++;
+            }
+            a++;
+        }
+        a = 0;
+        while(a < sz(A) && b < sz(B))
+        {
+            str tmp = to_string((A[a] - '0') + (B[b] - '0'));
+            flip(tmp);
+            R += tmp;
+            a++; b++;
+        }
+        while(a < sz(A))
+        { R += A[a]; a++; }
+        while(b < sz(B))
+        { R += B[b]; b++; }
+        flip(R);
+        R.erase(0, R.find_first_not_of('0'));
+        flip(S);
+        if(S == R)
+        {
+            flip(B);
+            B.erase(0, B.find_first_not_of('0'));
+            cout << B << '\n';
+        }
+        else
+        { cout << "-1\n"; }
+    }
 }

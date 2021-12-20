@@ -67,7 +67,6 @@
 #define sz(x) (ll) x.size()
 #define ssort(x) sort(x.begin(), x.end())
 #define rsort(x) sort(x.begin(), x.end(), greater<>())
-#define flip(x) reverse(x.begin(), x.end())
 
 #define FOR(x, e) for(ll  x = 0; x < (ll) e; x++)
 #define FORR(x, e) for(ll x = (ll) e - 1; x >= (ll) 0; x--)
@@ -80,5 +79,25 @@ using namespace std;
 
 int main()
 {
-// ヽ(ಠ_ಠ)ノ
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N;
+        cin >> N;
+        ll a = pow(N, 1.0 / 2.0), b = pow(N, 1.0 / 3.0), c = pow(N, 1.0 / 6.0);
+        while(a * a <= N)
+        { a++; }
+        while(a * a > N)
+        { a--; }
+        while(b * b * b <= N)
+        { b++; }
+        while(b * b * b > N)
+        { b--; }
+        while(c * c * c * c * c * c <= N)
+        { c++; }
+        while(c * c * c * c * c * c > N)
+        { c--; }
+        cout << a + b - c << '\n';
+    }
 }

@@ -78,7 +78,42 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1619/problem/E
+
 int main()
 {
-// ヽ(ಠ_ಠ)ノ
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N;
+        cin >> N;
+        N++;
+        vl ref(N), dp(N, -1);
+        FOR(n, N - 1)
+        {
+            ll a;
+            cin >> a;
+            ref[a]++;
+        }
+        stack<ll> ava;
+        dp[0] = 0;
+        FOB(n, 1, N)
+        {
+            FOR(i, ref[n - 1])
+            { ava.push(n); }
+            if(sz(ava))
+            { dp[n] = dp[n - 1] + n - ava.top(); ava.pop(); }
+            else
+            { break; }
+        }
+        FOR(n, N)
+        {
+            if(dp[n] == -1)
+            { cout << "-1 "; }
+            else
+            { cout << ref[n] + dp[n] << ' '; }
+        }
+        cout << '\n';
+    }
 }
