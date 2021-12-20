@@ -77,18 +77,56 @@
 
 using namespace std;
 
+// http://www.usaco.org/index.php?page=viewproblem2&cpid=515
+
+ll bitcount(ll x)
+{
+	ll rv = 0;
+	while(x > 0) { rv++; x &= (x - 1); }
+	return rv;
+}
+
 int main()
 {
-//      (()__(()
-//      /       \ 
-//     ( /    \  \ 
-//      \ o o    /
-//      (_()_)__/ \ 
-//     / _,==.____ \ 
-//    (   |--|      )
-//    /\_.|__|'-.__/\_
-//   / (        /     \ 
-//   \  \      (      /
-//    )  '._____)    /
-// (((____.--(((____/
+    ifstream cin("movie.in");
+    ofstream cout("movie.out");
+
+    ll N, L;
+    cin >> N >> L;
+    vplvl M(N);
+    FOR(n, N)
+    {
+        ll C;
+        cin >> M[n].first >> C;
+        M[n].second = vl(C);
+        FOR(c, C)
+        { cin >> M[n].second[c]; M[n].second[c] *= -1; }
+    }
+    FOR(n, N)
+    { reverse(M[n].second.begin(), M[n].second.end()); }
+    ll rv = 1e18;
+    vl dp(1 << N, -1);
+    dp[0] = 0;
+    FOR(x, 1 << N)
+    {
+        if(dp[x] < 0)
+        { continue; }
+        ll nv = bitcount(x) + 1;
+        FOR(n, N)
+        {
+            if(x & (1 << n))
+            { continue; }
+            ll tmp = -*lower_bound(M[n].second.begin(), M[n].second.end(), -dp[x]) + M[n].first;
+            if(tmp - M[n].first <= dp[x] && tmp >= dp[x])
+            {
+                dp[x | (1 << n)] = max(dp[x | (1 << n)], tmp);
+                if(tmp >= L)
+                { rv = min(rv, nv); }
+            }
+        }
+    }
+    if(rv < 1e18)
+    { cout << rv << '\n'; }
+    else
+    { cout << "-1\n"; }
 }
