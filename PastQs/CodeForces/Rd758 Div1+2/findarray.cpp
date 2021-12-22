@@ -80,7 +80,18 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1608/problem/A
+
 int main()
 {
-    // (7._.)7
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N;
+        cin >> N;
+        FOB(n, 2, N + 2)
+        { cout << n << ' '; }
+        cout << '\n';
+    }
 }

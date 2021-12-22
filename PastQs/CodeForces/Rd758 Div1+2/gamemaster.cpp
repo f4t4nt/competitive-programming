@@ -80,7 +80,46 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1608/problem/C
+
 int main()
 {
-    // (7._.)7
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N;
+        cin >> N;
+        vpll A(N), B(N);
+        FOR(n, N)
+        { cin >> A[n].first; A[n].second = n; }
+        FOR(n, N)
+        { cin >> B[n].first; B[n].second = n; }
+        vvl graph(N);
+        N--;
+        ssort(A);
+        FOR(n, N)
+        { graph[A[n].second].pb(A[n + 1].second); }
+        ssort(B);
+        FOR(n, N)
+        { graph[B[n].second].pb(B[n + 1].second); }
+        ql bfs;
+        bfs.push(A[N].second);
+        N++;
+        vl rv(N);
+        while(sz(bfs))
+        {
+            ll &x = bfs.front();
+            if(!rv[x])
+            {
+                rv[x] = 1;
+                FORE(v, graph[x])
+                { bfs.push(v); }
+            }
+            bfs.pop();
+        }
+        FOR(n, N)
+        { cout << rv[n]; }
+        cout << '\n';
+    }
 }

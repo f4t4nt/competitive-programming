@@ -80,7 +80,33 @@
 
 using namespace std;
 
+// http://www.usaco.org/index.php?page=viewproblem2&cpid=839
+// IMPORTANT NOTE: https://usaco.guide/problems/usaco-839-talent-show/solution
+
 int main()
 {
-    // (7._.)7
+    ifstream cin("talent.in");
+    ofstream cout("talent.out");
+
+    ll N, W, rv = 0;
+    cin >> N >> W;
+    vpll C(N);
+    FOR(n, N)
+    { cin >> C[n].first >> C[n].second; }
+    vl dp(1e6, 1e18);
+    dp[0] = 0;
+    FOR(n, N)
+    {
+        FORR(x, 1e6)
+        {
+            if(dp[x] < 1e18)
+            {
+                ll y = x + C[n].second;
+                dp[y] = min(dp[y], dp[x] + C[n].first);
+                if(dp[y] >= W)
+                { rv = max(rv, (1000 * y) / dp[y]); }
+            }
+        }
+    }
+    cout << rv << '\n';
 }

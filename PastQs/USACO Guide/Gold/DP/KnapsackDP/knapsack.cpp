@@ -80,7 +80,42 @@
 
 using namespace std;
 
+// https://oj.uz/problem/view/NOI18_knapsack
+
 int main()
 {
-    // (7._.)7
+    ll S, N;
+    cin >> S >> N;
+    mlvpll W;
+    FOR(n, N)
+    {
+        ll v, w, k;
+        cin >> v >> w >> k;
+        W[w].pb({ v, k });
+    }
+    ll M = sz(W) + 1;
+    S++;
+    vvl dp(M, vl(S));
+    ll m = 1;
+    FORE(x, W)
+    {
+        ll w = x.first;
+        vpll &v = x.second;
+        rsort(v);
+        dp[m] = dp[m - 1];
+        FOR(s, S)
+        {
+            ll i = 1, j = 0, k = 0, p = 0;
+            while(i * w <= s && j < sz(v))
+            {
+                p += v[j].first;
+                dp[m][s] = max(dp[m][s], dp[m - 1][s - i * w] + p);
+                i++; k++;
+                if(k == v[j].second)
+                { k = 0; j++; }
+            }
+        }
+        m++;
+    }
+    cout << max_elem(dp[M - 1]) << '\n';
 }

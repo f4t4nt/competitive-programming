@@ -80,7 +80,64 @@
 
 using namespace std;
 
+// http://www.usaco.org/index.php?page=viewproblem2&cpid=897
+
+constexpr ll MOD = 1e9 + 7;
+
+ll pow(ll a, ll b)
+{
+    if(!b)
+    { return 1; }
+    elif(b == 1)
+    { return a; }
+    ll rv = pow(a, b / 2);
+    rv = (rv * rv + MOD) % MOD;
+    if(b % 2) { rv = (rv * a + MOD) % MOD; }
+    return rv;
+}
+
 int main()
 {
-    // (7._.)7
+    ifstream cin("poetry.in");
+    ofstream cout("poetry.out");
+
+    ll N, M, K, maxE = 0, rv = 1;
+    cin >> N >> M >> K;
+    vpll W(N);
+    FOR(n, N)
+    { cin >> W[n].first >> W[n].second; }
+    vl L(26);
+    FOR(m, M)
+    {
+        char e;
+        cin >> e;
+        L[e - 'A']++;
+        maxE = max(maxE, L[e - 'A']);
+    }
+    vl dp(K + 1), ref(N + 1);
+    dp[0] = 1;
+    FOR(k, K)
+    {
+        FOR(n, N)
+        {
+            if(W[n].first <= k)
+            { dp[k] = (dp[k] + dp[k - W[n].first] + MOD) % MOD; }
+        }
+    }
+    FOR(n, N)
+    { ref[W[n].second] = (ref[W[n].second] + dp[K - W[n].first] + MOD) % MOD; }
+    FOR(i, 26)
+    {
+        ll tmp = 0;
+        if(L[i])
+        {
+            FOB(n, 1, N + 1)
+            {
+                if(ref[n])
+                { tmp = (tmp + pow(ref[n], L[i]) + MOD) % MOD; }
+            }
+            rv = (rv * tmp + MOD) % MOD;
+        }
+    }
+    cout << rv << '\n';
 }
