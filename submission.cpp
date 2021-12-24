@@ -61,6 +61,7 @@
 #define str string
 #define vstr vector<str>
 #define mstrl map<str, ll>
+#define mcl map<char, ll>
 
 #define pb push_back
 #define elif else if
@@ -74,13 +75,14 @@
 #define FOR(x, e) for(ll  x = 0; x < (ll) e; x++)
 #define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
 #define FOB(x, b, e) for(auto x = (ll) b; x != (ll) e; x++)
-#define FOE(x, e, b) for(auto x = (ll) e - 1; x >= (ll) b; x--)
+#define FOE(x, e, b) for(auto x = (ll) e - 1; x != (ll) b; x--)
 #define FOI(x, e, i) for(ll x = 0; x < (ll) e; x += (ll) i)
+#define FOBI(x, b, e, i) for(ll x = (ll) b; x < (ll) e; x += (ll) i)
 #define FORE(x, C) for(auto& x : C)
 
 using namespace std;
 
 int main()
 {
-    // (7._.)7
+    // (7^.^)7
 }
