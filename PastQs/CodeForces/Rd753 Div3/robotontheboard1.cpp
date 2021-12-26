@@ -82,7 +82,45 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1607/problem/E
+
 int main()
 {
-    // <(T_T^)
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N, M, x = 0, y = 0, l = 0, r = 0, d = 0, u = 0, s = 0;
+        cin >> N >> M;
+        str S;
+        cin >> S;
+        while(s < sz(S))
+        {
+            if(S[s] == 'L')
+            { x--; l = min(l, x); }
+            elif(S[s] == 'R')
+            { x++; r = max(r, x); }
+            elif(S[s] == 'D')
+            { y--; d = min(d, y); }
+            elif(S[s] == 'U')
+            { y++; u = max(u, y); }
+            if(u - d >= N)
+            { break; }
+            if(r - l >= M)
+            { break; }
+            s++;
+        }
+        if(s < sz(S))
+        {
+            if(S[s] == 'L')
+            { x++; l++; }
+            elif(S[s] == 'R')
+            { x--; r--; }
+            elif(S[s] == 'D')
+            { y++; d++; }
+            elif(S[s] == 'U')
+            { y--; u--; }
+        }
+        cout << N + d << ' ' << 1 - l << '\n';
+    }
 }

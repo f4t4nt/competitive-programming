@@ -82,7 +82,38 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1584/problem/D
+
 int main()
 {
-    // <(T_T^)
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N, X, Y, i, j, k;
+        cin >> N;
+        cout << "? " << 1 << ' ' << N << '\n';
+        cout.flush();
+        cin >> X;
+        ll lo = 1, hi = N;
+        while(lo < hi)
+        {
+            ll mid = (lo + hi + 1) / 2;
+            cout << "? " << mid << ' ' << N << '\n';
+            cout.flush();
+            cin >> Y;
+            if(Y == X)
+            { lo = mid; }
+            else
+            { hi = mid - 1; }
+        }
+        i = lo;
+        cout << "? " << lo + 1 << ' ' << N << '\n';
+        cin >> Y;
+        cout.flush();
+        j = X - Y + i  + 1;
+        Y = X - (j - i) * (j - i - 1) / 2;
+        k = (sqrt(8 * Y + 1) - 1) / 2 + j;
+        cout << "! " << i << ' ' << j << ' ' << k << '\n';
+    }
 }

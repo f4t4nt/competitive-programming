@@ -82,7 +82,41 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1612/problem/E
+
+constexpr ll MAXK = 21;
+
 int main()
 {
-    // <(T_T^)
+    ll N, rv = 0;
+    cin >> N;
+    mll ref0, ref1;
+    vpll A(N);
+    FOR(n, N)
+    {
+        ll m, k;
+        cin >> m >> k;
+        if(!ref0[m])
+        { ref0[m] = sz(ref0); }
+        A[n] = { ref0[m] - 1, k };
+    }
+    FORE(r, ref0)
+    { r.second--; ref1[r.second] = r.first; }
+    ll M = sz(ref0);
+    vector<pair<fl, vl>> ref2(MAXK);
+    FOB(k, 1, min(M + 1, MAXK))
+    {
+        vector<pair<fl, ll>> tmp(M);
+        FOR(n, N)
+        { tmp[A[n].first].first += min((fl) 1, (fl) A[n].second / k); tmp[A[n].first].second = A[n].first; }
+        rsort(tmp);
+        FOR(x, k)
+        { ref2[k].first += tmp[x].first; ref2[k].second.pb(tmp[x].second); }
+        if(ref2[k].first > ref2[rv].first)
+        { rv = k; }
+    }
+    cout << rv << '\n';
+    FORE(r, ref2[rv].second)
+    { cout << ref1[r] << ' '; }
+    cout << '\n';
 }
