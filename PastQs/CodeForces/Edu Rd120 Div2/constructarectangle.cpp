@@ -80,7 +80,25 @@
 #define FOBI(x, b, e, i) for(ll x = (ll) b; x < (ll) e; x += (ll) i)
 #define FORE(x, C) for(auto& x : C)
 
+using namespace std;
+
+// https://codeforces.com/contest/1622/problem/A
+
 int main()
 {
-    // ヽ(ಠ_ಠ)ノ hardstuck ~~iron 4 lol~~ 1400s cf
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll L1, L2, L3;
+        cin >> L1 >> L2 >> L3;
+        ll A = min(L1, min(L2, L3)), C = max(L1, max(L2, L3));
+        ll B = L1 + L2 + L3 - A - C;
+        if((A == B && C % 2 == 0) ||
+            (B == C && A % 2 == 0) ||
+            (A + B == C))
+        { cout << "YES\n"; }
+        else
+        { cout << "NO\n"; }
+    }
 }

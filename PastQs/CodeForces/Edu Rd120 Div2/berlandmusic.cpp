@@ -80,7 +80,60 @@
 #define FOBI(x, b, e, i) for(ll x = (ll) b; x < (ll) e; x += (ll) i)
 #define FORE(x, C) for(auto& x : C)
 
+using namespace std;
+
+// https://codeforces.com/contest/1622/problem/B
+
 int main()
 {
-    // ヽ(ಠ_ಠ)ノ hardstuck ~~iron 4 lol~~ 1400s cf
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N, X = 0;
+        cin >> N;
+        vpll P(N), Q;
+        vb S(N), ref(N);
+        vl rv(N);
+        FOR(n, N)
+        { cin >> P[n].first; P[n].second = n; }
+        rsort(P);
+        FOR(n, N)
+        {
+            char c;
+            cin >> c;
+            S[n] = c - '0';
+            if(S[n])
+            { X++; }
+        }
+        FOR(x, X)
+        {
+            if(S[P[x].second])
+            { rv[P[x].second] = P[x].first; ref[P[x].second] = true; }
+            else
+            { Q.pb(P[x]); }
+        }
+        FOB(x, X, N)
+        {
+            if(!S[P[x].second])
+            { rv[P[x].second] = P[x].first; ref[P[x].second] = true; }
+            else
+            { Q.pb(P[x]); }
+        }
+        ll n = 0, q1 = 0, q2 = sz(Q) - 1;
+        while(n < N && q1 <= q2)
+        {
+            if(!ref[n])
+            {
+                if(S[n])
+                { rv[n] = Q[q1].first; q1++; }
+                else
+                { rv[n] = Q[q2].first; q2--; }
+            }
+            n++;
+        }
+        FORE(r, rv)
+        { cout << r << ' '; }
+        cout << '\n';
+    }
 }

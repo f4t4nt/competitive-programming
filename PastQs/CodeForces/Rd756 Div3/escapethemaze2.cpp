@@ -80,7 +80,74 @@
 #define FOBI(x, b, e, i) for(ll x = (ll) b; x < (ll) e; x += (ll) i)
 #define FORE(x, C) for(auto& x : C)
 
+using namespace std;
+
+// https://codeforces.com/contest/1611/problem/E2
+
 int main()
 {
-    // ヽ(ಠ_ಠ)ノ hardstuck ~~iron 4 lol~~ 1400s cf
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N, K;
+        cin >> N >> K;
+        sl rv;
+        vl ref(N), bfs0 = { 0 };
+        ref[0] = 1;
+        vpll bfs1(K);
+        FOR(k, K)
+        {
+            cin >> bfs1[k].first;
+            bfs1[k].first--;
+            bfs1[k].second = k + 1;
+            ref[bfs1[k].first] = -bfs1[k].second;
+        }
+        vvl graph(N);
+        FOR(n, N - 1)
+        {
+            ll u, v;
+            cin >> u >> v;
+            u--; v--;
+            graph[u].pb(v);
+            graph[v].pb(u);
+        }
+        bool valid = false;
+        while(sz(bfs0) && sz(bfs1) && !valid)
+        {
+            vl tmp0;
+            vpll tmp1;
+            FORE(v, bfs1)
+            {
+                FORE(e, graph[v.first])
+                {
+                    if(ref[e] > -1)
+                    { ref[e] = -v.second; tmp1.pb({ e, v.second }); }
+                }
+            }
+            swap(bfs1, tmp1);
+            FORE(v, bfs0)
+            {
+                FORE(e, graph[v])
+                {
+                    if(!ref[e])
+                    {
+                        ref[e] = 1;
+                        tmp0.pb(e);
+                        if(sz(graph[e]) == 1)
+                        { valid = true; break; }
+                    }
+                    elif(ref[e] < 0)
+                    { rv.insert(-ref[e]); }
+                }
+                if(valid)
+                { break; }
+            }
+            swap(bfs0, tmp0);
+        }
+        if(valid)
+        { cout << "-1\n"; }
+        else
+        { cout << sz(rv) << '\n'; }
+    }
 }

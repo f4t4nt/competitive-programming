@@ -80,7 +80,45 @@
 #define FOBI(x, b, e, i) for(ll x = (ll) b; x < (ll) e; x += (ll) i)
 #define FORE(x, C) for(auto& x : C)
 
+using namespace std;
+
+// https://codeforces.com/contest/1622/problem/C
+
+bool verify(ll mid, vl &A, vl &ref, ll &N, ll &S, ll &K)
+{
+    ll rv = S, x = N, A0 = A[0] - mid;
+    while(A0 <= A[0] && x > 0)
+    {
+        ll tv0 = A0 * (N - x + 1), tv1 = ref[x] - A[0];
+        rv = min(rv, tv0 + tv1);
+        x--; A0++;
+    }
+    return rv <= K;
+}
+
 int main()
 {
-    // ヽ(ಠ_ಠ)ノ hardstuck ~~iron 4 lol~~ 1400s cf
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N, S = 0, K;
+        cin >> N >> K;
+        vl A(N), ref(N + 1);
+        FOR(n, N)
+        { cin >> A[n]; S += A[n]; }
+        ssort(A);
+        FOR(n, N)
+        { ref[n + 1] = ref[n] + A[n]; }
+        ll lo = 0, hi = 1e18;
+        while(lo < hi)
+        {
+            ll mid = (hi + lo - 1) / 2;
+            if(verify(mid, A, ref, N, S, K))
+            { hi = mid; }
+            else
+            { lo = mid + 1; }
+        }
+        cout << lo << '\n';
+    }
 }
