@@ -83,7 +83,40 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1623/problem/B
+
 int main()
 {
-    // ¯\(°_°)/¯
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N;
+        cin >> N;
+        vpll R(N);
+        FOR(n, N)
+        { cin >> R[n].first >> R[n].second; }
+        ssort(R);
+        vvl rv;
+        FORE(r, R)
+        {
+            if(r.first == r.second)
+            { rv.pb({ r.first, r.first, r.first }); }
+            elif(contains(R, make_pair(r.first + 1, r.second)))
+            { rv.pb({ r.first, r.second, r.first }); }
+            elif(contains(R, make_pair(r.first, r.second - 1)))
+            { rv.pb({ r.first, r.second, r.second }); }
+            else
+            {
+                FOB(x, r.first + 1, r.second)
+                {
+                    if(contains(R, make_pair(r.first, x - 1)) && contains(R, make_pair(x + 1, r.second)))
+                    { rv.pb({ r.first, r.second, x }); break; }
+                }
+            }
+        }
+        FORE(r, rv)
+        { cout << r[0] << ' ' << r[1] << ' ' << r[2] << '\n'; }
+        cout << '\n';
+    }
 }

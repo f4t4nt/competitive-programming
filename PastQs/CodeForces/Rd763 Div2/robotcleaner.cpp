@@ -71,7 +71,6 @@
 #define rsort(C) sort(C.begin(), C.end(), greater<>())
 #define max_elem(C) *max_element(C.begin(), C.end())
 #define min_elem(C) *min_element(C.begin(), C.end())
-#define contains(C, x) find(C.begin(), C.end(), x) != C.end()
 
 #define FOR(x, e) for(ll  x = 0; x < (ll) e; x++)
 #define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
@@ -83,7 +82,28 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1623/problem/A
+
 int main()
 {
-    // ¯\(°_°)/¯
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N, M, Rb, Cb, Rd, Cd, rv = 0, dr = 1, dc = 1;
+        cin >> N >> M >> Rb >> Cb >> Rd >> Cd;
+        while(Rb != Rd && Cb != Cd)
+        {
+            if(Rb == 1)
+            { dr = 1; }
+            elif(Rb == N)
+            { dr = -1; }
+            if(Cb == 1)
+            { dc = 1; }
+            elif(Cb == M)
+            { dc = -1; }
+            Rb += dr; Cb += dc; rv++;
+        }
+        cout << rv << '\n';
+    }
 }

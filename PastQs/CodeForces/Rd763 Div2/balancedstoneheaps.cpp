@@ -83,7 +83,50 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1623/problem/C
+
+bool verify(ll &mid, ll &N, vl H)
+{
+    vl ref(N);
+    ll m = N - 1;
+    while(m > 1)
+    {
+        if(ref[m] + H[m] < mid)
+        { return false; }
+        else
+        {
+            ll x = min(H[m] / 3, (ref[m] + H[m] - mid) / 3);
+            ref[m - 1] += x;
+            ref[m - 2] += 2 * x;
+        }
+        m--;
+    }
+    bool valid = true;
+    FOR(n, N)
+    { valid = valid && (H[n] + ref[n] >= mid); }
+    return valid;
+}
+
 int main()
 {
-    // ¯\(°_°)/¯
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N;
+        cin >> N;
+        vl H(N);
+        FOR(n, N)
+        { cin >> H[n]; }
+        ll lo = 0, hi = 1e9 + 1;
+        while(lo < hi)
+        {
+            ll mid = (lo + hi + 1) / 2;
+            if(verify(mid, N, H))
+            { lo = mid; }
+            else
+            { hi = mid - 1; }
+        }
+        cout << lo << '\n';
+    }
 }
