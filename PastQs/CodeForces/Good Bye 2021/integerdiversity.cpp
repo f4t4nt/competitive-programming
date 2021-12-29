@@ -85,5 +85,21 @@ using namespace std;
 
 int main()
 {
-    // .(>_<).
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N;
+        cin >> N;
+        sl A;
+        FOR(n, N)
+        {
+            ll a, s = sz(A);
+            cin >> a;
+            A.insert(a);
+            if(sz(A) == s)
+            { A.insert(-a); }
+        }
+        cout << sz(A) << '\n';
+    }
 }

@@ -83,7 +83,32 @@
 
 using namespace std;
 
+// https://oj.uz/problem/view/IZhO14_bank
+
 int main()
 {
-    // .(>_<).
+    ll N, M;
+    cin >> N >> M;
+    vl A(N), B(M);
+    FOR(n, N)
+    { cin >> A[n]; }
+    FOR(m, M)
+    { cin >> B[m]; }
+    vpll dp(1 << M);
+    FOR(x, 1 << M)
+    {
+        FOR(m, M)
+        {
+            if(x & (1 << m))
+            { continue; }
+            pll tmp = { dp[x].first, dp[x].second + B[m] };
+            if(dp[x].first < N && A[dp[x].first] == tmp.second)
+            { tmp.first++; tmp.second = 0; }
+            dp[x | (1 << m)] = max(dp[x | (1 << m)], tmp);
+        }
+    }
+    if(dp[(1 << M) - 1].first == N)
+    { cout << "YES\n"; }
+    else
+    { cout << "NO\n"; }
 }

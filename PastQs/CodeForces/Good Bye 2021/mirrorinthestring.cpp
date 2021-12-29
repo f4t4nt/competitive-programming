@@ -83,7 +83,30 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1616/problem/B
+
 int main()
 {
-    // .(>_<).
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N;
+        cin >> N;
+        str S;
+        cin >> S;
+        ll n = 1;
+        while(n < N && S[n - 1] > S[n])
+        {
+            bool valid = false;
+            while(n < N && S[n - 1] > S[n])
+            { n++; valid = true; }
+            while(valid && n < N && S[n - 1] == S[n])
+            { n++; }
+        }
+        str rv = S.substr(0, n);
+        cout << rv;
+        flip(rv);
+        cout << rv << '\n';
+    }
 }

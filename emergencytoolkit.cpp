@@ -83,7 +83,52 @@
 
 using namespace std;
 
-int main()
+// emergency toolkit in the case of mental shutdowns ＼(｀o´)／
+// mostly just need [REDACTED] but the others don't hurt to include (>^-^)>
+
+void binsearch()
 {
-    // .(>_<).
+    ll lo = 0, hi = 1e9;
+    while(hi - lo > 0)
+    {
+        ll mid = (lo + hi + 1) / 2;
+        if(/*...*/(mid))
+        { lo = mid; }
+        else
+        { hi = mid - 1; }
+    }
+}
+
+ll bitcount(ll x)
+{
+	ll rv = 0;
+	while(x > 0) { rv++; x &= (x - 1); }
+	return rv;
+}
+
+void bitmaskdp()
+{
+    ll N;
+    vl dp(1 << N);
+    FOR(x, 1 << N)
+    {
+        FOR(n, N)
+        {
+            if(x & (1 << n))
+            { continue; }
+            dp[x | (1 << n)]/*=...*/;
+        }
+    }
+}
+
+fl dist(pll &p0, pll &p1)
+{
+    ll dx = p0.first - p1.first, dy = p0.second - p1.second;
+    return sqrt((fl) (dx * dx + dy * dy));
+}
+
+ll gcd(ll x, ll y)
+{
+	if(!y) { return x; }
+	else { return gcd(y, x % y); }
 }

@@ -83,7 +83,36 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1616/problem/C
+
 int main()
 {
-    // .(>_<).
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N, rv = 0;
+        cin >> N;
+        vf A(N);
+        FOR(n, N)
+        { cin >> A[n]; }
+        if(N <= 2)
+        { cout << "0\n"; continue; }
+        FOR(n, N)
+        {
+            FOR(m, n)
+            {
+                ll tmp = 0;
+                fl slope = (A[n] - A[m]) / ((fl) (n - m));
+                fl intercept = A[m] - ((fl) m) * slope;
+                FOR(i, N)
+                {
+                    if(A[i] == slope * i + intercept)
+                    { tmp++; }
+                }
+                rv = max(tmp, rv);
+            }
+        }
+        cout << N - rv << '\n';
+    }
 }
