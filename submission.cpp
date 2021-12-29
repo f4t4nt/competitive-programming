@@ -55,7 +55,7 @@
 #define vmll vector<mll>
 #define ql queue<ll>
 #define qpll queue<pll>
-#define fl float
+#define fl long double
 #define vf vector<fl>
 #define vvf vector<vf>
 #define str string
@@ -85,5 +85,5 @@ using namespace std;
 
 int main()
 {
-    // .(>_<).
+    // (7x_x)7
 }

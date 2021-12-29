@@ -55,7 +55,7 @@
 #define vmll vector<mll>
 #define ql queue<ll>
 #define qpll queue<pll>
-#define fl float
+#define fl long double
 #define vf vector<fl>
 #define vvf vector<vf>
 #define str string
@@ -83,21 +83,9 @@
 
 using namespace std;
 
-// emergency toolkit in the case of mental shutdowns \('o')/
-// mostly just need [REDACTED] but the others don't hurt to include (>^-^)>
+// https://open.kattis.com/problems/catandmice
 
-void binsearch()
-{
-    ll lo = 0, hi = 1e9;
-    while(hi - lo > 0)
-    {
-        ll mid = (lo + hi + 1) / 2;
-        if(/*...*/(mid))
-        { lo = mid; }
-        else
-        { hi = mid - 1; }
-    }
-}
+constexpr fl ERR = 1e-6;
 
 ll bitcount(ll x)
 {
@@ -106,29 +94,66 @@ ll bitcount(ll x)
 	return rv;
 }
 
-void bitmaskdp()
+fl dist(fl x0, fl y0, fl x1, fl y1)
 {
-    ll N;
-    vl dp(1 << N);
+    fl dx = x0 - x1, dy = y0 - y1;
+    return sqrt(dx * dx + dy * dy);
+}
+
+bool valid(fl &mid, ll &N, vvf &A, vf &pow)
+{
+    vvf dp(1 << N, vf(N, 1e18));
+    FOR(n, N)
+    {
+        fl tmp = dist(A[n][0], A[n][1], 0, 0) / mid;
+        if(tmp <= A[n][2])
+        { dp[1 << n][n] = tmp; }
+    }
     FOR(x, 1 << N)
     {
+        fl v = mid * pow[bitcount(x)];
         FOR(n, N)
         {
             if(x & (1 << n))
             { continue; }
-            dp[x | (1 << n)]/*=...*/;
+            FOR(m, N)
+            {
+                if(dp[x][m] == 1e18)
+                { continue; }
+                fl tmp = dp[x][m] + dist(A[n][0], A[n][1], A[m][0], A[m][1]) / v;
+                if(tmp <= A[n][2])
+                { dp[x | (1 << n)][n] = min(dp[x | (1 << n)][n], tmp); }
+            }
         }
     }
+    FOR(n, N)
+    {
+        if(dp[(1 << N) - 1][n] <= A[n][2])
+        { return true; }
+    }
+    return false;
 }
 
-fl dist(pll &p0, pll &p1)
+int main()
 {
-    ll dx = p0.first - p1.first, dy = p0.second - p1.second;
-    return sqrt((fl) (dx * dx + dy * dy));
-}
-
-ll gcd(ll x, ll y)
-{
-	if(!y) { return x; }
-	else { return gcd(y, x % y); }
+    ll N;
+    cin >> N;
+    vvf A(N, vf(3));
+    FOR(n, N)
+    { cin >> A[n][0] >> A[n][1] >> A[n][2]; }
+    fl M;
+    cin >> M;
+    vf pow(N + 1, 1);
+    FOR(n, N)
+    { pow[n + 1] = pow[n] * M; }
+    fl lo = 0, hi = 1e9;
+    while(hi - lo > ERR)
+    {
+        fl mid = (hi + lo) / 2;
+        if(valid(mid, N, A, pow))
+        { hi = mid; }
+        else
+        { lo = mid; }
+    }
+    cout << fixed << setprecision(6) << lo << '\n';
 }
