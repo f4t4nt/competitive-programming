@@ -84,7 +84,32 @@
 
 using namespace std;
 
+// https://codeforces.com/contest/1616/problem/D
+
 int main()
 {
-    
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll N, X;
+        cin >> N;
+        vl A(N);
+        FOR(n, N)
+        { cin >> A[n]; }
+        cin >> X;
+        FOR(n, N)
+        { A[n] -= X; }
+        vb ref(N, true);
+        FOB(n, 1, N)
+        {
+            if((A[n - 1] + A[n] < 0 && ref[n - 1])
+                || (n > 1 && A[n - 2] + A[n - 1] + A[n] < 0 && ref[n - 2] && ref[n - 1]))
+            { ref[n] = false; }
+        }
+        ll rv = 0;
+        FOR(n, N)
+        { rv += ref[n]; }
+        cout << rv << '\n';
+    }
 }

@@ -1,0 +1,57 @@
+emergency toolkit in the case of mental shutdowns \('o')/
+
+void binsearch()
+{
+    ll lo = 0, hi = 1e9;
+    while(hi - lo > 0)
+    {
+        ll mid = lo + (hi - lo + 1) / 2;
+        if(/*...*/)
+        { lo = mid; }
+        else
+        { hi = mid - 1; }
+    }
+}
+
+ll bitcount(ll x)
+{
+	ll rv = 0;
+	while(x > 0) { rv++; x &= (x - 1); }
+	return rv;
+}
+
+void bitmaskdp()
+{
+    ll N;
+    vl dp(1 << N);
+    FOR(x, 1 << N)
+    {
+        FOR(n, N)
+        {
+            if(x & (1 << n))
+            { continue; }
+            dp[x | (1 << n)]=/*...*/;
+        }
+    }
+}
+
+void customsort()
+{
+    vl x;
+    sort(x.begin(), x.end(),
+        [] (const ll &a, const ll &b) -> bool
+        { return a < b; });
+    // equivalent to regular sort
+}
+
+fl dist(pll &p0, pll &p1)
+{
+    ll dx = p0.first - p1.first, dy = p0.second - p1.second;
+    return sqrt((fl) (dx * dx + dy * dy));
+}
+
+ll gcd(ll x, ll y)
+{
+	if(!y) { return x; }
+	else { return gcd(y, x % y); }
+}

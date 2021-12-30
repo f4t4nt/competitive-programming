@@ -24,7 +24,6 @@
 #include <vector>
 
 #define ll long long
-#define ull unsigned long long
 #define pll pair<ll, ll>
 #define vi vector<int>
 #define vvi vector<vi>
@@ -84,7 +83,49 @@
 
 using namespace std;
 
+// https://oj.uz/problem/view/CEOI18_clo
+
+struct Transaction
+{
+    ll c;
+    ll f;
+    ll p;
+};
+
 int main()
 {
-    
+    ll N, M;
+    vector<Transaction> ref;
+    cin >> N;
+    FOR(n, N)
+    {
+        Transaction t;
+        cin >> t.c >> t.f >> t.p;
+        t.p *= -1;
+        ref.pb(t);
+    }
+    cin >> M;
+    FOR(m, M)
+    {
+        Transaction t;
+        cin >> t.c >> t.f >> t.p;
+        t.c *= -1;
+        ref.pb(t);
+    }
+    sort(ref.begin(), ref.end(),
+        [] (const Transaction &a, const Transaction &b) -> bool
+        { return a.f != b.f ? a.f > b.f : a.p < b.p; });
+    vl dp0(1e5 + 1, -1e18);
+    dp0[0] = 0;
+    FORE(t, ref)
+    {
+        vl dp1 = dp0;
+        FOR(i, 1e5 + 1)
+        {
+            if(i + t.c >= 0)
+            { dp1[i + t.c] = max(dp1[i + t.c], dp0[i] + t.p); }
+        }
+        swap(dp0, dp1);
+    }
+    cout << max_elem(dp0) << '\n';
 }

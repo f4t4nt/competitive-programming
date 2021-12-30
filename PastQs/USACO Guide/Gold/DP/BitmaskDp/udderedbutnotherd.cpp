@@ -55,7 +55,7 @@
 #define vmll vector<mll>
 #define ql queue<ll>
 #define qpll queue<pll>
-#define fl float
+#define fl long double
 #define vf vector<fl>
 #define vvf vector<vf>
 #define str string
@@ -83,52 +83,42 @@
 
 using namespace std;
 
-// emergency toolkit in the case of mental shutdowns \('o')/
-// mostly just need [REDACTED] but the others don't hurt to include (>^-^)>
+// http://www.usaco.org/index.php?page=viewproblem2&cpid=1089
 
-void binsearch()
+int main()
 {
-    ll lo = 0, hi = 1e9;
-    while(hi - lo > 0)
+    str S;
+    cin >> S;
+    ll N = sz(S);
+    mcl ref1;
+    FOR(n, N)
     {
-        ll mid = (lo + hi + 1) / 2;
-        if(/*...*/(mid))
-        { lo = mid; }
-        else
-        { hi = mid - 1; }
+        if(!ref1[S[n]])
+        { ref1[S[n]] = sz(ref1); }
     }
-}
-
-ll bitcount(ll x)
-{
-	ll rv = 0;
-	while(x > 0) { rv++; x &= (x - 1); }
-	return rv;
-}
-
-void bitmaskdp()
-{
-    ll N;
-    vl dp(1 << N);
-    FOR(x, 1 << N)
+    FORE(r, ref1)
+    { r.second--; }
+    ll X = sz(ref1);
+    vvl ref2(X, vl(X));
+    FOB(n, 1, N)
+    { ref2[ref1[S[n - 1]]][ref1[S[n]]]++; }
+    vl dp(1 << X, 1e18);
+    dp[0] = 1;
+    FOR(x, 1 << X)
     {
-        FOR(n, N)
+        FOR(i, X)
         {
-            if(x & (1 << n))
-            { continue; }
-            dp[x | (1 << n)]/*=...*/;
+            if(x & (1 << i))
+            {
+                ll tmp = dp[x ^ (1 << i)];
+                FOR(j, X)
+                {
+                    if(x & (1 << j))
+                    { tmp += ref2[i][j]; }
+                }
+                dp[x] = min(dp[x], tmp);
+            }
         }
     }
-}
-
-fl dist(pll &p0, pll &p1)
-{
-    ll dx = p0.first - p1.first, dy = p0.second - p1.second;
-    return sqrt((fl) (dx * dx + dy * dy));
-}
-
-ll gcd(ll x, ll y)
-{
-	if(!y) { return x; }
-	else { return gcd(y, x % y); }
+    cout << dp[(1 << X) - 1] << '\n';
 }
