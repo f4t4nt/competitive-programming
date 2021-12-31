@@ -94,18 +94,24 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1607/problem/C
+
 int main()
 {
     ll T;
     cin >> T;
     while(T--)
     {
-        ll X, Y;
-        cin >> X >> Y;
-        if(X > Y)
-        { cout << X + Y << '\n'; }
-        else
-        { cout << Y - (Y % X) / 2 << '\n'; }
+        ll N;
+        cin >> N;
+        vl A(N);
+        FOR(n, N)
+        { cin >> A[n]; }
+        ssort(A);
+        ll rv = A[0];
+        FOB(n, 1, N)
+        { rv = max(rv, A[n] - A[n - 1]); }
+        cout << rv << '\n';
     }
     return 0;
 }

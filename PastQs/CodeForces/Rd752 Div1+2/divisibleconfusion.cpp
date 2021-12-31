@@ -94,18 +94,31 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1604/problem/C
+
 int main()
 {
     ll T;
     cin >> T;
     while(T--)
     {
-        ll X, Y;
-        cin >> X >> Y;
-        if(X > Y)
-        { cout << X + Y << '\n'; }
+        ll N;
+        cin >> N;
+        vl A(N);
+        FOR(n, N)
+        { cin >> A[n]; }
+        bool valid = true;
+        FOR(n, min(N, (ll) 22))
+        {
+            bool tmp = false;
+            FOB(x, 2, n + 3)
+            { tmp = tmp || (A[n] % x); }
+            valid = valid && tmp;
+        }
+        if(valid)
+        { cout << "YES\n"; }
         else
-        { cout << Y - (Y % X) / 2 << '\n'; }
+        { cout << "NO\n"; }
     }
     return 0;
 }

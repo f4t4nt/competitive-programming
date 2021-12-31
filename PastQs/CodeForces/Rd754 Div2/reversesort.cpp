@@ -94,18 +94,50 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1605/problem/B
+
 int main()
 {
     ll T;
     cin >> T;
     while(T--)
     {
-        ll X, Y;
-        cin >> X >> Y;
-        if(X > Y)
-        { cout << X + Y << '\n'; }
+        ll N, X = 0, Y = 0;
+        cin >> N;
+        vl A(N);
+        FOR(n, N)
+        {
+            char c;
+            cin >> c;
+            A[n] = c - '0';
+            if(A[n])
+            { X++; } // 1s
+            else
+            { Y++; } // 0s
+        }
+        vl B = A;
+        ssort(B);
+        if(A == B)
+        { cout << "0\n"; }
         else
-        { cout << Y - (Y % X) / 2 << '\n'; }
+        {
+            cout << "1\n";
+            vl rv;
+            FOR(n, Y)
+            {
+                if(A[n])
+                { rv.pb(n + 1); }
+            }
+            FOB(n, Y, N)
+            {
+                if(!A[n])
+                { rv.pb(n + 1); }
+            }
+            cout << sz(rv) << ' ';
+            FORE(r, rv)
+            { cout << r << ' '; }
+            cout << '\n';
+        }
     }
     return 0;
 }

@@ -94,18 +94,25 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1607/problem/B
+
 int main()
 {
     ll T;
     cin >> T;
     while(T--)
     {
-        ll X, Y;
-        cin >> X >> Y;
-        if(X > Y)
-        { cout << X + Y << '\n'; }
-        else
-        { cout << Y - (Y % X) / 2 << '\n'; }
+        ll X, N, rv = 0;
+        cin >> X >> N;
+        if(N % 4 == 1)
+        { rv = -N; }
+        elif(N % 4 == 2)
+        { rv = 1; }
+        elif(N % 4 == 3)
+        { rv = N + 1; }
+        if(X % 2)
+        { rv *= -1; }
+        cout << X + rv << '\n';
     }
     return 0;
 }

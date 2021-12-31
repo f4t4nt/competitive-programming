@@ -94,18 +94,51 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1605/problem/C
+
 int main()
 {
     ll T;
     cin >> T;
     while(T--)
     {
-        ll X, Y;
-        cin >> X >> Y;
-        if(X > Y)
-        { cout << X + Y << '\n'; }
+        ll N, rv = 1e18;
+        cin >> N;
+        vl S(N);
+        FOR(n, N)
+        {
+            char c;
+            cin >> c;
+            S[n] = c - 'a';
+        }
+        bool valid0 = false, valid1 = false;
+        ll n = 0, b0 = 0, c0 = 0, b1 = 0, c1 = 0;
+        while(n < N)
+        {
+            if(!S[n])
+            {
+                if(valid0 && b0 < 3 && c0 < 3)
+                { rv = min(rv, 3 + b0 + c0); }
+                if(valid1 && b1 < 2 && c1 < 2)
+                { rv = min(rv, 2 + b1 + c1); }
+                b0 = b1;
+                c0 = c1;
+                b1 = 0;
+                c1 = 0;
+                if(valid1)
+                { valid0 = true; }
+                valid1 = true;
+            }
+            elif(S[n] == 1)
+            { b0++; b1++; }
+            else
+            { c0++; c1++; }
+            n++;
+        }
+        if(rv != 1e18)
+        { cout << rv << '\n'; }
         else
-        { cout << Y - (Y % X) / 2 << '\n'; }
+        { cout << "-1\n"; }
     }
     return 0;
 }

@@ -94,18 +94,25 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1607/problem/A
+
 int main()
 {
     ll T;
     cin >> T;
     while(T--)
     {
-        ll X, Y;
-        cin >> X >> Y;
-        if(X > Y)
-        { cout << X + Y << '\n'; }
-        else
-        { cout << Y - (Y % X) / 2 << '\n'; }
+        str K;
+        cin >> K;
+        mcl ref;
+        FOR(i, 26)
+        { ref[K[i]] = i; }
+        str S;
+        cin >> S;
+        ll rv = 0;
+        FOB(i, 1, sz(S))
+        { rv += abs(ref[S[i - 1]] - ref[S[i]]); }
+        cout << rv << '\n';
     }
     return 0;
 }

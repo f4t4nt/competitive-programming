@@ -94,18 +94,38 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1607/problem/D
+
 int main()
 {
     ll T;
     cin >> T;
     while(T--)
     {
-        ll X, Y;
-        cin >> X >> Y;
-        if(X > Y)
-        { cout << X + Y << '\n'; }
+        ll N;
+        cin >> N;
+        vpll A(N);
+        FOR(n, N)
+        { cin >> A[n].second; A[n].second--; }
+        FOR(n, N)
+        {
+            char c;
+            cin >> c;
+            A[n].first = c;
+        }
+        ssort(A);
+        bool valid = true;
+        FOR(n, N)
+        {
+            if(A[n].first - 66)
+            { valid = valid && (A[n].second <= n); }
+            else
+            { valid = valid && (A[n].second >= n); }
+        }
+        if(valid)
+        { cout << "YES\n"; }
         else
-        { cout << Y - (Y % X) / 2 << '\n'; }
+        { cout << "NO\n"; }
     }
     return 0;
 }
