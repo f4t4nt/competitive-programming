@@ -11,12 +11,11 @@ istringstream fin;
 ostringstream fout;
 extern string test_file_name;
 
-string trim(string str)
+void trim(string& str)
 {
     string whitespaces = " \t\n\r\f\v";
     str.erase(str.find_last_not_of(whitespaces) + 1);
     str.erase(0,str.find_first_not_of(whitespaces));
-    return str;
 }
 
 string read_block(basic_istream<char, char_traits<char>>& test_in)
@@ -58,15 +57,14 @@ vector<pair<string, string>> read_inputs()
     return tests;
 }
 
-void print_result(ostream& cout, string& test_result, string& test_out, size_t& test_idx)
+void print_result(ostream& cout, string& test_in, string& test_out, string& test_result, size_t& test_idx)
 {
     if(test_idx)
     { cout << '\n'; }
     if(test_result == test_out)
     { cout << "test " << test_idx + 1 << " passed\n"; }
     else
-    { cout << "TEST " << test_idx + 1 << " FAILED\n" << "expected:\n" << test_out << endl << "actual:\n"; }
-    cout << test_result << '\n';
+    { cout << "TEST " << test_idx + 1 << " FAILED\n" << "input:\n" << test_in << '\n' << "expected:\n" << test_out << endl << "received:\n" << test_result << '\n'; }
 }
 
 void run_test(ofstream& test_results, string& test_in, string& test_out, size_t test_idx)
@@ -83,8 +81,8 @@ void run_test(ofstream& test_results, string& test_in, string& test_out, size_t 
     fin.str(test_result);
     test_result = read_block(fin);
     
-    print_result(cout, test_result, test_out, test_idx);
-    print_result(test_results, test_result, test_out, test_idx);
+    print_result(cout, test_in, test_out, test_result, test_idx);
+    print_result(test_results, test_in, test_out, test_result, test_idx);
 }
 
 int main()
