@@ -1,6 +1,5 @@
 *.exe
 *.ilk
 *.obj
-*.out
 *.pdb
 bin\

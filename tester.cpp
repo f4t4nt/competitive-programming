@@ -15,7 +15,7 @@ void trim(string& str)
 {
     string whitespaces = " \t\n\r\f\v";
     str.erase(str.find_last_not_of(whitespaces) + 1);
-    str.erase(0,str.find_first_not_of(whitespaces));
+    str.erase(0, str.find_first_not_of(whitespaces));
 }
 
 string read_block(basic_istream<char, char_traits<char>>& test_in)
@@ -59,8 +59,6 @@ vector<pair<string, string>> read_inputs()
 
 void print_result(ostream& cout, string& test_in, string& test_out, string& test_result, size_t& test_idx)
 {
-    if(test_idx)
-    { cout << '\n'; }
     if(test_result == test_out)
     { cout << "test " << test_idx + 1 << " passed\n"; }
     else

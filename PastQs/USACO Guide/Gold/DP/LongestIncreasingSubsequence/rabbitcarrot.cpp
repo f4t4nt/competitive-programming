@@ -94,6 +94,8 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://oj.uz/problem/view/LMIO19_triusis
+
 int main()
 {
     ll N, M;
