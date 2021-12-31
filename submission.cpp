@@ -23,46 +23,48 @@
 #include <utility>
 #include <vector>
 
-#define ll long long
-#define ull unsigned long long
-#define pll pair<ll, ll>
-#define vi vector<int>
-#define vvi vector<vi>
-#define vl vector<ll>
-#define vvl vector<vl>
-#define vvvl vector<vvl>
-#define vvvvl vector<vvvl>
-#define vpll vector<pll>
-#define vvpll vector<vpll>
-#define plvl pair<ll, vl>
-#define vplvl vector<plvl>
-#define sl set<ll>
-#define spll set<pll>
-#define vsl vector<sl>
-#define ssl set<sl>
-#define plsl pair<ll, sl>
-#define vplsl vector<plsl>
-#define msl multiset<ll>
-#define mspll multiset<pll>
-#define vb vector<bool>
-#define vvb vector<vb>
-#define mll map<ll, ll>
-#define mlll map<ll, mll>
-#define mlvl map<ll, vl>
-#define mlpll map<ll, pll>
-#define mlvpll map<ll, vpll>
-#define mlsl map<ll, sl>
-#define mpllb map<pll, bool>
-#define vmll vector<mll>
-#define ql queue<ll>
-#define qpll queue<pll>
-#define fl long double
-#define vf vector<fl>
-#define vvf vector<vf>
-#define str string
-#define vstr vector<str>
-#define mstrl map<str, ll>
-#define mcl map<char, ll>
+using namespace std;
+
+using vi = vector<int>;
+using vvi = vector<vi>;
+using ll = long long;
+using ull = unsigned long long;
+using vl = vector<ll>;
+using vvl = vector<vl>;
+using vvvl = vector<vvl>;
+using vvvvl = vector<vvvl>;
+using pll = pair<ll, ll>;
+using vpll = vector<pll>;
+using vvpll = vector<vpll>;
+using plvl = pair<ll, vl>;
+using vplvl = vector<plvl>;
+using sl = set<ll>;
+using spll = set<pll>;
+using vsl = vector<sl>;
+using ssl = set<sl>;
+using plsl = pair<ll, sl>;
+using vplsl = vector<plsl>;
+using msl = multiset<ll>;
+using mspll = multiset<pll>;
+using vb = vector<bool>;
+using vvb = vector<vb>;
+using mll = map<ll, ll>;
+using mlll = map<ll, mll>;
+using mlvl = map<ll, vl>;
+using mlpll = map<ll, pll>;
+using mlvpll = map<ll, vpll>;
+using mlsl = map<ll, sl>;
+using mpllb = map<pll, bool>;
+using vmll = vector<mll>;
+using ql = queue<ll>;
+using qpll = queue<pll>;
+using fl = long double;
+using vf = vector<fl>;
+using vvf = vector<vf>;
+using str = string;
+using vstr = vector<str>;
+using mstrl = map<str, ll>;
+using mcl = map<char, ll>;
 
 #define pb push_back
 #define elif else if
@@ -80,11 +82,27 @@
 #define FOE(x, e, b) for(auto x = (ll) e - 1; x != (ll) b; x--)
 #define FOI(x, e, i) for(ll x = 0; x < (ll) e; x += (ll) i)
 #define FOBI(x, b, e, i) for(ll x = (ll) b; x < (ll) e; x += (ll) i)
-#define FORE(x, C) for(auto& x : C)
+#define FORE(x, C) for(auto &x : C)
 
-using namespace std;
+#ifdef LOCAL
+#include "tester.cpp"
+#define main test_main
+extern istringstream fin;
+extern ostringstream fout;
+string test_file_name = "tests";
+#define cin fin
+#define cout fout
+#endif
 
 int main()
 {
-    
+    ll T;
+    cin >> T;
+    while(T--)
+    {
+        ll X, Y;
+        cin >> X >> Y;
+        cout << max(X, Y) << " + " << min(X, Y) << " = " << X + Y << '\n';
+    }
+    return 0;
 }

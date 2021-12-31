@@ -39,7 +39,7 @@ void customsort()
 {
     vl x;
     sort(x.begin(), x.end(),
-        [] (const ll &a, const ll &b) -> bool
+        &[] (const ll &a, const ll &b) -> bool
         { return a < b; });
     // equivalent to regular sort
 }
