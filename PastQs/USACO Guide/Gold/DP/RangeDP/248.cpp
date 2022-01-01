@@ -94,25 +94,33 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// http://www.usaco.org/index.php?page=viewproblem2&cpid=647
+
 int main()
 {
-    ifstream cin("cowjog.in");
-    ofstream cout("cowjog.out");
+    ifstream cin("248.in");
+    ofstream cout("248.out");
 
-    ll N, T;
-    cin >> N >> T;
-    vl dp;
-    FOR(i, N)
+    ll N, rv = 0;
+    cin >> N;
+    vl A(N);
+    FOR(n, N)
+    { cin >> A[n]; }
+    vvl dp(N, vl(N));
+    FOR(x, N)
     {
-        ll x, s;
-        cin >> x >> s;
-        x = -x - s * T;
-        auto it = upper_bound(dp.begin(), dp.end(), x);
-        if(it == dp.end())
-        { dp.pb(x); }
-        else
-        { *it = x; }
+        FOR(i, N - x)
+        {
+            if(x == 0)
+            { dp[i][i] = A[i]; continue; }
+            FOB(j, i, i + x)
+            {
+                if(dp[i][j] == dp[j + 1][i + x] && dp[i][j])
+                { dp[i][i + x] = max(dp[i][i + x], dp[i][j] + 1); }
+            }
+            rv = max(rv, dp[i][i + x]);
+        }
     }
-    cout << sz(dp) << '\n';
+    cout << rv << '\n';
     return 0;
 }

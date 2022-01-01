@@ -94,6 +94,8 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// http://www.usaco.org/index.php?page=viewproblem2&cpid=496
+
 int main()
 {
     ifstream cin("cowjog.in");

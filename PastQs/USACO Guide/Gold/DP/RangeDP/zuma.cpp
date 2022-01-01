@@ -94,25 +94,38 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/problemset/problem/607/B
+
 int main()
 {
-    ifstream cin("cowjog.in");
-    ofstream cout("cowjog.out");
-
-    ll N, T;
-    cin >> N >> T;
-    vl dp;
-    FOR(i, N)
+    ll N;
+    cin >> N;
+    vl C(N);
+    FOR(n, N)
+    { cin >> C[n]; }
+    vvl dp(N, vl(N));
+    FOR(x, N)
     {
-        ll x, s;
-        cin >> x >> s;
-        x = -x - s * T;
-        auto it = upper_bound(dp.begin(), dp.end(), x);
-        if(it == dp.end())
-        { dp.pb(x); }
-        else
-        { *it = x; }
+        FOR(n, N - x)
+        {
+            if(x == 0)
+            { dp[n][n] = 1; }
+            else
+            {
+                ll tmp = 1 + dp[n + 1][n + x];
+                FOB(m, n + 1, n + x)
+                { tmp = min(tmp, dp[n][m] + dp[m + 1][n + x]); }
+                if(C[n] == C[n + x])
+                {
+                    if(x - 1)
+                    { tmp = min(tmp, dp[n + 1][n +  x - 1]); }
+                    else
+                    { tmp = min(tmp, (ll) 1); }
+                }
+                dp[n][n + x] = tmp;
+            }
+        }
     }
-    cout << sz(dp) << '\n';
+    cout << dp[0][N - 1] << '\n';
     return 0;
 }

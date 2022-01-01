@@ -94,25 +94,58 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+constexpr ll MOD = 1e9 + 7;
+
+// https://cses.fi/problemset/task/1080
+
 int main()
 {
-    ifstream cin("cowjog.in");
-    ofstream cout("cowjog.out");
-
-    ll N, T;
-    cin >> N >> T;
-    vl dp;
-    FOR(i, N)
+    str S;
+    cin >> S;
+    ll N = sz(S);
+    vvl choose(N / 2 + 1, vl(N / 2 + 1));
+    choose[0][0] = 1;
+    FOB(n, 1, N / 2 + 1)
     {
-        ll x, s;
-        cin >> x >> s;
-        x = -x - s * T;
-        auto it = upper_bound(dp.begin(), dp.end(), x);
-        if(it == dp.end())
-        { dp.pb(x); }
-        else
-        { *it = x; }
+        choose[n][0] = true;
+        FOB(m, 1, n + 1)
+        {
+            choose[n][m] = choose[n - 1][m] + choose[n - 1][m - 1];
+            choose[n][m] %= MOD;
+        }
     }
-    cout << sz(dp) << '\n';
+    vvl dp(N, vl(N));
+    FOB(x, 1, N)
+    {
+        FOR(n, N - x)
+        {
+            if(x == 1)
+            {
+                if(S[n] == S[n + x])
+                {
+                    dp[n][n + x] = 1;
+                    dp[n + x][n] = 1;
+                }
+            }
+            else
+            {
+                if(S[n] == S[n + x])
+                { dp[n][n + x] = dp[n + 1][n + x - 1]; }
+                FOB(m, n + 1, n + x)
+                {
+                    if(S[n] == S[m])
+                    { 
+                        ll tmp = dp[n + 1][m - 1] * dp[m + 1][n + x];
+                        tmp %= MOD;
+                        tmp *= choose[(x + 1) / 2][(m - n + 1) / 2];
+                        tmp %= MOD;
+                        dp[n][n + x] += tmp;
+                        dp[n][n + x] %= MOD;
+                    }
+                }
+            }
+        }
+    }
+    cout << dp[0][N - 1];
     return 0;
 }
