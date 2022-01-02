@@ -94,33 +94,56 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+vb search(vvvl &G, ll i)
+{
+    vb ref(sz(G));
+    ql bfs;
+    bfs.push(0);
+    while(sz(bfs))
+    {
+        ll x = bfs.front();
+        bfs.pop();
+        if(!ref[x])
+        {
+            FORE(v, G[x][i])
+            { bfs.push(v); }
+            ref[x] = true;
+        }
+    }
+    return ref;
+}
+
 int main()
 {
-    ll T;
-    cin >> T;
-    while(T--)
+    ll N, M;
+    cin >> N >> M;
+    vvvl G(N, vvl(2));
+    FOR(m, M)
     {
-        ll N, X;
-        cin >> N >> X;
-        vl A(N);
-        FOR(i, N)
-        { cin >> A[i]; }
-        ll i = 0, j = 0, rv1 = -1, rv2 = 0;
-        vpll S(N + 1, { X, 0 });
-        while(i < N && j < N)
-        {
-            ll tmp = S[i].first + A[i];
-            while(tmp < 0 && j <= i)
-            { tmp -= A[j]; j++; }
-            S[i + 1] = { tmp, i - j + 1 };
-            if(S[i + 1].second > rv2)
-            { rv1 = i; rv2 = S[i + 1].second; }
-            i++;
-        }
-        if(rv1 < 0)
-        { cout << "-1\n"; }
-        else
-        { cout << rv1 - rv2 + 2 << ' ' << rv1 + 1 << '\n'; }
+        ll a, b;
+        cin >> a >> b;
+        a--; b--;
+        G[a][0].pb(b);
+        G[b][1].pb(a);
     }
+    vb ref = search(G, 0);
+    FOR(n, N)
+    {
+        if(!ref[n])
+        {
+            cout << "NO\n" << 1 << ' ' << n + 1 << '\n';
+            return 0;
+        }
+    }
+    ref = search(G, 1);
+    FOR(n, N)
+    {
+        if(!ref[n])
+        {
+            cout << "NO\n" << n + 1 << ' ' << 1 << '\n';
+            return 0;
+        }
+    }
+    cout << "YES\n";
     return 0;
 }

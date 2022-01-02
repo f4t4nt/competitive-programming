@@ -94,33 +94,49 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1618/problem/C
+
+ll gcd(ll x, ll y)
+{
+	if(!y) { return x; }
+	else { return gcd(y, x % y); }
+}
+
 int main()
 {
     ll T;
     cin >> T;
     while(T--)
     {
-        ll N, X;
-        cin >> N >> X;
+        ll N;
+        cin >> N;
         vl A(N);
         FOR(i, N)
         { cin >> A[i]; }
-        ll i = 0, j = 0, rv1 = -1, rv2 = 0;
-        vpll S(N + 1, { X, 0 });
-        while(i < N && j < N)
+        ll G = A[0];
+        FOI(i, N, 2)
+        { G = gcd(G, A[i]); }
+        bool valid = true;
+        FOBI(i, 1, N, 2)
         {
-            ll tmp = S[i].first + A[i];
-            while(tmp < 0 && j <= i)
-            { tmp -= A[j]; j++; }
-            S[i + 1] = { tmp, i - j + 1 };
-            if(S[i + 1].second > rv2)
-            { rv1 = i; rv2 = S[i + 1].second; }
-            i++;
+            if(A[i] % G == 0)
+            { valid = false; break; }
         }
-        if(rv1 < 0)
-        { cout << "-1\n"; }
+        if(valid)
+        { cout << G << '\n'; continue; }
+        G = A[1];
+        FOBI(i, 1, N, 2)
+        { G = gcd(G, A[i]); }
+        valid = true;
+        FOI(i, N, 2)
+        {
+            if(A[i] % G == 0)
+            { valid = false; break; }
+        }
+        if(valid)
+        { cout << G << '\n'; }
         else
-        { cout << rv1 - rv2 + 2 << ' ' << rv1 + 1 << '\n'; }
+        { cout << "0\n"; }
     }
     return 0;
 }

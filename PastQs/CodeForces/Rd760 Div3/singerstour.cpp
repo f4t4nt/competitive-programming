@@ -94,33 +94,40 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/problemset/problem/1618/E
+
 int main()
 {
     ll T;
     cin >> T;
     while(T--)
     {
-        ll N, X;
-        cin >> N >> X;
-        vl A(N);
+        ll N, S = 0;
+        cin >> N;
+        vl A(N), B(N);
         FOR(i, N)
-        { cin >> A[i]; }
-        ll i = 0, j = 0, rv1 = -1, rv2 = 0;
-        vpll S(N + 1, { X, 0 });
-        while(i < N && j < N)
+        { cin >> B[i]; S += B[i]; }
+        ll X = N * (N + 1) / 2;
+        if(S % X)
+        { cout << "NO\n"; continue; }
+        S /= X;
+        bool valid = true;
+        FOR(i, N)
         {
-            ll tmp = S[i].first + A[i];
-            while(tmp < 0 && j <= i)
-            { tmp -= A[j]; j++; }
-            S[i + 1] = { tmp, i - j + 1 };
-            if(S[i + 1].second > rv2)
-            { rv1 = i; rv2 = S[i + 1].second; }
-            i++;
+            ll tmp = B[(i - 1 + N) % N] + S - B[i];
+            if(tmp % N || tmp < N)
+            { valid = false; break; }
+            A[i] = tmp / N;
         }
-        if(rv1 < 0)
-        { cout << "-1\n"; }
+        if(valid)
+        {
+            cout << "YES\n";
+            FORE(a, A)
+            { cout << a << ' '; }
+            cout << '\n';
+        }
         else
-        { cout << rv1 - rv2 + 2 << ' ' << rv1 + 1 << '\n'; }
+        { cout << "NO\n"; }
     }
     return 0;
 }

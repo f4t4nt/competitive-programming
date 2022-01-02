@@ -94,33 +94,18 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1618/problem/A
+
 int main()
 {
     ll T;
     cin >> T;
     while(T--)
     {
-        ll N, X;
-        cin >> N >> X;
-        vl A(N);
-        FOR(i, N)
-        { cin >> A[i]; }
-        ll i = 0, j = 0, rv1 = -1, rv2 = 0;
-        vpll S(N + 1, { X, 0 });
-        while(i < N && j < N)
-        {
-            ll tmp = S[i].first + A[i];
-            while(tmp < 0 && j <= i)
-            { tmp -= A[j]; j++; }
-            S[i + 1] = { tmp, i - j + 1 };
-            if(S[i + 1].second > rv2)
-            { rv1 = i; rv2 = S[i + 1].second; }
-            i++;
-        }
-        if(rv1 < 0)
-        { cout << "-1\n"; }
-        else
-        { cout << rv1 - rv2 + 2 << ' ' << rv1 + 1 << '\n'; }
+        vl B(7);
+        FOR(i, 7)
+        { cin >> B[i]; }
+        cout << B[0] << ' ' << B[1] << ' ' << B[6] - B[0] - B[1] << '\n';
     }
     return 0;
 }
