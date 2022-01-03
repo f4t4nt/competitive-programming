@@ -97,6 +97,8 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1621/problem/D
+
 int main()
 {
     ll T;

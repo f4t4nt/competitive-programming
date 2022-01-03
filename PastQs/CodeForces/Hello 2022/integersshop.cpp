@@ -97,32 +97,49 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1621/problem/B
+
+struct Segment
+{
+    ll L;
+    ll R;
+    ll C;
+};
+
 int main()
 {
     ll T;
     cin >> T;
     while(T--)
     {
-        ll N, rv = 0;
+        ll N;
         cin >> N;
-        vvl G(2 * N, vl(2 * N));
-        FOR(i, 2 * N)
+        vector<Segment> A(N);
+        FOR(i, N)
+        { cin >> A[i].L >> A[i].R >> A[i].C; }
+        Segment L = A[0], R = A[0], X = A[0];
+        cout << L.C << '\n';
+        FOB(i, 1, N)
         {
-            FOR(j, 2 * N)
-            {
-                cin >> G[i][j];
-                if(i >= N && j >= N)
-                { rv += G[i][j]; }
-            }
+            if(A[i].L < L.L)
+            { L = A[i]; }
+            elif(A[i].L == L.L && A[i].C < L.C)
+            { L = A[i]; }
+            if(A[i].R > R.R)
+            { R = A[i]; }
+            elif(A[i].R == R.R && A[i].C < R.C)
+            { R = A[i]; }
+            if(A[i].R - A[i].L > X.R - X.L)
+            { X = A[i]; }
+            elif(A[i].R - A[i].L >= X.R - X.L && A[i].C < X.C)
+            { X = A[i]; }
+            if(X.R - X.L > R.R - L.L)
+            { cout << X.C << '\n'; }
+            elif(X.R - X.L == R.R - L.L)
+            { cout << min(X.C, L.C + R.C) << '\n'; }
+            else
+            { cout << L.C + R.C << '\n'; }
         }
-        cout << rv + min(G[N][0],
-                        min(G[N][N - 1],
-                        min(G[2 * N - 1][0],
-                        min(G[2 * N - 1][N - 1],
-                        min(G[0][N],
-                        min(G[N - 1][N],
-                        min(G[0][2 * N - 1],
-                            G[N - 1][2 * N - 1]))))))) << '\n';
     }
     return 0;
 }

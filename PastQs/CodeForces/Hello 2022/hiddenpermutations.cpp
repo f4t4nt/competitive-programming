@@ -87,15 +87,17 @@ using mcl = map<char, ll>;
 #define FOBI(x, b, e, i) for(ll x = (ll) b; x < (ll) e; x += (ll) i)
 #define FORE(x, C) for(auto &x : C)
 
-#ifdef LOCAL
-#include "tester.cpp"
-#define main test_main
-extern istringstream fin;
-extern ostringstream fout;
-string test_file_name = "tests";
-#define cin fin
-#define cout fout
-#endif
+// #ifdef LOCAL
+// #include "tester.cpp"
+// #define main test_main
+// extern istringstream fin;
+// extern ostringstream fout;
+// string test_file_name = "tests";
+// #define cin fin
+// #define cout fout
+// #endif
+
+// https://codeforces.com/contest/1621/problem/C
 
 int main()
 {
@@ -103,26 +105,33 @@ int main()
     cin >> T;
     while(T--)
     {
-        ll N, rv = 0;
+        ll N, i = 1;
         cin >> N;
-        vvl G(2 * N, vl(2 * N));
-        FOR(i, 2 * N)
+        vl rv(N + 1);
+        while(i <= N)
         {
-            FOR(j, 2 * N)
+            cout << "? " << i << '\n';
+            cout.flush();
+            ll X, p = -1, c = -1;
+            cin >> X;
+            p = X;
+            while(c != X)
             {
-                cin >> G[i][j];
-                if(i >= N && j >= N)
-                { rv += G[i][j]; }
+                cout << "? " << i << '\n';
+                cout.flush();
+                cin >> c;
+                if(p > -1)
+                { rv[p] = c; }
+                p = c;
             }
+            while(rv[i] && i <= N)
+            { i++; }
         }
-        cout << rv + min(G[N][0],
-                        min(G[N][N - 1],
-                        min(G[2 * N - 1][0],
-                        min(G[2 * N - 1][N - 1],
-                        min(G[0][N],
-                        min(G[N - 1][N],
-                        min(G[0][2 * N - 1],
-                            G[N - 1][2 * N - 1]))))))) << '\n';
+        cout << "! ";
+        FOR(j, N)
+        { cout << rv[j + 1] << ' '; }
+        cout << '\n';
+        cout.flush();
     }
     return 0;
 }

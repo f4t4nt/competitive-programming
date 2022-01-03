@@ -97,32 +97,37 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1621/problem/A
+
 int main()
 {
     ll T;
     cin >> T;
     while(T--)
     {
-        ll N, rv = 0;
-        cin >> N;
-        vvl G(2 * N, vl(2 * N));
-        FOR(i, 2 * N)
+        ll N, K;
+        cin >> N >> K;
+        if(K * 2 - 1 > N)
+        { cout << "-1\n"; }
+        else
         {
-            FOR(j, 2 * N)
+            FOR(i, N)
             {
-                cin >> G[i][j];
-                if(i >= N && j >= N)
-                { rv += G[i][j]; }
+                FOR(j, N)
+                {
+                    if(i == j)
+                    {
+                        if(K && i % 2 == 0)
+                        { cout << 'R'; K--; }
+                        else
+                        {cout << '.'; }
+                    }
+                    else
+                    { cout << '.'; }
+                }
+                cout << '\n';
             }
         }
-        cout << rv + min(G[N][0],
-                        min(G[N][N - 1],
-                        min(G[2 * N - 1][0],
-                        min(G[2 * N - 1][N - 1],
-                        min(G[0][N],
-                        min(G[N - 1][N],
-                        min(G[0][2 * N - 1],
-                            G[N - 1][2 * N - 1]))))))) << '\n';
     }
     return 0;
 }
