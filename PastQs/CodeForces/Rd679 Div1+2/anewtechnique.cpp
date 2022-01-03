@@ -94,6 +94,8 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1435/problem/B    
+
 int main()
 {
     ll T;
@@ -127,9 +129,7 @@ int main()
         FOR(i, N)
         {
             FOR(j, M)
-            {
-                cout << rv[i][j] << ' ';
-            }
+            { cout << rv[i][j] << ' '; }
             cout << '\n';
         }
     }

@@ -94,44 +94,20 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/432/problem/B
+
 int main()
 {
-    ll T;
-    cin >> T;
-    while(T--)
+    ll N;
+    cin >> N;
+    vpll A(N);
+    mll ref;
+    FOR(i, N)
     {
-        ll N, M;
-        cin >> N >> M;
-        mlpll ref;
-        vvl rv(N, vl(M));
-        FOR(i, N)
-        {
-            FOR(j, M)
-            {
-                ll tmp;
-                cin >> tmp;
-                ref[tmp].first = j;
-            }
-        }
-        FOR(i, M)
-        {
-            FOR(j, N)
-            {
-                ll tmp;
-                cin >> tmp;
-                ref[tmp].second = j;
-            }
-        }
-        FORE(x, ref)
-        { rv[x.second.second][x.second.first] = x.first; }
-        FOR(i, N)
-        {
-            FOR(j, M)
-            {
-                cout << rv[i][j] << ' ';
-            }
-            cout << '\n';
-        }
+        cin >> A[i].first >> A[i].second;
+        ref[A[i].first]++;
     }
+    FOR(i, N)
+    { cout << ref[A[i].second] + N - 1 << ' ' << N - 1 - ref[A[i].second] << '\n'; }
     return 0;
 }
