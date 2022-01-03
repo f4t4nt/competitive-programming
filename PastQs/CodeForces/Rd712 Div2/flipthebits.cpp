@@ -96,27 +96,29 @@ string test_file_name = "tests";
 
 int main()
 {
-    ll N;
-    cin >> N;
-    vl A(N);
-    FOR(i, N)
-    { cin >> A[i]; }
-    rsort(A);
-    ll X = 1e18, rv = 0;
-    FOR(i, N)
+    ll T;
+    cin >> T;
+    while(T--)
     {
-        ll Y = -1, tmp = 1;
-        while(tmp > -2)
+        ll N, x = 0;
+        cin >> N;
+        str A, B;
+        cin >> A >> B;
+        A += '0'; B += '0';
+        bool valid = true;
+        FOR(i, N)
         {
-            if(A[i] + tmp < X && A[i] + tmp > 0)
-            { Y = A[i] + tmp; break; }
-            tmp--;
+            if(A[i] - '0')
+            { x--; }
+            else
+            { x++; }
+            if((A[i] == B[i]) != (A[i + 1] == B[i + 1]) && x)
+            { valid = false; break; }
         }
-        if(Y == -1)
-        { continue; }
-        rv++;
-        swap(X, Y);
+        if(valid)
+        { cout << "YES\n"; }
+        else
+        { cout << "NO\n"; }
     }
-    cout << rv << '\n';
     return 0;
 }

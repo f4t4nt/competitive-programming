@@ -94,29 +94,26 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/586/problem/B
+
 int main()
 {
     ll N;
     cin >> N;
-    vl A(N);
+    vl A(N - 1), B(N - 1), C(N), As(N), Bs(N), rv(N);
+    FOB(i, 1, N)
+    { cin >> A[i - 1]; As[i] = As[i - 1] + A[i - 1]; }
+    FOB(i, 1, N)
+    { cin >> B[i - 1]; }
+    flip(B);
+    FOB(i, 1, N)
+    { Bs[i] = Bs[i - 1] + B[i - 1]; }
+    flip(Bs);
     FOR(i, N)
-    { cin >> A[i]; }
-    rsort(A);
-    ll X = 1e18, rv = 0;
+    { cin >> C[i]; }
     FOR(i, N)
-    {
-        ll Y = -1, tmp = 1;
-        while(tmp > -2)
-        {
-            if(A[i] + tmp < X && A[i] + tmp > 0)
-            { Y = A[i] + tmp; break; }
-            tmp--;
-        }
-        if(Y == -1)
-        { continue; }
-        rv++;
-        swap(X, Y);
-    }
-    cout << rv << '\n';
+    { rv[i] = C[i] + As[i] + Bs[i]; }
+    ssort(rv);
+    cout << rv[0] + rv[1];
     return 0;
 }
