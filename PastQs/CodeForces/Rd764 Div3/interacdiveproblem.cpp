@@ -55,7 +55,6 @@ using mll = map<ll, ll>;
 using mlll = map<ll, mll>;
 using mlvl = map<ll, vl>;
 using mlpll = map<ll, pll>;
-using mplll = map<pll, ll>;
 using mlvpll = map<ll, vpll>;
 using mlsl = map<ll, sl>;
 using mpllb = map<pll, bool>;
@@ -88,43 +87,37 @@ using mcl = map<char, ll>;
 #define FOBI(x, b, e, i) for(ll x = (ll) b; x < (ll) e; x += (ll) i)
 #define FORE(x, C) for(auto &x : C)
 
-#ifdef LOCAL
-#include "tester.cpp"
-#define main test_main
-extern istringstream fin;
-extern ostringstream fout;
-string test_file_name = "tests";
-#define cin fin
-#define cout fout
-#endif
+// #ifdef LOCAL
+// #include "tester.cpp"
+// #define main test_main
+// extern istringstream fin;
+// extern ostringstream fout;
+// string test_file_name = "tests";
+// #define cin fin
+// #define cout fout
+// #endif
 
-constexpr ll MAXN = 1e6 + 1;
-
-ll gcd(ll x, ll y)
-{
-	if(!y) { return x; }
-	else { return gcd(y, x % y); }
-}
+// https://codeforces.com/contest/1624/problem/F
 
 int main()
 {
-    ll N, rv = 0;
+    ll N;
     cin >> N;
-    vb ref0(MAXN);
-    vl ref1(MAXN);
-    vl A(N);
-    FOR(i, N)
-    { cin >> A[i]; ref0[A[i]] = true; }
-    FOB(i, 1, MAXN)
+    ll pv = 0, lo = 1, hi = N - 1;
+    while(hi - lo > 0)
     {
-        FOBI(j, i, MAXN, i)
-        {
-            if(ref0[j])
-            { ref1[i] = gcd(ref1[i], j); }
-        }
-        if(ref1[i] == i)
-        { rv++; }
+        ll mid = (N * (pv + 1) - hi) + (hi - lo) / 2, cv;
+        lo += mid;
+        hi += mid;
+        cout << "+ " << mid << '\n';
+        cout.flush();
+        cin >> cv;
+        if(cv != pv)
+        { lo = N * cv; }
+        else
+        { hi = N * (cv + 1) - 1; }
+        pv = cv;
     }
-    cout << rv - N << '\n';
+    cout << "! " << lo << '\n';
     return 0;
 }

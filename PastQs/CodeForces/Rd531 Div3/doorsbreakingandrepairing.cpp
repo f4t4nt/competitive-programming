@@ -55,7 +55,6 @@ using mll = map<ll, ll>;
 using mlll = map<ll, mll>;
 using mlvl = map<ll, vl>;
 using mlpll = map<ll, pll>;
-using mplll = map<pll, ll>;
 using mlvpll = map<ll, vpll>;
 using mlsl = map<ll, sl>;
 using mpllb = map<pll, bool>;
@@ -88,6 +87,8 @@ using mcl = map<char, ll>;
 #define FOBI(x, b, e, i) for(ll x = (ll) b; x < (ll) e; x += (ll) i)
 #define FORE(x, C) for(auto &x : C)
 
+// https://codeforces.com/contest/1102/problem/C
+
 #ifdef LOCAL
 #include "tester.cpp"
 #define main test_main
@@ -98,33 +99,24 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-constexpr ll MAXN = 1e6 + 1;
-
-ll gcd(ll x, ll y)
-{
-	if(!y) { return x; }
-	else { return gcd(y, x % y); }
-}
-
 int main()
 {
-    ll N, rv = 0;
-    cin >> N;
-    vb ref0(MAXN);
-    vl ref1(MAXN);
+    ll N, X, Y;
+    cin >> N >> X >> Y;
     vl A(N);
     FOR(i, N)
-    { cin >> A[i]; ref0[A[i]] = true; }
-    FOB(i, 1, MAXN)
+    { cin >> A[i]; }
+    if(X > Y)
+    { cout << N << '\n'; }
+    else
     {
-        FOBI(j, i, MAXN, i)
+        ll rv = 0;
+        FOR(i, N)
         {
-            if(ref0[j])
-            { ref1[i] = gcd(ref1[i], j); }
+            if(A[i] <= X)
+            { rv++; }
         }
-        if(ref1[i] == i)
-        { rv++; }
+        cout << (rv + 1) / 2 << '\n';
     }
-    cout << rv - N << '\n';
     return 0;
 }

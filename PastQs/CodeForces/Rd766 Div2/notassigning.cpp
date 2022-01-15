@@ -98,33 +98,61 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-constexpr ll MAXN = 1e6 + 1;
-
-ll gcd(ll x, ll y)
-{
-	if(!y) { return x; }
-	else { return gcd(y, x % y); }
-}
+// https://codeforces.com/contest/1627/problem/C
 
 int main()
 {
-    ll N, rv = 0;
-    cin >> N;
-    vb ref0(MAXN);
-    vl ref1(MAXN);
-    vl A(N);
-    FOR(i, N)
-    { cin >> A[i]; ref0[A[i]] = true; }
-    FOB(i, 1, MAXN)
+    ll T;
+    cin >> T;
+    while(T--)
     {
-        FOBI(j, i, MAXN, i)
+        ll N, x0, x1;
+        cin >> N;
+        bool valid = true, two = true;
+        vvl G(N);
+        vpll order(N - 1);
+        mplll rv;
+        FOR(i, N - 1)
         {
-            if(ref0[j])
-            { ref1[i] = gcd(ref1[i], j); }
+            ll u, v;
+            cin >> u >> v;
+            u--; v--;
+            order[i] = { u, v };
+            G[u].pb(v);
+            G[v].pb(u);
         }
-        if(ref1[i] == i)
-        { rv++; }
+        FOR(i, N)
+        {
+            if(sz(G[i]) > 2)
+            { valid = false; break; }
+            elif(sz(G[i]) == 1)
+            { x0 = i; x1 = i; }
+        }
+        if(!valid)
+        { cout << "-1\n"; continue; }
+        while(sz(G[x1]) != 1 || x1 == x0)
+        {
+            ll x2 = G[x1][0];
+            if(x2 == x0)
+            { x2 = G[x1][1]; }
+            if(two)
+            {
+                rv[{ x1, x2 }] = 2;
+                rv[{ x2, x1 }] = 2;
+                two = false;
+            }
+            else
+            {
+                rv[{ x1, x2 }] = 3;
+                rv[{ x2, x1 }] = 3;
+                two = true;
+            }
+            x0 = x1;
+            x1 = x2;
+        }
+        FOR(i, N - 1)
+        { cout << rv[order[i]] << ' '; }
+        cout << '\n';
     }
-    cout << rv - N << '\n';
     return 0;
 }

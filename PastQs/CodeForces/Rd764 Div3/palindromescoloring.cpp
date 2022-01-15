@@ -55,7 +55,6 @@ using mll = map<ll, ll>;
 using mlll = map<ll, mll>;
 using mlvl = map<ll, vl>;
 using mlpll = map<ll, pll>;
-using mplll = map<pll, ll>;
 using mlvpll = map<ll, vpll>;
 using mlsl = map<ll, sl>;
 using mpllb = map<pll, bool>;
@@ -98,33 +97,60 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-constexpr ll MAXN = 1e6 + 1;
+// https://codeforces.com/contest/1624/problem/D
 
-ll gcd(ll x, ll y)
+bool valid2(ll mid, ll &N, ll &K, vl &ref)
 {
-	if(!y) { return x; }
-	else { return gcd(y, x % y); }
+    ll i = 0, cv = 0, k = 0;
+    while(k < K && i < 26)
+    {
+        if(ref[i] + cv >= mid)
+        { ref[i] -= mid - cv; cv = 0; k++; }
+        else
+        { cv += ref[i] / 2 * 2; ref[i] %= 2; i++; }
+    }
+    return k == K;
+}
+
+ll sum(vl &ref)
+{
+    ll rv = 0;
+    FORE(r, ref)
+    { rv += r; }
+    return rv;
+}
+
+bool valid(ll mid, ll &N, ll &K, vl ref)
+{
+    bool odd = false;
+    if(mid % 2)
+    { odd = true; mid--; }
+    return valid2(mid, N, K, ref) && (!odd || (odd && sum(ref) >= K));
 }
 
 int main()
 {
-    ll N, rv = 0;
-    cin >> N;
-    vb ref0(MAXN);
-    vl ref1(MAXN);
-    vl A(N);
-    FOR(i, N)
-    { cin >> A[i]; ref0[A[i]] = true; }
-    FOB(i, 1, MAXN)
+    ll T;
+    cin >> T;
+    while(T--)
     {
-        FOBI(j, i, MAXN, i)
+        ll N, K;
+        cin >> N >> K;
+        str S;
+        cin >> S;
+        vl ref(26);
+        FOR(i, N)
+        { ref[S[i] - 'a']++; }
+        ll lo = 0, hi = N;
+        while(hi - lo > 0)
         {
-            if(ref0[j])
-            { ref1[i] = gcd(ref1[i], j); }
+            ll mid = lo + (hi - lo + 1) / 2;
+            if(valid(mid, N, K, ref))
+            { lo = mid; }
+            else
+            { hi = mid - 1; }
         }
-        if(ref1[i] == i)
-        { rv++; }
+        cout << lo << '\n';
     }
-    cout << rv - N << '\n';
     return 0;
 }

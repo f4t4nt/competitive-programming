@@ -55,7 +55,6 @@ using mll = map<ll, ll>;
 using mlll = map<ll, mll>;
 using mlvl = map<ll, vl>;
 using mlpll = map<ll, pll>;
-using mplll = map<pll, ll>;
 using mlvpll = map<ll, vpll>;
 using mlsl = map<ll, sl>;
 using mpllb = map<pll, bool>;
@@ -98,33 +97,46 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-constexpr ll MAXN = 1e6 + 1;
-
-ll gcd(ll x, ll y)
-{
-	if(!y) { return x; }
-	else { return gcd(y, x % y); }
-}
+// https://codeforces.com/problemset/problem/1609/B
 
 int main()
 {
-    ll N, rv = 0;
-    cin >> N;
-    vb ref0(MAXN);
-    vl ref1(MAXN);
-    vl A(N);
-    FOR(i, N)
-    { cin >> A[i]; ref0[A[i]] = true; }
-    FOB(i, 1, MAXN)
+    ll N, Q, rv = 0;
+    str S;
+    cin >> N >> Q >> S;
+    vb ref(N);
+    FOR(i, N - 2)
     {
-        FOBI(j, i, MAXN, i)
-        {
-            if(ref0[j])
-            { ref1[i] = gcd(ref1[i], j); }
-        }
-        if(ref1[i] == i)
-        { rv++; }
+        if(S[i] == 'a' && S[i + 1] == 'b' && S[i + 2] == 'c')
+        { rv++; ref[i] = true; ref[i + 1] = true; ref[i + 2] = true; }
     }
-    cout << rv - N << '\n';
+    while(Q--)
+    {
+        ll i;
+        char c;
+        cin >> i >> c;
+        i--;
+        if(S[i] != c)
+        {
+            if(ref[i])
+            {
+                rv--;
+                if(S[i] == 'a')
+                { ref[i] = false; ref[i + 1] = false; ref[i + 2] = false; }
+                elif(S[i] == 'b')
+                { ref[i - 1] = false; ref[i] = false; ref[i + 1] = false; }
+                elif(S[i] == 'c')
+                { ref[i - 2] = false; ref[i - 1] = false; ref[i] = false; }
+            }
+            if(c == 'a' && i < N - 2 && S[i + 1] == 'b' && S[i + 2] == 'c')
+            { rv++; ref[i] = true; ref[i + 1] = true; ref[i + 2] = true; }
+            elif(c == 'b' && i > 0 && i < N - 1 && S[i - 1] == 'a' && S[i + 1] == 'c')
+            { rv++; ref[i - 1] = true; ref[i] = true; ref[i + 1] = true; }
+            elif(c == 'c' && i > 1 && S[i - 2] == 'a' && S[i - 1] == 'b')
+            { rv++; ref[i - 2] = true; ref[i - 1] = true; ref[i] = true; }
+            S[i] = c;
+        }
+        cout << rv << '\n';
+    }
     return 0;
 }

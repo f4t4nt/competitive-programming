@@ -55,7 +55,6 @@ using mll = map<ll, ll>;
 using mlll = map<ll, mll>;
 using mlvl = map<ll, vl>;
 using mlpll = map<ll, pll>;
-using mplll = map<pll, ll>;
 using mlvpll = map<ll, vpll>;
 using mlsl = map<ll, sl>;
 using mpllb = map<pll, bool>;
@@ -98,33 +97,28 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-constexpr ll MAXN = 1e6 + 1;
+// https://codeforces.com/contest/842/problem/B
 
-ll gcd(ll x, ll y)
+struct Sausage
 {
-	if(!y) { return x; }
-	else { return gcd(y, x % y); }
-}
+    fl x;
+    fl y;
+    fl r;
+};
 
 int main()
 {
-    ll N, rv = 0;
-    cin >> N;
-    vb ref0(MAXN);
-    vl ref1(MAXN);
-    vl A(N);
+    fl R, D, N, rv = 0;
+    cin >> R >> D >> N;
+    vector<Sausage> S(N);
     FOR(i, N)
-    { cin >> A[i]; ref0[A[i]] = true; }
-    FOB(i, 1, MAXN)
+    { cin >> S[i].x >> S[i].y >> S[i].r; }
+    FOR(i, N)
     {
-        FOBI(j, i, MAXN, i)
-        {
-            if(ref0[j])
-            { ref1[i] = gcd(ref1[i], j); }
-        }
-        if(ref1[i] == i)
+        if(sqrt(S[i].x * S[i].x + S[i].y * S[i].y) + S[i].r <= R
+            && sqrt(S[i].x * S[i].x + S[i].y * S[i].y) - S[i].r >= R - D)
         { rv++; }
     }
-    cout << rv - N << '\n';
+    cout << rv << '\n';
     return 0;
 }

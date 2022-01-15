@@ -55,7 +55,6 @@ using mll = map<ll, ll>;
 using mlll = map<ll, mll>;
 using mlvl = map<ll, vl>;
 using mlpll = map<ll, pll>;
-using mplll = map<pll, ll>;
 using mlvpll = map<ll, vpll>;
 using mlsl = map<ll, sl>;
 using mpllb = map<pll, bool>;
@@ -98,33 +97,40 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-constexpr ll MAXN = 1e6 + 1;
-
-ll gcd(ll x, ll y)
-{
-	if(!y) { return x; }
-	else { return gcd(y, x % y); }
-}
+// https://codeforces.com/contest/1608/problem/B
 
 int main()
 {
-    ll N, rv = 0;
-    cin >> N;
-    vb ref0(MAXN);
-    vl ref1(MAXN);
-    vl A(N);
-    FOR(i, N)
-    { cin >> A[i]; ref0[A[i]] = true; }
-    FOB(i, 1, MAXN)
+    ll T;
+    cin >> T;
+    while(T--)
     {
-        FOBI(j, i, MAXN, i)
+        ll N, A, B;
+        cin >> N >> A >> B;
+        ll X = N - A - B;
+        if(abs(A - B) > 1 || X < 2)
+        { cout << "-1\n"; }
+        else
         {
-            if(ref0[j])
-            { ref1[i] = gcd(ref1[i], j); }
+            vl rv;
+            ll x = 1, y = N;
+            while(x < X)
+            { rv.pb(x++); }
+            while(x <= y)
+            {
+                rv.pb(y--);
+                if(x < y)
+                { rv.pb(x++); }
+            }
+            if(B > A)
+            {
+                FORE(r, rv)
+                { r = N + 1 - r; }
+            }
+            FORE(r, rv)
+            { cout << r << ' '; }
+            cout << '\n';
         }
-        if(ref1[i] == i)
-        { rv++; }
     }
-    cout << rv - N << '\n';
     return 0;
 }

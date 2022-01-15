@@ -98,6 +98,8 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1627/problem/D
+
 constexpr ll MAXN = 1e6 + 1;
 
 ll gcd(ll x, ll y)

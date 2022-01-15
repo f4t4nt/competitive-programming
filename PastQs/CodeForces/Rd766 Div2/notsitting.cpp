@@ -98,33 +98,75 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-constexpr ll MAXN = 1e6 + 1;
-
-ll gcd(ll x, ll y)
-{
-	if(!y) { return x; }
-	else { return gcd(y, x % y); }
-}
+// https://codeforces.com/contest/1627/problem/B
 
 int main()
 {
-    ll N, rv = 0;
-    cin >> N;
-    vb ref0(MAXN);
-    vl ref1(MAXN);
-    vl A(N);
-    FOR(i, N)
-    { cin >> A[i]; ref0[A[i]] = true; }
-    FOB(i, 1, MAXN)
+    ll T;
+    cin >> T;
+    while(T--)
     {
-        FOBI(j, i, MAXN, i)
+        ll N, M;
+        cin >> N >> M;
+        vvl G(N, vl(M));
+        ll s = N / 2 + M / 2;
+        qpll bfs;
+        vl rv;
+        if(N % 2 && M % 2)
         {
-            if(ref0[j])
-            { ref1[i] = gcd(ref1[i], j); }
+            G[N / 2][M / 2] = s;
+            bfs.push({ N / 2, M / 2 });
         }
-        if(ref1[i] == i)
-        { rv++; }
+        else if(N % 2 && !(M % 2))
+        {
+            G[N / 2][M / 2] = s;
+            G[N / 2][M / 2 - 1] = s;
+            bfs.push({ N / 2, M / 2 });
+            bfs.push({ N / 2, M / 2 - 1 });
+        }
+        else if(!(N % 2) && M % 2)
+        {
+            G[N / 2][M / 2] = s;
+            G[N / 2 - 1][M / 2] = s;
+            bfs.push({ N / 2, M / 2 });
+            bfs.push({ N / 2 - 1, M / 2 });
+        }
+        else if(!(N % 2) && !(M % 2))
+        {
+            G[N / 2][M / 2] = s;
+            G[N / 2][M / 2 - 1] = s;
+            G[N / 2 - 1][M / 2] = s;
+            G[N / 2 - 1][M / 2 - 1] = s;
+            bfs.push({ N / 2, M / 2 });
+            bfs.push({ N / 2, M / 2 - 1 });
+            bfs.push({ N / 2 - 1, M / 2 });
+            bfs.push({ N / 2 - 1, M / 2 - 1 });
+        }
+        while(sz(bfs))
+        {
+            pll xy = bfs.front();
+            bfs.pop();
+            rv.pb(G[xy.first][xy.second]);
+            for(int dx = -1; dx <= 1; dx++)
+            {
+                for(int dy = -1; dy <= 1; dy++)
+                {
+                    if(dx && dy)
+                    { continue; }
+                    if(dx == dy)
+                    { continue; }
+                    ll x = xy.first + dx, y = xy.second + dy;
+                    if(x >= 0 && x < N && y >= 0 && y < M && !G[x][y])
+                    {
+                        G[x][y] = G[xy.first][xy.second] + 1;
+                        bfs.push({ x, y});
+                    }
+                }
+            }
+        }
+        FORE(r, rv)
+        { cout << r << ' '; }
+        cout << '\n';
     }
-    cout << rv - N << '\n';
     return 0;
 }
