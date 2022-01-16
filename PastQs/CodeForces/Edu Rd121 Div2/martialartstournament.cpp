@@ -98,6 +98,8 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1626/problem/D
+
 ll pow2(ll x)
 {
     if(!x)

@@ -98,54 +98,44 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-ll pow2(ll x)
-{
-    if(!x)
-    { return 1; }
-    x--;
-    x |= x >> 1;
-    x |= x >> 2;
-    x |= x >> 4;
-    x |= x >> 8;
-    x |= x >> 16;
-    return x + 1;
-}
-
 int main()
 {
     ll T;
     cin >> T;
     while(T--)
     {
-        ll N, rv = 1e18;
-        cin >> N;
-        vl A(N), ref0, ref1;
-        FORE(i, A) cin >> i;
-        ssort(A);
-        ref0.pb(0);
-        ref1.pb(0);
+        str S, rv = "";
+        cin >> S;
+        ll N = sz(S);
+        bool valid = false;
+        FORR(i, N)
+        {
+            if(i > 0 && (S[i] - '0') + (S[i - 1] - '0') > 9)
+            {
+                rv = S;
+                rv[i - 1] = '1';
+                str sum = to_string((S[i] - '0') + (S[i - 1] - '0') - 10);
+                rv[i] = sum[0];
+                valid = true;
+                break;
+            }
+        }
+        if(valid)
+        { cout << rv << '\n'; continue; }
         FOR(i, N)
         {
-            if(A[i] == *ref1.rbegin())
-            { ref0[sz(ref0) - 1]++; }
-            else
-            { ref0.pb(ref0[sz(ref0) - 1] + 1); ref1.pb(A[i]); }
-        }
-        FOR(i, 18)
-        {
-            ll x = 1 << i;
-            auto it = upper_bound(ref0.begin(), ref0.end(), x);
-            it--;
-            ll a = *it;
-            FOR(j, 18)
+            if(S[i] == '0')
             {
-                ll y = 1 << j;
-                auto jt = upper_bound(ref0.begin(), ref0.end(), a + y);
-                jt--;
-                ll b = *jt - a;
-                ll c = max(0LL, N - a - b);
-                ll tmp = x - a + y - b + pow2(c) - c;
-                rv = min(rv, tmp);
+                rv = S;
+                rv.erase(i, 1);
+                break;
+            }
+            elif(i < N - 1 && (S[i] - '0') > 0 && (S[i + 1] - '0') > 0)
+            {
+                rv = S;
+                rv.erase(i, 1);
+                rv[i] = to_string((S[i] - '0') + (S[i + 1] - '0'))[0];
+                break;
             }
         }
         cout << rv << '\n';
