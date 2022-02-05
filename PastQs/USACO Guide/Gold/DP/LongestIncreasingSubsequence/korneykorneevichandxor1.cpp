@@ -98,23 +98,34 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1582/problem/F1
+
 int main()
 {
     ll N;
     cin >> N;
-    vl A(N), ref(N + 1);
+    vl A(N);
+    FOR(i, N) cin >> A[i];
+    vl rv, ref(512, 1e9);
+    ref[0] = 0;
     FOR(i, N)
     {
-        cin >> A[i];
-        ref[i + 1] = A[i] + ref[i];
+        FOR(j, sz(ref))
+        {
+            if(ref[j] < A[i])
+            {
+                ll tmp = j ^ A[i];
+                ref[tmp] = min(ref[tmp], A[i]);
+            }
+        }
     }
-    ll M;
-    cin >> M;
-    vl Q(M);
-    FOR(i, M)
+    FOR(i, sz(ref))
     {
-        cin >> Q[i];
-        cout << lower_bound(ref.begin(), ref.end(), Q[i]) - ref.begin() << '\n';
+        if(ref[i] < 1e9)
+        { rv.pb(i); }
     }
+    cout << sz(rv) << '\n';
+    FORE(r, rv) cout << r << ' ';
+    cout << '\n';
     return 0;
 }

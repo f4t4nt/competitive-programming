@@ -98,23 +98,40 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/109/problem/B
+
+void init_ref(vl &ref, str tmp)
+{
+    if(sz(tmp) > 9) return;
+    else
+    {
+        if(tmp == "") ref.pb(0);
+        else ref.pb(stoi(tmp));
+        init_ref(ref, tmp + "4");
+        init_ref(ref, tmp + "7");
+    }
+}
+
 int main()
 {
-    ll N;
-    cin >> N;
-    vl A(N), ref(N + 1);
-    FOR(i, N)
+    ll Pl, Pr, Vl, Vr, K;
+    fl rv = 0;
+    cin >> Pl >> Pr >> Vl >> Vr >> K;
+    vl ref;
+    init_ref(ref, "");
+    ref.pb(1e9 + 1);
+    ssort(ref);
+    FOB(i, 1, sz(ref) - K)
     {
-        cin >> A[i];
-        ref[i + 1] = A[i] + ref[i];
+        ll minVP = ref[i], maxVP = ref[i + K - 1];
+        ll caseVP = max(0LL, min(Pr, minVP) - max(ref[i - 1], Pl - 1))
+                * max(0LL, min(ref[i + K], Vr + 1) - max(maxVP, Vl)),
+            casePV = max(0LL, min(Vr, minVP) - max(ref[i - 1], Vl - 1))
+                * max(0LL, min(ref[i + K], Pr + 1) - max(maxVP, Pl));
+        rv += caseVP + casePV;
+        if (K == 1 && caseVP > 0 && casePV > 0)
+        { rv--; }
     }
-    ll M;
-    cin >> M;
-    vl Q(M);
-    FOR(i, M)
-    {
-        cin >> Q[i];
-        cout << lower_bound(ref.begin(), ref.end(), Q[i]) - ref.begin() << '\n';
-    }
+    cout << setprecision(9) << rv / ((fl) (Pr - Pl + 1) * (Vr - Vl + 1));
     return 0;
 }

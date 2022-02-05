@@ -98,23 +98,18 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/6/problem/A
+
 int main()
 {
-    ll N;
-    cin >> N;
-    vl A(N), ref(N + 1);
-    FOR(i, N)
-    {
-        cin >> A[i];
-        ref[i + 1] = A[i] + ref[i];
-    }
-    ll M;
-    cin >> M;
-    vl Q(M);
-    FOR(i, M)
-    {
-        cin >> Q[i];
-        cout << lower_bound(ref.begin(), ref.end(), Q[i]) - ref.begin() << '\n';
-    }
+    vl A(4);
+    FOR(i, 4) cin >> A[i];
+    rsort(A);
+    if(A[0] < A[1] + A[2] || A[1] < A[2] + A[3])
+    { cout << "TRIANGLE\n"; }
+    elif(A[0] == A[1] + A[2] || A[1] == A[2] + A[3])
+    { cout << "SEGMENT\n"; }
+    else
+    { cout << "IMPOSSIBLE\n"; }
     return 0;
 }

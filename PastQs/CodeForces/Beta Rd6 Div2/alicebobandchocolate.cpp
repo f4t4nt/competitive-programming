@@ -98,23 +98,20 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/6/problem/C
+
 int main()
 {
     ll N;
     cin >> N;
-    vl A(N), ref(N + 1);
+    vl T(N), S(N + 1);
     FOR(i, N)
     {
-        cin >> A[i];
-        ref[i + 1] = A[i] + ref[i];
+        cin >> T[i];
+        S[i + 1] = S[i] + T[i];
     }
-    ll M;
-    cin >> M;
-    vl Q(M);
-    FOR(i, M)
-    {
-        cin >> Q[i];
-        cout << lower_bound(ref.begin(), ref.end(), Q[i]) - ref.begin() << '\n';
-    }
+    ll rv = upper_bound(S.begin(), S.end(), S[N] / 2) - S.begin();
+    if(S[rv - 1] > S[N] - S[rv]) rv--;
+    cout << rv << ' ' << N - rv << '\n';
     return 0;
 }

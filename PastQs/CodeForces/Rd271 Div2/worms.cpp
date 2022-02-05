@@ -98,6 +98,8 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/problemset/problem/474/B
+
 int main()
 {
     ll N;

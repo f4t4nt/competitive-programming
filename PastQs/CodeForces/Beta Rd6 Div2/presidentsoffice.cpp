@@ -98,23 +98,42 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/6/problem/B
+
 int main()
 {
-    ll N;
-    cin >> N;
-    vl A(N), ref(N + 1);
+    ll N, M, C;
+    char tmp;
+    cin >> N >> M >> tmp;
+    C = tmp;
+    vvl G(N, vl(M));
     FOR(i, N)
     {
-        cin >> A[i];
-        ref[i + 1] = A[i] + ref[i];
+        FOR(j, M)
+        {
+            char c;
+            cin >> c;
+            G[i][j] = c;
+        }
     }
-    ll M;
-    cin >> M;
-    vl Q(M);
-    FOR(i, M)
+    sl rv;
+    FOR(i, N)
     {
-        cin >> Q[i];
-        cout << lower_bound(ref.begin(), ref.end(), Q[i]) - ref.begin() << '\n';
+        FOR(j, M)
+        {
+            if(G[i][j] != '.' && G[i][j] != C)
+            {
+                if(i > 0 && G[i - 1][j] == C)
+                { rv.insert(G[i][j]); }
+                elif(i < N - 1 && G[i + 1][j] == C)
+                { rv.insert(G[i][j]); }
+                if(j > 0 && G[i][j - 1] == C)
+                { rv.insert(G[i][j]); }
+                elif(j < M - 1 && G[i][j + 1] == C)
+                { rv.insert(G[i][j]); }
+            }
+        }
     }
+    cout << sz(rv) << '\n';
     return 0;
 }

@@ -98,23 +98,53 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1633/problem/D
+
 int main()
 {
-    ll N;
-    cin >> N;
-    vl A(N), ref(N + 1);
-    FOR(i, N)
+    ll T;
+    cin >> T;
+    vvl ref0(15);
+    vl ref1(1001, -1);
+    ref0[0].pb(1);
+    ref1[1] = 0;
+    FOR(i, 14)
     {
-        cin >> A[i];
-        ref[i + 1] = A[i] + ref[i];
+        FOR(j, sz(ref0[i]))
+        {
+            FOB(x, 1, ref0[i][j] + 1)
+            {
+                ll y = ref0[i][j] + ref0[i][j] / x;
+                if(y < 1001 && ref1[y] == -1)
+                {
+                    ref1[y] = i + 1;
+                    ref0[i + 1].pb(y);
+                }
+            }
+        }
     }
-    ll M;
-    cin >> M;
-    vl Q(M);
-    FOR(i, M)
+    while(T--)
     {
-        cin >> Q[i];
-        cout << lower_bound(ref.begin(), ref.end(), Q[i]) - ref.begin() << '\n';
+        ll N, K;
+        cin >> N >> K;
+        vl B(N), C(N), ref2(N);
+        FOR(i, N) cin >> B[i];
+        FOR(i, N) cin >> C[i];
+        FOR(i, N) ref2[i] = ref1[B[i]];
+        vl dp(15 * N, -1);
+        dp[0] = 0;
+        FOR(i, N)
+        {
+            FORR(j, 15 * N - ref2[i])
+            {
+                if(dp[j] == -1) continue;
+                ll k = j + ref2[i];
+                dp[k] = max(dp[k], dp[j] + C[i]);
+            }
+        }
+        ll rv = 0;
+        FOR(i, min(K + 1, 15 * N)) rv = max(rv, dp[i]);
+        cout << rv << '\n';
     }
     return 0;
 }
