@@ -59,6 +59,8 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/gym/324282/problem/B
+
 vector<ll> dx { 0, -1, -1, -1,  0,  1,  1,  1,  0 };
 vector<ll> dy { 0, -1,  0,  1,  1,  1,  0, -1, -1 };
 
