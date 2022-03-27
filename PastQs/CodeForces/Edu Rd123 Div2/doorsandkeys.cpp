@@ -27,21 +27,24 @@ using namespace std;
 
 using ll = long long;
 using ull = unsigned long long;
-using ld = long double;
+using fl = long double;
 using ch = char;
 using str = string;
 
 #define pb push_back
 #define elif else if
 #define sz(C) (ll) C.size()
-#define mp make_pair
 #define flip(C) reverse(C.begin(), C.end())
 #define ssort(C) sort(C.begin(), C.end())
 #define rsort(C) sort(C.begin(), C.end(), greater<>())
+#define max_elem(C) *max_element(C.begin(), C.end())
+#define min_elem(C) *min_element(C.begin(), C.end())
+#define contains(C, x) find(C.begin(), C.end(), x) != C.end()
 
 #define FOR(x, e) for(ll  x = 0; x < (ll) e; x++)
 #define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
-#define FOB(x, b, e) for(auto x = b; x < e; x++)
+#define FOB(x, b, e) for(auto x = (ll) b; x != (ll) e; x++)
+#define FOE(x, e, b) for(auto x = (ll) e - 1; x != (ll) b; x--)
 #define FOI(x, e, i) for(ll x = 0; x < (ll) e; x += (ll) i)
 #define FOBI(x, b, e, i) for(ll x = (ll) b; x < (ll) e; x += (ll) i)
 #define FORE(x, C) for(auto &x : C)
@@ -56,29 +59,28 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1644/problem/A
+
 int main()
 {
     ll t;
     cin >> t;
     while(t--)
     {
-        ll l, r;
-        cin >> l >> r;
-        ll n = r - l + 1;
-        vector<ll> a(n);
-        FOR(i, n) cin >> a[i];
-        vector<ll> ref0(17), ref1(17);
-        FOB(i, l, r + 1)
+        str s;
+        cin >> s;
+        bool valid = true, r = false, g = false, b = false;
+        FOR(i, 6)
         {
-            FOR(j, 17)
-            {
-                if((i & (1 << j)) == (1 << j)) ref0[j]++;
-                if((a[i - l] & (1 << j)) == (1 << j)) ref1[j]++;
-            }
+            if(s[i] == 'R' && !r) valid = false;
+            elif(s[i] == 'G' && !g) valid = false;
+            elif(s[i] == 'B' && !b) valid = false;
+            elif(s[i] == 'r') r = true;
+            elif(s[i] == 'g') g = true;
+            elif(s[i] == 'b') b = true;
         }
-        ll rv = 0;
-        FOR(i, 17) if(ref0[i] != ref1[i]) rv += 1 << i;
-        cout << rv << '\n';
+        if(valid) cout << "YES\n";
+        else cout << "NO\n";
     }
     return 0;
 }

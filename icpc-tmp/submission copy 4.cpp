@@ -34,7 +34,6 @@ using str = string;
 #define pb push_back
 #define elif else if
 #define sz(C) (ll) C.size()
-#define mp make_pair
 #define flip(C) reverse(C.begin(), C.end())
 #define ssort(C) sort(C.begin(), C.end())
 #define rsort(C) sort(C.begin(), C.end(), greater<>())
@@ -56,29 +55,52 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+bool recurse(str s, vector<vector<ll>> &ref, vector<bool> c)
+{
+    ll i = sz(s);
+    if(i == sz(ref[0]))
+    { cout << s << '\n'; return true; }
+    else
+    {
+        vector<bool> cf = c, ct = c;
+        bool validf = true, validt = true;
+        FOR(j, sz(c))
+        {
+            if(ref[j][i] == 1)
+            {
+                if(c[j]) validt = false;
+                else ct[j] = true;
+            }
+            if(ref[j][i] == -1)
+            {
+                if(c[j]) validf = false;
+                else cf[j] = true;
+            }
+            if(!validf && !validt) return false;
+        }
+        if(validf) if(recurse(s + "F", ref, cf)) return true;
+        if(validt) if(recurse(s + "T", ref, ct)) return true;
+        return false;
+    }
+}
+
 int main()
 {
-    ll t;
-    cin >> t;
-    while(t--)
+    ll n, k;
+    cin >> n >> k;
+    vector<vector<ll>> ref(n, vector<ll>(k));
+    FOR(i, n)
     {
-        ll l, r;
-        cin >> l >> r;
-        ll n = r - l + 1;
-        vector<ll> a(n);
-        FOR(i, n) cin >> a[i];
-        vector<ll> ref0(17), ref1(17);
-        FOB(i, l, r + 1)
+        FOR(j, k)
         {
-            FOR(j, 17)
-            {
-                if((i & (1 << j)) == (1 << j)) ref0[j]++;
-                if((a[i - l] & (1 << j)) == (1 << j)) ref1[j]++;
-            }
+            char c;
+            cin >> c;
+            if(c == 'T') ref[i][j] = 1;
+            elif(c == 'F') ref[i][j] = -1;
+            elif(c == 'X') ref[i][j] = 0;
         }
-        ll rv = 0;
-        FOR(i, 17) if(ref0[i] != ref1[i]) rv += 1 << i;
-        cout << rv << '\n';
     }
+    vector<bool> c(n);
+    if(!recurse("", ref, c)) cout << -1 << '\n';
     return 0;
 }

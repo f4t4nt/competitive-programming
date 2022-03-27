@@ -34,7 +34,6 @@ using str = string;
 #define pb push_back
 #define elif else if
 #define sz(C) (ll) C.size()
-#define mp make_pair
 #define flip(C) reverse(C.begin(), C.end())
 #define ssort(C) sort(C.begin(), C.end())
 #define rsort(C) sort(C.begin(), C.end(), greater<>())
@@ -56,29 +55,30 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1651/problem/B
+
 int main()
 {
     ll t;
     cin >> t;
     while(t--)
     {
-        ll l, r;
-        cin >> l >> r;
-        ll n = r - l + 1;
-        vector<ll> a(n);
-        FOR(i, n) cin >> a[i];
-        vector<ll> ref0(17), ref1(17);
-        FOB(i, l, r + 1)
+        ll n;
+        cin >> n;
+        vector<ll> rv;
+        rv.pb(1);
+        FOB(i, 1, n)
         {
-            FOR(j, 17)
-            {
-                if((i & (1 << j)) == (1 << j)) ref0[j]++;
-                if((a[i - l] & (1 << j)) == (1 << j)) ref1[j]++;
-            }
+            rv.pb(rv[i - 1] * 3);
+            if(rv[i] > 1e9) break;
         }
-        ll rv = 0;
-        FOR(i, 17) if(ref0[i] != ref1[i]) rv += 1 << i;
-        cout << rv << '\n';
+        if(sz(rv) == n && rv[n - 1] <= 1e9)
+        {
+            cout << "YES\n";
+            FORE(r, rv) cout << r << ' ';
+            cout << '\n';
+        }
+        else cout << "NO\n";
     }
     return 0;
 }

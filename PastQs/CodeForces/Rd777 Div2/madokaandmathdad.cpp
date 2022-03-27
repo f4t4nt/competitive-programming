@@ -56,28 +56,32 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1647/problem/A
+
 int main()
 {
     ll t;
     cin >> t;
     while(t--)
     {
-        ll l, r;
-        cin >> l >> r;
-        ll n = r - l + 1;
-        vector<ll> a(n);
-        FOR(i, n) cin >> a[i];
-        vector<ll> ref0(17), ref1(17);
-        FOB(i, l, r + 1)
+        ll n;
+        cin >> n;
+        str rv = "";
+        if(n % 3 == 0) FOR(i, n / 3) rv += "21";
+        elif(n % 3 == 1) 
         {
-            FOR(j, 17)
-            {
-                if((i & (1 << j)) == (1 << j)) ref0[j]++;
-                if((a[i - l] & (1 << j)) == (1 << j)) ref1[j]++;
-            }
+            ll s = 1;
+            rv = "1";
+            while(s != n)
+            { rv += "21"; s += 3; }
         }
-        ll rv = 0;
-        FOR(i, 17) if(ref0[i] != ref1[i]) rv += 1 << i;
+        else
+        {
+            ll s = 2;
+            rv = "2";
+            while(s != n)
+            { rv += "12"; s += 3; }
+        }
         cout << rv << '\n';
     }
     return 0;

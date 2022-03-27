@@ -62,23 +62,23 @@ int main()
     cin >> t;
     while(t--)
     {
-        ll l, r;
-        cin >> l >> r;
-        ll n = r - l + 1;
-        vector<ll> a(n);
-        FOR(i, n) cin >> a[i];
-        vector<ll> ref0(17), ref1(17);
-        FOB(i, l, r + 1)
+        ll n;
+        cin >> n;
+        vector<ll> c(n);
+        FOR(i, n) cin >> c[i];
+        ll idx = -1;
+        FOR(i, n) if(c[i] == 1) idx = i;
+        if(idx == -1)
+        { cout << "NO\n"; continue; }
+        rotate(c.begin(), c.begin() + idx, c.end());
+        bool valid = true;
+        FOB(i, 1, n)
         {
-            FOR(j, 17)
-            {
-                if((i & (1 << j)) == (1 << j)) ref0[j]++;
-                if((a[i - l] & (1 << j)) == (1 << j)) ref1[j]++;
-            }
+            valid = (c[i] <= c[i - 1] + 1) && (c[i] > 1);
+            if(!valid) break;
         }
-        ll rv = 0;
-        FOR(i, 17) if(ref0[i] != ref1[i]) rv += 1 << i;
-        cout << rv << '\n';
+        if(valid) cout << "YES\n";
+        else cout << "NO\n";
     }
     return 0;
 }

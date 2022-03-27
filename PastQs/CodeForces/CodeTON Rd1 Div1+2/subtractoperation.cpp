@@ -62,23 +62,21 @@ int main()
     cin >> t;
     while(t--)
     {
-        ll l, r;
-        cin >> l >> r;
-        ll n = r - l + 1;
+        ll n, k;
+        cin >> n >> k;
         vector<ll> a(n);
         FOR(i, n) cin >> a[i];
-        vector<ll> ref0(17), ref1(17);
-        FOB(i, l, r + 1)
+        ssort(a);
+        ll i = 0, j = 0;
+        while(i < n && j < n)
         {
-            FOR(j, 17)
-            {
-                if((i & (1 << j)) == (1 << j)) ref0[j]++;
-                if((a[i - l] & (1 << j)) == (1 << j)) ref1[j]++;
-            }
+            if(a[j] - a[i] == k) break;
+            elif(a[j] - a[i] < k) j++;
+            else i++;
+
         }
-        ll rv = 0;
-        FOR(i, 17) if(ref0[i] != ref1[i]) rv += 1 << i;
-        cout << rv << '\n';
+        if(a[j] - a[i] == k) cout << "YES" << endl;
+        else cout << "NO" << endl;
     }
     return 0;
 }

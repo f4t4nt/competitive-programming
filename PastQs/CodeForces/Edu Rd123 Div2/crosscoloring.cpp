@@ -34,14 +34,13 @@ using str = string;
 #define pb push_back
 #define elif else if
 #define sz(C) (ll) C.size()
-#define mp make_pair
 #define flip(C) reverse(C.begin(), C.end())
 #define ssort(C) sort(C.begin(), C.end())
 #define rsort(C) sort(C.begin(), C.end(), greater<>())
 
 #define FOR(x, e) for(ll  x = 0; x < (ll) e; x++)
 #define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
-#define FOB(x, b, e) for(auto x = b; x < e; x++)
+#define FOB(x, b, e) for(auto x = b; x != e; x++)
 #define FOI(x, e, i) for(ll x = 0; x < (ll) e; x += (ll) i)
 #define FOBI(x, b, e, i) for(ll x = (ll) b; x < (ll) e; x += (ll) i)
 #define FORE(x, C) for(auto &x : C)
@@ -56,29 +55,40 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1644/problem/D
+
+constexpr ll MOD = 998244353;
+
+ll pow(ll x, ll y)
+{
+    if(!y) return 1;
+    ll rv = pow(x, y / 2);
+    rv = (rv * rv) % MOD;
+    if(y % 2) rv = (rv * x) % MOD;
+    return rv;
+}
+
 int main()
 {
     ll t;
     cin >> t;
     while(t--)
     {
-        ll l, r;
-        cin >> l >> r;
-        ll n = r - l + 1;
-        vector<ll> a(n);
-        FOR(i, n) cin >> a[i];
-        vector<ll> ref0(17), ref1(17);
-        FOB(i, l, r + 1)
+        ll n, m, k, q, rv = 0;
+        cin >> n >> m >> k >> q;
+        vector<pair<ll, ll>> que(q);
+        FOR(i, q) cin >> que[i].first >> que[i].second;
+        set<ll> refx, refy;
+        FORR(i, q)
         {
-            FOR(j, 17)
-            {
-                if((i & (1 << j)) == (1 << j)) ref0[j]++;
-                if((a[i - l] & (1 << j)) == (1 << j)) ref1[j]++;
-            }
+            ll &x = que[i].first, &y = que[i].second;
+            if(refx.find(x) != refx.end() && refy.find(y) != refy.end()) continue;
+            rv++;
+            refx.insert(x);
+            refy.insert(y);
+            if(sz(refx) == n || sz(refy) == m) break;
         }
-        ll rv = 0;
-        FOR(i, 17) if(ref0[i] != ref1[i]) rv += 1 << i;
-        cout << rv << '\n';
+        cout << pow(k, rv) << '\n';
     }
     return 0;
 }

@@ -56,29 +56,46 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1657/problem/D
+
 int main()
 {
-    ll t;
-    cin >> t;
-    while(t--)
+    ll n, C, m;
+    cin >> n >> C;
+    vector<ll> a(n), c(n);
+    FOR(i, n)
     {
-        ll l, r;
-        cin >> l >> r;
-        ll n = r - l + 1;
-        vector<ll> a(n);
-        FOR(i, n) cin >> a[i];
-        vector<ll> ref0(17), ref1(17);
-        FOB(i, l, r + 1)
-        {
-            FOR(j, 17)
-            {
-                if((i & (1 << j)) == (1 << j)) ref0[j]++;
-                if((a[i - l] & (1 << j)) == (1 << j)) ref1[j]++;
-            }
-        }
-        ll rv = 0;
-        FOR(i, 17) if(ref0[i] != ref1[i]) rv += 1 << i;
-        cout << rv << '\n';
+        ll d, h;
+        cin >> c[i] >> d >> h;
+        a[i] = d * h;
     }
+    cin >> m;
+    vector<ll> b(m);
+    FOR(i, m)
+    {
+        ll d, h;
+        cin >> d >> h;
+        b[i] = d * h;
+    }
+    vector<ll> ref(C + 1);
+    FOR(i, n) ref[c[i]] = max(ref[c[i]], a[i]);
+    FOB(i, 1, C + 1) FOB(j, 2, C / i + 1) ref[j * i] = max(ref[j * i], j * ref[i]);
+    FOR(i, C) ref[i + 1] = max(ref[i + 1], ref[i]);
+    FOR(i, m)
+    {
+        if(ref[C] <= b[i]) cout << "-1 ";
+        else
+        {
+            ll lo = 1, hi = C;
+            while(hi - lo > 0)
+            {
+                ll mid = (hi + lo) / 2;
+                if(ref[mid] <= b[i]) lo = mid + 1;
+                else hi = mid;
+            }
+            cout << lo << ' ';
+        }
+    }
+    cout << '\n';
     return 0;
 }

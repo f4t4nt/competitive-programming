@@ -56,29 +56,29 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1658/problem/B
+
+constexpr ll MOD = 998244353;
+
 int main()
 {
     ll t;
     cin >> t;
     while(t--)
     {
-        ll l, r;
-        cin >> l >> r;
-        ll n = r - l + 1;
-        vector<ll> a(n);
-        FOR(i, n) cin >> a[i];
-        vector<ll> ref0(17), ref1(17);
-        FOB(i, l, r + 1)
+        ll n;
+        cin >> n;
+        if(n % 2) cout << 0 << '\n';
+        else
         {
-            FOR(j, 17)
+            ll f = 1;
+            FOR(i, n / 2)
             {
-                if((i & (1 << j)) == (1 << j)) ref0[j]++;
-                if((a[i - l] & (1 << j)) == (1 << j)) ref1[j]++;
+                f *= (i + 1);
+                f %= MOD;
             }
+            cout << (f * f) % MOD << '\n';
         }
-        ll rv = 0;
-        FOR(i, 17) if(ref0[i] != ref1[i]) rv += 1 << i;
-        cout << rv << '\n';
     }
     return 0;
 }

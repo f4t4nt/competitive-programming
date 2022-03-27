@@ -34,7 +34,6 @@ using str = string;
 #define pb push_back
 #define elif else if
 #define sz(C) (ll) C.size()
-#define mp make_pair
 #define flip(C) reverse(C.begin(), C.end())
 #define ssort(C) sort(C.begin(), C.end())
 #define rsort(C) sort(C.begin(), C.end(), greater<>())
@@ -56,29 +55,42 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1649/problem/C
+
+ll manhattan1d(vector<ll> &ref)
+{
+    ssort(ref);
+    ll rv = 0, s = 0;
+    FOR(i, sz(ref))
+    {
+        rv += ref[i] * i - s;
+        s += ref[i];
+    }
+    return rv;
+}
+
+ll manhattan(vector<ll> &refx, vector<ll> &refy)
+{
+    return manhattan1d(refx) + manhattan1d(refy);
+}
+
 int main()
 {
-    ll t;
-    cin >> t;
-    while(t--)
+    ll n, m, rv = 0;
+    cin >> n >> m;
+    vector<vector<ll>> refx(1e5), refy(1e5);
+    vector<vector<ll>> g(n, vector<ll>(m));
+    FOR(i, n)
     {
-        ll l, r;
-        cin >> l >> r;
-        ll n = r - l + 1;
-        vector<ll> a(n);
-        FOR(i, n) cin >> a[i];
-        vector<ll> ref0(17), ref1(17);
-        FOB(i, l, r + 1)
+        FOR(j, m)
         {
-            FOR(j, 17)
-            {
-                if((i & (1 << j)) == (1 << j)) ref0[j]++;
-                if((a[i - l] & (1 << j)) == (1 << j)) ref1[j]++;
-            }
+            cin >> g[i][j];
+            g[i][j]--;
+            refx[g[i][j]].pb(i);
+            refy[g[i][j]].pb(j);
         }
-        ll rv = 0;
-        FOR(i, 17) if(ref0[i] != ref1[i]) rv += 1 << i;
-        cout << rv << '\n';
     }
+    FOR(i, 1e5) rv += manhattan(refx[i], refy[i]);
+    cout << rv << '\n';
     return 0;
 }

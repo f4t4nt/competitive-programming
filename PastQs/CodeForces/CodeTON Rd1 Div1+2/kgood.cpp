@@ -56,29 +56,30 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+ll solve(ll n)
+{
+    if(n % 2) return 2;
+    ll m = n, x = 1;
+    while(n % 2 == 0)
+    {
+        n /= 2;
+        x *= 2;
+    }
+    if(n == 1) return -1;
+    n = min(n, x * 2);
+    if(m < n * (n + 1) / 2) return -1;
+    return n;
+}
+
 int main()
 {
     ll t;
     cin >> t;
     while(t--)
     {
-        ll l, r;
-        cin >> l >> r;
-        ll n = r - l + 1;
-        vector<ll> a(n);
-        FOR(i, n) cin >> a[i];
-        vector<ll> ref0(17), ref1(17);
-        FOB(i, l, r + 1)
-        {
-            FOR(j, 17)
-            {
-                if((i & (1 << j)) == (1 << j)) ref0[j]++;
-                if((a[i - l] & (1 << j)) == (1 << j)) ref1[j]++;
-            }
-        }
-        ll rv = 0;
-        FOR(i, 17) if(ref0[i] != ref1[i]) rv += 1 << i;
-        cout << rv << '\n';
+        ll n;
+        cin >> n;
+        cout << solve(n) << '\n';
     }
     return 0;
 }

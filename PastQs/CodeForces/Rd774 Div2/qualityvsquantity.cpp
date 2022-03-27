@@ -34,14 +34,13 @@ using str = string;
 #define pb push_back
 #define elif else if
 #define sz(C) (ll) C.size()
-#define mp make_pair
 #define flip(C) reverse(C.begin(), C.end())
 #define ssort(C) sort(C.begin(), C.end())
 #define rsort(C) sort(C.begin(), C.end(), greater<>())
 
 #define FOR(x, e) for(ll  x = 0; x < (ll) e; x++)
 #define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
-#define FOB(x, b, e) for(auto x = b; x < e; x++)
+#define FOB(x, b, e) for(auto x = b; x != e; x++)
 #define FOI(x, e, i) for(ll x = 0; x < (ll) e; x += (ll) i)
 #define FOBI(x, b, e, i) for(ll x = (ll) b; x < (ll) e; x += (ll) i)
 #define FORE(x, C) for(auto &x : C)
@@ -62,23 +61,24 @@ int main()
     cin >> t;
     while(t--)
     {
-        ll l, r;
-        cin >> l >> r;
-        ll n = r - l + 1;
+        ll n;
+        cin >> n;
         vector<ll> a(n);
         FOR(i, n) cin >> a[i];
-        vector<ll> ref0(17), ref1(17);
-        FOB(i, l, r + 1)
+        ssort(a);
+        bool valid = false;
+        ll i = 1, j = n - 1, s0 = a[0], s1 = 0;
+        while(i < j)
         {
-            FOR(j, 17)
-            {
-                if((i & (1 << j)) == (1 << j)) ref0[j]++;
-                if((a[i - l] & (1 << j)) == (1 << j)) ref1[j]++;
-            }
+            s0 += a[i];
+            s1 += a[j];
+            if (s0 < s1)
+            { valid = true; break; }
+            i++;
+            j--;
         }
-        ll rv = 0;
-        FOR(i, 17) if(ref0[i] != ref1[i]) rv += 1 << i;
-        cout << rv << '\n';
+        if(valid) cout << "YES\n";
+        else cout << "NO\n";
     }
     return 0;
 }

@@ -62,23 +62,19 @@ int main()
     cin >> t;
     while(t--)
     {
-        ll l, r;
-        cin >> l >> r;
-        ll n = r - l + 1;
+        ll n;
+        cin >> n;
         vector<ll> a(n);
-        FOR(i, n) cin >> a[i];
-        vector<ll> ref0(17), ref1(17);
-        FOB(i, l, r + 1)
+        bool consecutive = false;
+        map<ll, ll> ref;
+        FOR(i, n)
         {
-            FOR(j, 17)
-            {
-                if((i & (1 << j)) == (1 << j)) ref0[j]++;
-                if((a[i - l] & (1 << j)) == (1 << j)) ref1[j]++;
-            }
+            cin >> a[i];
+            ref[a[i]]++;
+            if(ref[a[i] - 1] || ref[a[i] + 1]) consecutive = true;
         }
-        ll rv = 0;
-        FOR(i, 17) if(ref0[i] != ref1[i]) rv += 1 << i;
-        cout << rv << '\n';
+        if(ref[1] && consecutive) cout << "NO\n";
+        else cout << "YES\n";
     }
     return 0;
 }

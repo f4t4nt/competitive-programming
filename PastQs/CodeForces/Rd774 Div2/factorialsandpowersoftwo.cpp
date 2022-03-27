@@ -34,14 +34,13 @@ using str = string;
 #define pb push_back
 #define elif else if
 #define sz(C) (ll) C.size()
-#define mp make_pair
 #define flip(C) reverse(C.begin(), C.end())
 #define ssort(C) sort(C.begin(), C.end())
 #define rsort(C) sort(C.begin(), C.end(), greater<>())
 
 #define FOR(x, e) for(ll  x = 0; x < (ll) e; x++)
 #define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
-#define FOB(x, b, e) for(auto x = b; x < e; x++)
+#define FOB(x, b, e) for(auto x = b; x != e; x++)
 #define FOI(x, e, i) for(ll x = 0; x < (ll) e; x += (ll) i)
 #define FOBI(x, b, e, i) for(ll x = (ll) b; x < (ll) e; x += (ll) i)
 #define FORE(x, C) for(auto &x : C)
@@ -56,29 +55,32 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+ll bitcount(ll x)
+{
+	ll rv = 0;
+	while(x > 0) { rv++; x &= (x - 1); }
+	return rv;
+}
+
 int main()
 {
     ll t;
     cin >> t;
+    vector<ll> fact = { 1, 2 };
+    while(fact[sz(fact) - 1] < 1e12) fact.pb(fact[sz(fact) - 1] * (sz(fact) + 1));
     while(t--)
     {
-        ll l, r;
-        cin >> l >> r;
-        ll n = r - l + 1;
-        vector<ll> a(n);
-        FOR(i, n) cin >> a[i];
-        vector<ll> ref0(17), ref1(17);
-        FOB(i, l, r + 1)
+        ll n, rv = 1e18;
+        cin >> n;
+        FOR(x, 1 << sz(fact))
         {
-            FOR(j, 17)
-            {
-                if((i & (1 << j)) == (1 << j)) ref0[j]++;
-                if((a[i - l] & (1 << j)) == (1 << j)) ref1[j]++;
-            }
+            ll m = 0;
+            FOR(i, sz(fact)) if(x & (1 << i)) m += fact[i];
+            if(m > n) continue;
+            rv = min(rv, bitcount(x) + bitcount(n - m));
         }
-        ll rv = 0;
-        FOR(i, 17) if(ref0[i] != ref1[i]) rv += 1 << i;
-        cout << rv << '\n';
+        if(rv == 1e18) cout << -1 << '\n';
+        else cout << rv << '\n';
     }
     return 0;
 }

@@ -62,23 +62,24 @@ int main()
     cin >> t;
     while(t--)
     {
-        ll l, r;
-        cin >> l >> r;
-        ll n = r - l + 1;
+        ll n, mini = 0, maxi = 0, minv = 1e18, maxv = 0;
+        cin >> n;
         vector<ll> a(n);
-        FOR(i, n) cin >> a[i];
-        vector<ll> ref0(17), ref1(17);
-        FOB(i, l, r + 1)
+        FOR(i, n)
         {
-            FOR(j, 17)
+            cin >> a[i];
+            if(a[i] < minv)
             {
-                if((i & (1 << j)) == (1 << j)) ref0[j]++;
-                if((a[i - l] & (1 << j)) == (1 << j)) ref1[j]++;
+                minv = a[i];
+                mini = i;
+            }
+            if(a[i] > maxv)
+            {
+                maxv = a[i];
+                maxi = i;
             }
         }
-        ll rv = 0;
-        FOR(i, 17) if(ref0[i] != ref1[i]) rv += 1 << i;
-        cout << rv << '\n';
+        cout << mini + 1 << ' ' << maxi + 1 << '\n';
     }
     return 0;
 }

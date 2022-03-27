@@ -56,29 +56,28 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1592/problem/B
+
 int main()
 {
     ll t;
     cin >> t;
     while(t--)
     {
-        ll l, r;
-        cin >> l >> r;
-        ll n = r - l + 1;
+        ll n, x;
+        cin >> n >> x;
         vector<ll> a(n);
         FOR(i, n) cin >> a[i];
-        vector<ll> ref0(17), ref1(17);
-        FOB(i, l, r + 1)
+        if(n >= 2 * x) cout << "YES\n";
+        else
         {
-            FOR(j, 17)
-            {
-                if((i & (1 << j)) == (1 << j)) ref0[j]++;
-                if((a[i - l] & (1 << j)) == (1 << j)) ref1[j]++;
-            }
+            bool valid = true;
+            vector<ll> b = a;
+            ssort(b);
+            FOB(i, n - x, x) valid = valid && (a[i] == b[i]);
+            if(valid) cout << "YES\n";
+            else cout << "NO\n";
         }
-        ll rv = 0;
-        FOR(i, 17) if(ref0[i] != ref1[i]) rv += 1 << i;
-        cout << rv << '\n';
     }
     return 0;
 }

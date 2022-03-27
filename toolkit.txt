@@ -6,10 +6,8 @@ void binsearch()
     while(hi - lo > 0)
     {
         ll mid = lo + (hi - lo + 1) / 2;
-        if(/*...*/)
-        { lo = mid; }
-        else
-        { hi = mid - 1; }
+        if(/*...*/) lo = mid;
+        else hi = mid - 1;
     }
 }
 
@@ -23,13 +21,12 @@ ll bitcount(ll x)
 void bitmaskdp()
 {
     ll N;
-    vl dp(1 << N);
+    vector<ll> dp(1 << N);
     FOR(x, 1 << N)
     {
         FOR(n, N)
         {
-            if(x & (1 << n))
-            { continue; }
+            if(x & (1 << n)) continue;
             dp[x | (1 << n)]=/*...*/;
         }
     }
@@ -37,21 +34,24 @@ void bitmaskdp()
 
 void customsort()
 {
-    vl x;
+    vector<ll> x;
     sort(x.begin(), x.end(),
         &[] (const ll &a, const ll &b) -> bool
         { return a < b; });
     // equivalent to regular sort
 }
 
-fl dist(pll &p0, pll &p1)
-{
-    ll dx = p0.first - p1.first, dy = p0.second - p1.second;
-    return sqrt((fl) (dx * dx + dy * dy));
-}
-
 ll gcd(ll x, ll y)
 {
 	if(!y) { return x; }
 	else { return gcd(y, x % y); }
+}
+
+ll pow(ll x, ll y)
+{
+    if(!y) return 1;
+    ll rv = pow(x, y / 2);
+    rv = (rv * rv) % MOD;
+    if(y % 2) rv = (rv * x) % MOD;
+    return rv;
 }

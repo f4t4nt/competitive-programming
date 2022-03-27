@@ -56,29 +56,52 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1647/problem/C
+
 int main()
 {
     ll t;
     cin >> t;
     while(t--)
     {
-        ll l, r;
-        cin >> l >> r;
-        ll n = r - l + 1;
-        vector<ll> a(n);
-        FOR(i, n) cin >> a[i];
-        vector<ll> ref0(17), ref1(17);
-        FOB(i, l, r + 1)
+        ll n, m;
+        cin >> n >> m;
+        bool valid = true;
+        vector<vector<bool>> ref(n, vector<bool>(m));
+        vector<vector<bool>> g(n, vector<bool>(m));
+        FOR(i, n)
         {
-            FOR(j, 17)
+            FOR(j, m)
             {
-                if((i & (1 << j)) == (1 << j)) ref0[j]++;
-                if((a[i - l] & (1 << j)) == (1 << j)) ref1[j]++;
+                char c;
+                cin >> c;
+                if(c == '1') g[i][j] = true;
             }
         }
-        ll rv = 0;
-        FOR(i, 17) if(ref0[i] != ref1[i]) rv += 1 << i;
-        cout << rv << '\n';
+        if(g[0][0]) cout << -1 << '\n';
+        else
+        {
+            vector<vector<ll>> rv;
+            queue<pair<ll, ll>> bfs;
+            bfs.push({n - 1, m - 1});
+            while(sz(bfs))
+            {
+                pair<ll, ll> p;
+                p = bfs.front();
+                bfs.pop();
+                if(g[p.first][p.second])
+                {
+                    if(p.first > 0) rv.pb({ p.first - 1, p.second, p.first, p.second });
+                    else rv.pb({ p.first, p.second - 1, p.first, p.second });
+                }
+                if(p.first > 0 && !ref[p.first - 1][p.second])
+                { bfs.push({ p.first - 1, p.second }); ref[p.first - 1][p.second] = true; }
+                if(p.second > 0 && !ref[p.first][p.second - 1])
+                { bfs.push({ p.first, p.second - 1 }); ref[p.first][p.second - 1] = true; }
+            }
+            cout << sz(rv) << '\n';
+            FOR(i, sz(rv)) cout << rv[i][0] + 1 << ' ' << rv[i][1] + 1 << ' ' << rv[i][2] + 1 << ' ' << rv[i][3] + 1 << '\n';
+        }
     }
     return 0;
 }

@@ -56,29 +56,50 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1647/problem/D
+
+bool funkyfunc(ll &d, ll &sqrtd, ll &y)
+{
+    FOB(i, 2, sqrtd) if(d % i == 0 && ((y * i) % d != 0 || (y * (d / i)) % d != 0)) return false;
+    return true;
+}
+
 int main()
 {
     ll t;
     cin >> t;
     while(t--)
     {
-        ll l, r;
-        cin >> l >> r;
-        ll n = r - l + 1;
-        vector<ll> a(n);
-        FOR(i, n) cin >> a[i];
-        vector<ll> ref0(17), ref1(17);
-        FOB(i, l, r + 1)
+        ll x, d;
+        cin >> x >> d;
+        if(x % (d * d) != 0) cout << "NO\n";
+        else
         {
-            FOR(j, 17)
+            // x = y *  d ^ e
+            ll y = x, e = 0, sqrtd = sqrt(d) + 1, taud = 0;
+            while(y % d == 0)
+            { y /= d; e++; }
+            ll sqrty = sqrt(y) + 1, tauy = 0;
+            FOB(i, 1, sqrty)
             {
-                if((i & (1 << j)) == (1 << j)) ref0[j]++;
-                if((a[i - l] & (1 << j)) == (1 << j)) ref1[j]++;
+                if(y % i == 0)
+                {
+                    if(i * i == y) tauy += 1;
+                    else tauy += 2;
+                }
             }
+            FOB(i, 1, sqrtd)
+            {
+                if(d % i == 0)
+                {
+                    if(i * i == d) taud += 1;
+                    else taud += 2;
+                }
+            }
+            if(tauy <= 2 && (e == 2 || taud <= 2)) cout << "NO\n";
+            elif(tauy <= 2 && e == 3 && funkyfunc(d, sqrtd, y)) cout << "NO\n";
+            else cout << "YES\n";
         }
-        ll rv = 0;
-        FOR(i, 17) if(ref0[i] != ref1[i]) rv += 1 << i;
-        cout << rv << '\n';
     }
     return 0;
 }

@@ -34,7 +34,6 @@ using str = string;
 #define pb push_back
 #define elif else if
 #define sz(C) (ll) C.size()
-#define mp make_pair
 #define flip(C) reverse(C.begin(), C.end())
 #define ssort(C) sort(C.begin(), C.end())
 #define rsort(C) sort(C.begin(), C.end(), greater<>())
@@ -56,29 +55,36 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1651/problem/C
+
 int main()
 {
     ll t;
     cin >> t;
     while(t--)
     {
-        ll l, r;
-        cin >> l >> r;
-        ll n = r - l + 1;
-        vector<ll> a(n);
+        ll n;
+        cin >> n;
+        vector<ll> a(n), b(n);
         FOR(i, n) cin >> a[i];
-        vector<ll> ref0(17), ref1(17);
-        FOB(i, l, r + 1)
+        FOR(i, n) cin >> b[i];
+        if(n == 1) cout << abs(a[0] - b[0]) << '\n';
+        else
         {
-            FOR(j, 17)
-            {
-                if((i & (1 << j)) == (1 << j)) ref0[j]++;
-                if((a[i - l] & (1 << j)) == (1 << j)) ref1[j]++;
-            }
+            ll x = abs(a[0] - b[0]), x0 = 1e18, x1 = 1e18,
+                y = abs(a[n - 1] - b[n - 1]), y0 = 1e18, y1 = 1e18,
+                z0 = abs(a[0] - b[n - 1]), z1 = abs(a[n - 1] - b[0]);
+            FOR(i, n - 1) x0 = min(x0, abs(a[0] - b[i + 1]));
+            FOR(i, n - 1) x1 = min(x1, abs(a[n - 1] - b[i]));
+            FOR(i, n - 1) y0 = min(y0, abs(b[0] - a[i + 1]));
+            FOR(i, n - 1) y1 = min(y1, abs(b[n - 1] - a[i]));
+            x = min(x, x0 + y0);
+            y = min(y, x1 + y1);
+            cout << min(x + y,
+                    min(z0 + z1,
+                    min(z0 + y0 + x1,
+                        z1 + x0 + y1))) << '\n';
         }
-        ll rv = 0;
-        FOR(i, 17) if(ref0[i] != ref1[i]) rv += 1 << i;
-        cout << rv << '\n';
     }
     return 0;
 }
