@@ -56,45 +56,40 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codingcompetitions.withgoogle.com/codejam/round/0000000000876ff1/0000000000a4621b
+
+str solve(ll &R, ll &C)
+{
+    str rv = "..+";
+    FOB(i, 1, C) rv += "-+";
+    rv += '\n';
+    rv += "..|";
+    FOB(i, 1, C) rv += ".|";
+    rv += '\n';
+    rv += "+";
+    FOR(i, C) rv += "-+";
+    rv += '\n';
+    FOB(i, 1, R)
+    {
+        rv += '|';
+        FOR(j, C) rv += ".|";
+        rv += '\n';
+        rv += "+";
+        FOR(i, C) rv += "-+";
+        rv += '\n';
+    }
+    return rv;
+}
+
 int main()
 {
     ll T;
     cin >> T;
     FOR(t, T)
     {
-        ll N;
-        cin >> N;
-        vector<ll> F(N + 1), P(N + 1);
-        vector<vector<ll>> G(N + 1);
-        FOR(i, N) cin >> F[i + 1];
-        FOR(i, N)
-        {
-            cin >> P[i + 1];
-            G[P[i + 1]].pb(i + 1);
-        }
-        vector<ll> ref;
-        ref.pb(0);
-        FOR(i, N + 1) FORE(x, G[ref[i]]) ref.pb(x);
-        FORR(i, N + 1)
-        {
-            ll x = ref[i], y = -1, m = 1e18;
-            FORE(z, G[x])
-            {
-                if(F[z] < m)
-                {
-                    m = F[z];
-                    y = z;
-                }
-            }
-            if(y >= 0)
-            {
-                F[y] = 0;
-                F[x] = max(F[x], m);
-            }
-        }
-        ll rv = 0;
-        FORE(x, F) rv += x;
-        cout << "Case #" << t + 1 << ": " << rv << '\n';
+        ll R, C;
+        cin >> R >> C;
+        cout << "Case #" << t + 1 << ":\n" << solve(R, C);
     }
     return 0;
 }

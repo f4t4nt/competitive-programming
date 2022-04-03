@@ -56,45 +56,41 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codingcompetitions.withgoogle.com/codejam/round/0000000000876ff1/0000000000a4672b
+
 int main()
 {
     ll T;
     cin >> T;
     FOR(t, T)
     {
-        ll N;
-        cin >> N;
-        vector<ll> F(N + 1), P(N + 1);
-        vector<vector<ll>> G(N + 1);
-        FOR(i, N) cin >> F[i + 1];
-        FOR(i, N)
+        vector<ll> rv(4, 1e18);
+        FOR(i, 3)
         {
-            cin >> P[i + 1];
-            G[P[i + 1]].pb(i + 1);
-        }
-        vector<ll> ref;
-        ref.pb(0);
-        FOR(i, N + 1) FORE(x, G[ref[i]]) ref.pb(x);
-        FORR(i, N + 1)
-        {
-            ll x = ref[i], y = -1, m = 1e18;
-            FORE(z, G[x])
+            FOR(j, 4)
             {
-                if(F[z] < m)
-                {
-                    m = F[z];
-                    y = z;
-                }
-            }
-            if(y >= 0)
-            {
-                F[y] = 0;
-                F[x] = max(F[x], m);
+                ll x;
+                cin >> x;
+                rv[j] = min(rv[j], x);
             }
         }
-        ll rv = 0;
-        FORE(x, F) rv += x;
-        cout << "Case #" << t + 1 << ": " << rv << '\n';
+        ll S = 0;
+        FOR(i, 4)
+        {
+            S += rv[i];
+            if(S >= 1e6)
+            {
+                ll d = S - 1e6;
+                rv[i] -= d;
+                FOB(j, i + 1, 4) rv[j] = 0;
+                S = 1e6;
+                break;
+            }
+        }
+        cout << "Case #" << t + 1 << ": ";
+        if(S < 1e6) cout << "IMPOSSIBLE";
+        else FOR(i, 4) cout << rv[i] << " ";
+        cout << '\n';
     }
     return 0;
 }
