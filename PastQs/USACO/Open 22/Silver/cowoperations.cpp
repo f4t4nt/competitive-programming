@@ -56,19 +56,37 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// http://usaco.org/index.php?page=viewproblem2&cpid=1232
+
 int main() {
-    ll n, m;
-    cin >> n >> m;
-    vector<vector<ll>> e(n);
-    FOR(i, m) {
-        ll a, b;
-        cin >> a >> b;
-        a--; b--;
-        e[a].pb(b);
-        e[b].pb(a);
+    str s;
+    cin >> s;
+    ll n = sz(s);
+    vector<vector<ll>> ref(n + 1, vector<ll>(3, 0));
+    FOR(i, n) {
+        ref[i + 1] = ref[i];
+        if(s[i] == 'C') {
+            ref[i + 1][0]++;
+        } elif(s[i] == 'O') {
+            ref[i + 1][1]++;
+        } elif(s[i] == 'W') {
+            ref[i + 1][2]++;
+        }
     }
-    ll ref0 = 0;
-    vector<bool> ref1(n);
-    
+    ll t;
+    cin >> t;
+    FOR(i, t) {
+        ll l, r;
+        cin >> l >> r;
+        ll c = ref[r][0] - ref[l - 1][0],
+            o = ref[r][1] - ref[l - 1][1],
+            w = ref[r][2] - ref[l - 1][2];
+        if((o + w) % 2 == 0 && (c + o) % 2 == 1) {
+            cout << "Y";
+        } else {
+            cout << "N";
+        }
+    }
+    cout << '\n';
     return 0;
 }

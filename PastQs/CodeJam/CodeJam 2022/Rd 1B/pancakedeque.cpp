@@ -56,19 +56,33 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codingcompetitions.withgoogle.com/codejam/round/000000000087711b/0000000000acd59d
+
 int main() {
-    ll n, m;
-    cin >> n >> m;
-    vector<vector<ll>> e(n);
-    FOR(i, m) {
-        ll a, b;
-        cin >> a >> b;
-        a--; b--;
-        e[a].pb(b);
-        e[b].pb(a);
+    ll t;
+    cin >> t;
+    FOR(i, t) {
+        ll n;
+        cin >> n;
+        vector<ll> dq(n);
+        FOR(i, n) cin >> dq[i];
+        ll l = 0, r = n - 1, m = 0, rv = 0;
+        while(l <= r) {
+            if(dq[l] > dq[r]) {
+                if(dq[r] >= m) {
+                    m = dq[r];
+                    rv++;
+                }
+                r--;
+            } else {
+                if(dq[l] >= m) {
+                    m = dq[l];
+                    rv++;
+                }
+                l++;
+            }
+        }
+        cout << "Case #" << i + 1 << ": " << rv << '\n';
     }
-    ll ref0 = 0;
-    vector<bool> ref1(n);
-    
     return 0;
 }

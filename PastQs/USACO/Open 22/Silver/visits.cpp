@@ -56,19 +56,46 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-int main() {
-    ll n, m;
-    cin >> n >> m;
-    vector<vector<ll>> e(n);
-    FOR(i, m) {
-        ll a, b;
-        cin >> a >> b;
-        a--; b--;
-        e[a].pb(b);
-        e[b].pb(a);
+// http://usaco.org/index.php?page=viewproblem2&cpid=1230
+
+struct DSU {
+    vector<ll> e;
+    void init(ll n) {
+        FOR(i, n) e.pb(i);
     }
-    ll ref0 = 0;
-    vector<bool> ref1(n);
-    
+    ll find(ll x) {
+        if (e[x] == x) return x;
+        return e[x] = find(e[x]);
+    }
+    bool merge(ll x, ll y) {
+        x = find(x);
+        y = find(y);
+        if (x == y) return false;
+        e[x] = y;
+        return true;
+    }
+};
+
+int main() {
+    ll n;
+    cin >> n;
+    vector<tuple<ll, ll, ll>> e;
+    FOR(i, n) {
+        ll a, v;
+        cin >> a >> v;
+        e.pb({ v, i, a - 1 });
+    }
+    rsort(e);
+    DSU d;
+    d.init(n);
+    ll rv = 0;
+    FORE(t, e) {
+        ll v, i, a;
+        tie(v, i, a) = t;
+        if (d.merge(i, a)) {
+            rv += v;
+        }
+    }
+    cout << rv << '\n';
     return 0;
 }

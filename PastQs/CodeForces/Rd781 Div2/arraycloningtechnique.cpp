@@ -56,19 +56,31 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-int main() {
-    ll n, m;
-    cin >> n >> m;
-    vector<vector<ll>> e(n);
-    FOR(i, m) {
-        ll a, b;
-        cin >> a >> b;
-        a--; b--;
-        e[a].pb(b);
-        e[b].pb(a);
+// https://codeforces.com/contest/1665/problem/B
+
+int main()
+{
+    ll t;
+    cin >> t;
+    while(t--)
+    {
+        ll n, m = 0;
+        cin >> n;
+        map<ll, ll> ref;
+        vector<ll> a(n);
+        FOR(i, n)
+        {
+            cin >> a[i];
+            ref[a[i]]++;
+            m = max(m, ref[a[i]]);
+        }
+        ll x = m, y = 0;
+        while(x < n)
+        {
+            x *= 2;
+            y++;
+        }
+        cout << n - m + y << '\n';
     }
-    ll ref0 = 0;
-    vector<bool> ref1(n);
-    
     return 0;
 }

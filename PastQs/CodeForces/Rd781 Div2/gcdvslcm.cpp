@@ -56,19 +56,19 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-int main() {
-    ll n, m;
-    cin >> n >> m;
-    vector<vector<ll>> e(n);
-    FOR(i, m) {
-        ll a, b;
-        cin >> a >> b;
-        a--; b--;
-        e[a].pb(b);
-        e[b].pb(a);
+// https://codeforces.com/contest/1665/problem/A
+
+int main()
+{
+    ll T;
+    cin >> T;
+    FOR(t, T)
+    {
+        ll N;
+        cin >> N;
+        if (N % 4 == 0) cout << N / 4 << ' ' << N / 4 << ' ' << N / 4 << ' ' << N / 4 << '\n';
+        else if (N % 3 == 1) cout << N / 3 << ' ' << N / 3 << ' ' << N / 3 << ' ' << 1 << '\n';
+        else cout << 1 << ' ' << N - 3 << ' ' << 1 << ' ' << 1 << '\n';
     }
-    ll ref0 = 0;
-    vector<bool> ref1(n);
-    
     return 0;
 }

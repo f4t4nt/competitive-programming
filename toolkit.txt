@@ -41,6 +41,24 @@ void customsort()
     // equivalent to regular sort
 }
 
+struct DSU {
+    vector<ll> e;
+    void init(ll n) {
+        FOR(i, n) e.pb(i);
+    }
+    ll find(ll x) {
+        if (e[x] == x) return x;
+        return e[x] = find(e[x]);
+    }
+    bool merge(ll x, ll y) {
+        x = find(x);
+        y = find(y);
+        if (x == y) return false;
+        e[x] = y;
+        return true;
+    }
+};
+
 ll gcd(ll x, ll y)
 {
 	if(!y) { return x; }
