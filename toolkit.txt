@@ -42,21 +42,18 @@ void customsort()
 }
 
 struct DSU {
-    vector<ll> e;
-    void init(ll n) {
-        FOR(i, n) e.pb(i);
-    }
-    ll find(ll x) {
-        if (e[x] == x) return x;
-        return e[x] = find(e[x]);
-    }
-    bool merge(ll x, ll y) {
-        x = find(x);
-        y = find(y);
-        if (x == y) return false;
-        e[x] = y;
-        return true;
-    }
+	vector<ll> e;
+	DSU(ll N) { e = vector<ll>(N, -1); }
+	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
+	bool same_set(ll a, ll b) { return get(a) == get(b); }
+	ll size(ll x) { return -e[get(x)]; }
+	bool unite(ll x, ll y) {
+		x = get(x), y = get(y);
+		if (x == y) return false;
+		if (e[x] > e[y]) swap(x, y);
+		e[x] += e[y]; e[y] = x;
+		return true;
+	}
 };
 
 ll gcd(ll x, ll y)

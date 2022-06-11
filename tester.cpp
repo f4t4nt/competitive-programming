@@ -22,7 +22,7 @@ string read_block(basic_istream<char, char_traits<char>>& test_in)
 {
     char ch;
     string block;
-    while((ch = test_in.peek()) >= 0 && ch != '#')
+    while((ch = test_in.peek()) >= 0 && ch != '=')
     {
         string line;
         getline(test_in, line);

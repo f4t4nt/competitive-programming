@@ -64,63 +64,36 @@ int main() {
         ll n;
         cin >> n;
         vector<vector<ll>> e(n);
+        e[0].pb(0);
         FOR(i, n - 1) {
             ll a, b;
             cin >> a >> b;
             e[a - 1].pb(b - 1);
             e[b - 1].pb(a - 1);
         }
-        vector<pair<ll, vector<ll>>> t(n);
-        queue<ll> bfs;
-        vector<ll> v(n, 0);
-        bfs.push(0);
+        multimap<ll, ll> bfs;
+        vector<bool> v(n);
+        bfs.insert(mp(0, 0));
         v[0] = true;
         while(sz(bfs)) {
-            ll x = bfs.front();
-            bfs.pop();
-            FOR(i, sz(e[x])) {
-                ll y = e[x][i];
-                if(!v[y]) {
-                    v[y]++;
-                    bfs.push(y);
-                    t[x].second.pb(y);
-                    t[y].first = x;
+            auto p = *bfs.begin();
+            auto x = p.first;
+            auto y = p.second;
+            bfs.erase(bfs.begin());
+            if(y == -1) {
+                cout << n - x << '\n';
+                break;
+            }
+            FOR(i, sz(e[y])) {
+                if(!v[e[y][i]]) {
+                    bfs.insert(mp(
+                        x + 1 + max(sz(e[y]) - 2, 0LL),
+                        e[y][i]));
+                    v[e[y][i]] = true;
                 }
             }
+            FOB(i, sz(e[y]), 3) bfs.insert(mp(x + 1 + max(sz(e[y]) - 1, 0LL), -1));
         }
-        vector<ll> ref(n, 1);
-        v = vector<ll>(n, 0);
-        FOR(i, n) {
-            v[i] = sz(t[i].second);
-            if(!v[i]) bfs.push(i);
-        }
-        while(sz(bfs)) {
-            ll x = bfs.front();
-            bfs.pop();
-            ref[t[x].first] += ref[x];
-            v[t[x].first]--;
-            if(!v[t[x].first]) bfs.push(t[x].first);
-        }
-        vector<ll> dp(n);
-        v = vector<ll>(n, 0);
-        FOR(i, n) {
-            v[i] = sz(t[i].second);
-            if(!v[i]) bfs.push(i);
-        }
-        while(sz(bfs)) {
-            ll x = bfs.front();
-            bfs.pop();
-            if(sz(t[x].second) == 2) {
-                dp[x] = max(
-                    dp[t[x].second[0]] + ref[t[x].second[1]] - 1,
-                    dp[t[x].second[1]] + ref[t[x].second[0]] - 1);
-            } elif(sz(t[x].second) == 1) {
-                dp[x] = ref[t[x].second[0]] - 1;
-            }
-            v[t[x].first]--;
-            if(x && !v[t[x].first]) bfs.push(t[x].first);
-        }
-        cout << dp[0] << '\n';
     }
     return 0;
 }
