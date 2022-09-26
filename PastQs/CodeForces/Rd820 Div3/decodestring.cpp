@@ -59,42 +59,26 @@ string test_file_name = "tests";
 #endif
 
 int main() {
-    ll t;
-    cin >> t;
-    while (t--) {
+    ll q;
+    cin >> q;
+    while (q--) {
         ll n;
         cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
-        FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
-        }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
-                }
-            }
-            if (!valid) {
-                break;
+        str s = "", t;
+        cin >> t;
+        FORR(i, n) {
+            if (t[i] == '0') {
+                ll tmp = (t[i - 1] - '0') + (t[i - 2] - '0') * 10;
+                s += 'a' + tmp - 1;
+                i -= 2;
+            } else {
+                s += 'a' + t[i] - '1';
             }
         }
-        if (valid) {
-            cout << "YES\n";
-        } else {
-            cout << "NO\n";
+        FORR(i, sz(s)) {
+            cout << s[i];
         }
+        cout << '\n';
     }
     return 0;
 }

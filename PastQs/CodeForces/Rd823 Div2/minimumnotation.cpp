@@ -62,39 +62,42 @@ int main() {
     ll t;
     cin >> t;
     while (t--) {
-        ll n;
-        cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
+        str s;
+        cin >> s;
+        ll n = sz(s);
+        vector<ll> a(n), b, ref(10, -1), cnt0(10), cnt1(10);
         FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
+            a[i] = s[i] - '0';
+            ref[a[i]] = i;
         }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
+        ll i = 0, tmp = 10;
+        FOR(j, 10) {
+            while (i <= ref[j]) {
+                if (a[i] == j) {
+                    cnt0[j]++;
+                } else {
+                    cnt1[a[i]]++;
+                    tmp = min(tmp, a[i] + 1);
+                }
+                i++;
+            }
+        }
+        FOR(j, 11) {
+            if (j < 10) {
+                while (cnt0[j]--) {
+                    b.pb(j);
                 }
             }
-            if (!valid) {
-                break;
+            if (j > 0) {
+                while (cnt1[j - 1]--) {
+                    b.pb(min(j, 9LL));
+                }
             }
         }
-        if (valid) {
-            cout << "YES\n";
-        } else {
-            cout << "NO\n";
+        FOR(i, n) {
+            cout << b[i];
         }
+        cout << '\n';
     }
     return 0;
 }

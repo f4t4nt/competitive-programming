@@ -64,37 +64,31 @@ int main() {
     while (t--) {
         ll n;
         cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
+        ld lo = 1e8, hi = 0;
+        vector<ld> x(n), t(n);
         FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
+            cin >> x[i];
+            lo = min(lo, x[i]);
+            hi = max(hi, x[i]);
         }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
-                }
+        FOR(i, n) {
+            cin >> t[i];
+        }
+        while (hi - lo > 1e-7) {
+            ld mid1 = lo + (hi - lo) / 3;
+            ld mid2 = hi - (hi - lo) / 3;
+            ld t1 = 0, t2 = 0;
+            FOR(i, n) {
+                t1 = max(t1, t[i] + abs(x[i] - mid1));
+                t2 = max(t2, t[i] + abs(x[i] - mid2));
             }
-            if (!valid) {
-                break;
+            if (t1 < t2) {
+                hi = mid2;
+            } else {
+                lo = mid1;
             }
         }
-        if (valid) {
-            cout << "YES\n";
-        } else {
-            cout << "NO\n";
-        }
+        cout << fixed << setprecision(10) << lo << '\n';
     }
     return 0;
 }

@@ -58,42 +58,66 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+vector<int> getResult(vector<int> arrival, vector<int> street) {
+    int n = arrival.size();
+    vector<tuple<int, int, int>> cars;
+    FOR(i, n) {
+        cars.pb(mt(arrival[i], street[i], i));
+    }
+    ssort(cars);
+    vector<int> result(n);
+    queue<int> q0, q1;
+    int time = 0;
+    int i = 0;
+    int last = 1;
+    while (i < n || !q0.empty() || !q1.empty()) {
+        while (i < n && get<0>(cars[i]) <= time) {
+            if (get<1>(cars[i]) == 0) {
+                q0.push(get<2>(cars[i]));
+            } else {
+                q1.push(get<2>(cars[i]));
+            }
+            i++;
+        }
+        if (!q1.empty() && (q0.empty() || last == 1)) {
+            while (!q1.empty()) {
+                result[q1.front()] = time;
+                q1.pop();
+                time++;
+            }
+            last = 1;
+        } else if (!q0.empty() && (q1.empty() || last == 0)) {
+            while (!q0.empty()) {
+                result[q0.front()] = time;
+                q0.pop();
+                time++;
+            }
+            last = 0;
+        } else if (i < n) {
+            time = get<0>(cars[i]);
+            last = 1;
+        }
+    }
+    return result;
+}
+
 int main() {
-    ll t;
-    cin >> t;
-    while (t--) {
+    ll T;
+    cin >> T;
+    FOR(t, T) {
         ll n;
         cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
+        vector<int> arrival(n);
+        vector<int> street(n);
         FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
+            cin >> arrival[i];
         }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
-                }
-            }
-            if (!valid) {
-                break;
-            }
+        FOR(i, n) {
+            cin >> street[i];
         }
-        if (valid) {
-            cout << "YES\n";
-        } else {
-            cout << "NO\n";
+        vector<int> result = getResult(arrival, street);
+        FOR(i, n) {
+            cout << result[i] << '\n';
         }
     }
     return 0;

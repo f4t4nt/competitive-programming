@@ -58,43 +58,42 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// http://www.usaco.org/index.php?page=viewproblem2&cpid=994
+
 int main() {
-    ll t;
-    cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
-        FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
+    ifstream cin("threesum.in");
+    ofstream cout("threesum.out");
+    ll n, q;
+    cin >> n >> q;
+    vector<ll> a(n);
+    FOR(i, n) {
+        cin >> a[i];
+    }
+    vector<vector<ll>> dp(n, vector<ll>(n));
+    vector<ll> ref(2e6 + 1);
+    FOR(i, n) {
+        FOB(j, i + 1, n) {
+            if (-a[i] - a[j] + 1e6 >= 0 && -a[i] - a[j] + 1e6 <= 2e6) {
+                dp[i][j] = ref[-a[i] - a[j] + 1e6];
             }
-            ref[x][y]++;
+            ref[a[j] + 1e6]++;
         }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
-                }
-            }
-            if (!valid) {
-                break;
-            }
+        FOB(j, i + 1, n) {
+            ref[a[j] + 1e6]--;
         }
-        if (valid) {
-            cout << "YES\n";
-        } else {
-            cout << "NO\n";
+    }
+    FOB(len, 2, n) {
+        FOR(i, n - len) {
+            ll j = i + len;
+            dp[i][j] += dp[i][j - 1] + dp[i + 1][j] - dp[i + 1][j - 1];
         }
+    }
+    FOR(i, q) {
+        ll l, r;
+        cin >> l >> r;
+        l--;
+        r--;
+        cout << dp[l][r] << '\n';
     }
     return 0;
 }

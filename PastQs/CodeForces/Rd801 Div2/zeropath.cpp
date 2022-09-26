@@ -18,7 +18,6 @@
 #include <stack>
 #include <stdio.h>
 #include <string>
-#include <string.h>
 #include <tuple>
 #include <unordered_set>
 #include <utility>
@@ -61,36 +60,35 @@ string test_file_name = "tests";
 int main() {
     ll t;
     cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
-        FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
+    while(t--) {
+        ll n, m;
+        cin >> n >> m;
+        vector<vector<ll>> a(n, vector<ll>(m));
+        FOR(i, n) FOR(j, m) {
+            cin >> a[i][j];
+            if(a[i][j] == -1) a[i][j] = 0;
         }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
+        ll x = n + m - 1;
+        if(x % 2 == 1) {
+            cout << "NO\n";
+            continue;
+        }
+        x /= 2;
+        vector<vector<pair<ll,ll>>> dp(n, vector<pair<ll,ll>>(m, {1e18, -1e18}));
+        dp[0][0] = {a[0][0], a[0][0]};
+        FOR(i, n) {
+            FOR(j, m) {
+                if(i > 0) {
+                    dp[i][j].first = min(dp[i][j].first, a[i][j] + dp[i - 1][j].first);
+                    dp[i][j].second = max(dp[i][j].second, a[i][j] + dp[i - 1][j].second);
+                }
+                if(j > 0) {
+                    dp[i][j].first = min(dp[i][j].first, a[i][j] + dp[i][j - 1].first);
+                    dp[i][j].second = max(dp[i][j].second, a[i][j] + dp[i][j - 1].second);
                 }
             }
-            if (!valid) {
-                break;
-            }
         }
-        if (valid) {
+        if(dp[n - 1][m - 1].first <= x && dp[n - 1][m - 1].second >= x) {
             cout << "YES\n";
         } else {
             cout << "NO\n";

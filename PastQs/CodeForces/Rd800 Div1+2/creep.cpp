@@ -18,7 +18,6 @@
 #include <stack>
 #include <stdio.h>
 #include <string>
-#include <string.h>
 #include <tuple>
 #include <unordered_set>
 #include <utility>
@@ -61,40 +60,32 @@ string test_file_name = "tests";
 int main() {
     ll t;
     cin >> t;
-    while (t--) {
+    while(t--) {
         ll n;
         cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
+        str s;
+        cin >> s;
+        vector<ll> p(n);
+        vector<pair<str, ll>> ref;
         FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
+            cin >> p[i];
+            p[i]--;
         }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
+        vector<bool> v(n);
+        FOR(i, n) {
+            if(!v[i]) {
+                str tmp0; // = s[i];
+                ll tmp1 = 1, x = p[i];
+                while(x != i) {
+                    v[x] = true;
+                    tmp0 += s[x];
+                    x = p[x];
+                    tmp1++;
                 }
-            }
-            if (!valid) {
-                break;
+                ref.pb(mp(tmp0, tmp1));
             }
         }
-        if (valid) {
-            cout << "YES\n";
-        } else {
-            cout << "NO\n";
-        }
+        
     }
     return 0;
 }

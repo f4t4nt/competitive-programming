@@ -18,7 +18,6 @@
 #include <stack>
 #include <stdio.h>
 #include <string>
-#include <string.h>
 #include <tuple>
 #include <unordered_set>
 #include <utility>
@@ -61,40 +60,21 @@ string test_file_name = "tests";
 int main() {
     ll t;
     cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
+    while(t--) {
+        ll n, m, x = -1e18, y = 0, z = 0;
+        cin >> n >> m;
+        vector<vector<ll>> a(n, vector<ll>(m));
         FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
-        }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
+            FOR(j, m) {
+                cin >> a[i][j];
+                if(x < a[i][j]) {
+                    x = a[i][j];
+                    y = i;
+                    z = j;
                 }
             }
-            if (!valid) {
-                break;
-            }
         }
-        if (valid) {
-            cout << "YES\n";
-        } else {
-            cout << "NO\n";
-        }
+        cout << max(y + 1, n - y) * max(z + 1, m - z) << '\n';
     }
     return 0;
 }

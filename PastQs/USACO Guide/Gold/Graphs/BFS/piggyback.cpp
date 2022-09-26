@@ -58,43 +58,53 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// http://www.usaco.org/index.php?page=viewproblem2&cpid=491
+
+struct Node {
+    ll idx;
+    vector<ll> dist = vector<ll>(3, 1e18); // 0 - bessie, 1 - elsie, 2 - both
+    vector<ll> adj;
+};
+
 int main() {
-    ll t;
-    cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
-        FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
+    ifstream cin("piggyback.in");
+    ofstream cout("piggyback.out");
+    vector<ll> energies(3);
+    ll n, m;
+    cin >> energies[0] >> energies[1] >> energies[2] >> n >> m;
+    vector<Node> nodes(n);
+    FOR(i, n) {
+        nodes[i].idx = i;
+    }
+    FOR(i, m) {
+        ll a, b;
+        cin >> a >> b;
+        a--;
+        b--;
+        nodes[a].adj.pb(b);
+        nodes[b].adj.pb(a);
+    }
+    queue<tuple<ll, ll, ll>> bfs; // idx, dist, type
+    nodes[0].dist[0] = 0;
+    nodes[1].dist[1] = 0;
+    nodes[n - 1].dist[2] = 0;
+    bfs.push(mt(0, 0, 0));
+    bfs.push(mt(1, 0, 1));
+    bfs.push(mt(n - 1, 0, 2));
+    while (!bfs.empty()) {
+        auto [idx, dist, type] = bfs.front();
+        bfs.pop();
+        FORE(adj, nodes[idx].adj) {
+            if (nodes[adj].dist[type] > dist + 1) {
+                nodes[adj].dist[type] = dist + 1;
+                bfs.push(mt(adj, dist + 1, type));
             }
-            ref[x][y]++;
-        }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
-                }
-            }
-            if (!valid) {
-                break;
-            }
-        }
-        if (valid) {
-            cout << "YES\n";
-        } else {
-            cout << "NO\n";
         }
     }
+    ll rv = 1e18;
+    FORE(node, nodes) {
+        rv = min(rv, node.dist[0] * energies[0] + node.dist[1] * energies[1] + node.dist[2] * energies[2]);
+    }
+    cout << rv << '\n';
     return 0;
 }

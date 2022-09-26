@@ -18,9 +18,8 @@
 #include <stack>
 #include <stdio.h>
 #include <string>
-#include <string.h>
 #include <tuple>
-#include <unordered_set>
+#include <uNOrdered_set>
 #include <utility>
 #include <vector>
 
@@ -61,36 +60,42 @@ string test_file_name = "tests";
 int main() {
     ll t;
     cin >> t;
-    while (t--) {
-        ll n;
+    while(t--) {
+        ll n, pos = 0, neg = 0, zero = 0;
         cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
+        set<ll> s;
+        vector<ll> a(n);
         FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
+            cin >> a[i];
+            s.insert(a[i]);
+            if(a[i] > 0) {
+                pos++;
+            } elif(a[i] < 0) {
+                neg++;
+            } else {
+                zero++;
             }
-            ref[x][y]++;
         }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
+        ssort(a);
+        if(n < 5) {
+            bool valid = true;
+            FOR(i, n) {
+                FOB(j, i + 1, n) {
+                    FOB(k, j + 1, n) {
+                        valid &= s.find(a[i] + a[j] + a[k]) != s.end();
                     }
-                    center = true;
                 }
             }
-            if (!valid) {
-                break;
+            if(valid) {
+                cout << "YES\n";
+            } else {
+                cout << "NO\n";
             }
-        }
-        if (valid) {
+        } elif(pos == 0 && neg == 0) {
+            cout << "YES\n";
+        } elif(pos == 1 && neg == 1 && a[0] == -a[n - 1]) {
+            cout << "YES\n";
+        } elif(pos + neg == 1) {
             cout << "YES\n";
         } else {
             cout << "NO\n";

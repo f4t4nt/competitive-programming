@@ -18,7 +18,6 @@
 #include <stack>
 #include <stdio.h>
 #include <string>
-#include <string.h>
 #include <tuple>
 #include <unordered_set>
 #include <utility>
@@ -58,43 +57,25 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1712/problem/B
+
 int main() {
     ll t;
     cin >> t;
-    while (t--) {
+    while(t--) {
         ll n;
         cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
-        FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
+        if (n % 2) {
+            cout << 1 << ' ';
+            FOBI(i, 2, n + 1, 2) {
+                cout << i + 1 << ' ' << i << ' ';
             }
-            ref[x][y]++;
-        }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
-                }
-            }
-            if (!valid) {
-                break;
-            }
-        }
-        if (valid) {
-            cout << "YES\n";
         } else {
-            cout << "NO\n";
+            FOBI(i, 1, n + 1, 2) {
+                cout << i + 1 << ' ' << i << ' ';
+            }
         }
+        cout << endl;
     }
     return 0;
 }

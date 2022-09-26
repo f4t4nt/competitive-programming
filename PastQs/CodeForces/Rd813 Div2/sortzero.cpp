@@ -18,7 +18,6 @@
 #include <stack>
 #include <stdio.h>
 #include <string>
-#include <string.h>
 #include <tuple>
 #include <unordered_set>
 #include <utility>
@@ -58,43 +57,38 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1712/problem/C
+
 int main() {
     ll t;
     cin >> t;
     while (t--) {
         ll n;
         cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
-        FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
-        }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
+        set<ll> ref;
+        vector<ll> a(n);
+        FOR(i, n) cin >> a[i];
+        set<ll> rv;
+        while (true) {
+            ll i = n - 1;
+            while (i > 0 && a[i - 1] <= a[i]) i--;
+            if (i == 0) break;
+            ll j = i - 1;
+            while (j >= 0) {
+                if (a[j]) {
+                    rv.insert(a[j]);
                 }
+                a[j] = 0;
+                j--;
             }
-            if (!valid) {
-                break;
+            while (i < n) {
+                if (rv.find(a[i]) != rv.end()) {
+                    a[i] = 0;
+                }
+                i++;
             }
         }
-        if (valid) {
-            cout << "YES\n";
-        } else {
-            cout << "NO\n";
-        }
+        cout << sz(rv) << endl;
     }
     return 0;
 }

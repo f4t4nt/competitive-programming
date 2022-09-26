@@ -18,7 +18,6 @@
 #include <stack>
 #include <stdio.h>
 #include <string>
-#include <string.h>
 #include <tuple>
 #include <unordered_set>
 #include <utility>
@@ -58,43 +57,53 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+ll gcd(ll x, ll y) {
+	if(!y) return x;
+	else return gcd(y, x % y);
+}
+
 int main() {
     ll t;
     cin >> t;
-    while (t--) {
+    while(t--) {
         ll n;
         cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
+        str s;
+        cin >> s;
+        vector<ll> p(n);
         FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
+            cin >> p[i];
+            p[i]--;
         }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
+        vector<bool> v(n);
+        vector<str> ref;
+        FOR(i, n) {
+            if(v[i]) {
+                continue;
+            } else {
+                str tmp;
+                tmp = s[i];
+                v[i] = true;
+                ll j = p[i];
+                while(i != j) {
+                    tmp += s[j];
+                    v[j] = true;
+                    j = p[j];
                 }
-            }
-            if (!valid) {
-                break;
+                ref.pb(tmp);
             }
         }
-        if (valid) {
-            cout << "YES\n";
-        } else {
-            cout << "NO\n";
+        ll rv = 1;
+        FORE(r, ref) {
+            ll x = 1;
+            str tmp = r.substr(1, sz(r) - 1) + r[0];
+            while(tmp != r) {
+                tmp = tmp.substr(1, sz(r) - 1) + tmp[0];
+                x++;
+            }
+            rv = rv * x / gcd(rv, x);
         }
+        cout << rv << '\n';
     }
     return 0;
 }

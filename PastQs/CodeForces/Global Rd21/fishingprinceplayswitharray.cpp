@@ -18,7 +18,6 @@
 #include <stack>
 #include <stdio.h>
 #include <string>
-#include <string.h>
 #include <tuple>
 #include <unordered_set>
 #include <utility>
@@ -58,43 +57,55 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+vector<pair<ll, ll>> decompose(ll &n, ll &m, vector<ll> &a) {
+    vector<pair<ll, ll>> rv;
+    FOR(i, n) {
+        ll x = a[i], y = 1;
+        while(x % m == 0) {
+            x /= m;
+            y *= m;
+        }
+        if(sz(rv) && rv[sz(rv) - 1].first == x) {
+            rv[sz(rv) - 1].second += y;
+        } else {
+            rv.pb(mp(x, y));
+        }
+    }
+    return rv;
+}
+
+bool valid(ll &n, ll &m, ll &k, vector<ll> &a, vector<ll> &b) {
+    vector<pair<ll, ll>> tmpa = decompose(n, m, a), tmpb = decompose(k, m, b);
+    if(sz(tmpa) != sz(tmpb)) {
+        return false;
+    }
+    FOR(i, sz(tmpa)) {
+        if(tmpa[i] != tmpb[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
 int main() {
     ll t;
     cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
+    while(t--) {
+        ll n, m, k, sa = 0, sb = 0;
+        cin >> n >> m;
+        vector<ll> a(n);
         FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
+            cin >> a[i];
+            sa += a[i];
         }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
-                }
-            }
-            if (!valid) {
-                break;
-            }
+        cin >> k;
+        vector<ll> b(k);
+        FOR(i, k) {
+            cin >> b[i];
+            sb += b[i];
         }
-        if (valid) {
-            cout << "YES\n";
-        } else {
-            cout << "NO\n";
-        }
+        if(sa == sb && valid(n, m, k, a, b)) cout << "Yes\n";
+        else cout << "No\n";
     }
     return 0;
 }

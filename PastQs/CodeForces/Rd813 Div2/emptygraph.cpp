@@ -18,7 +18,6 @@
 #include <stack>
 #include <stdio.h>
 #include <string>
-#include <string.h>
 #include <tuple>
 #include <unordered_set>
 #include <utility>
@@ -58,43 +57,52 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://codeforces.com/contest/1712/problem/D
+
 int main() {
     ll t;
     cin >> t;
     while (t--) {
-        ll n;
-        cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
+        ll n, k;
+        cin >> n >> k;
+        vector<ll> a(n);
+        vector<pair<ll, ll>> b(n);
         FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
+            cin >> a[i];
+            b[i] = mp(a[i], i);
         }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
+        ssort(b);
+        FOR(i, k - 1) {
+            a[b[i].second] = 1e9;
+        }
+        ll rv = 0;
+        FOR(i, n - 1) {
+            vector<ll> v(4);
+            v[0] = a[i];
+            v[1] = a[i + 1];
+            ll j = k - 1;
+            while (j < n && (b[j].second == i || b[j].second == i + 1)) {
+                j++;
+            }
+            if (j < n) {
+                v[2] = 2 * a[b[j].second];
+                j++;
+                while (j < n && (b[j].second == i || b[j].second == i + 1)) {
+                    j++;
                 }
+                if (j < n) {
+                    v[3] = 2 * a[b[j].second];
+                } else {
+                    v[3] = 1e9;
+                }
+            } else {
+                v[2] = 1e9;
+                v[3] = 1e9;
             }
-            if (!valid) {
-                break;
-            }
+            ssort(v);
+            rv = max(rv, v[1]);
         }
-        if (valid) {
-            cout << "YES\n";
-        } else {
-            cout << "NO\n";
-        }
+        cout << rv << '\n';
     }
     return 0;
 }

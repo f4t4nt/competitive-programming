@@ -58,43 +58,50 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// http://www.usaco.org/index.php?page=viewproblem2&cpid=1090
+
 int main() {
-    ll t;
-    cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
-        FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
-        }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
-                }
-            }
-            if (!valid) {
-                break;
-            }
-        }
-        if (valid) {
-            cout << "YES\n";
-        } else {
-            cout << "NO\n";
+    ll n, k;
+    cin >> n >> k;
+    vector<ll> b(n);
+    FOR(i, n) {
+        cin >> b[i];
+    }
+    vector<vector<bool>> s(k + 1, vector<bool>(k + 1));
+    FOB(i, 1, k + 1) {
+        FOB(j, 1, k + 1) {
+            char c;
+            cin >> c;
+            s[i][j] = c == '1';
         }
     }
+    s[0] = s[b[0]];
+    b[0] = 0;
+    vector<vector<ll>> dist(k + 1, vector<ll>(n, 1e18));
+    deque<pair<ll, ll>> q;
+    q.push_back({0, 0});
+    dist[0][0] = 0;
+    while (!q.empty()) {
+        auto [x, y] = q.front();
+        q.pop_front();
+        if (y + 1 < n && dist[x][y + 1] > dist[x][y] + 1) {
+            dist[x][y + 1] = dist[x][y] + 1;
+            q.push_back({x, y + 1});
+        }
+        if (y - 1 >= 0 && dist[x][y - 1] > dist[x][y] + 1) {
+            dist[x][y - 1] = dist[x][y] + 1;
+            q.push_back({x, y - 1});
+        }
+        if (s[x][b[y]] && dist[b[y]][y] > dist[x][y]) {
+            dist[b[y]][y] = dist[x][y];
+            q.push_front({b[y], y});
+        }
+    }
+    if (dist[b[n - 1]][n - 1] == 1e18) {
+        cout << -1;
+    } else {
+        cout << dist[b[n - 1]][n - 1];
+    }
+    cout << '\n';
     return 0;
 }

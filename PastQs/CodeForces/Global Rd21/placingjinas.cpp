@@ -18,7 +18,6 @@
 #include <stack>
 #include <stdio.h>
 #include <string>
-#include <string.h>
 #include <tuple>
 #include <unordered_set>
 #include <utility>
@@ -58,43 +57,60 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+const ll MOD = 1e9 + 7;
+const int MAXN = 1e6;
+
+long long fac[MAXN + 1], inv[MAXN + 1];
+
+/** Computes x^y modulo p in O(log p) time. */
+long long exp(long long x, long long y, long long p) {
+	long long res = 1; x %= p;
+	while (y) {
+		if (y & 1) {
+			res *= x; res %= p; 
+		}
+		x *= x; x %= p;
+		y >>= 1;
+	}
+	return res;
+}
+
+/** Precomputes n! from 0 to MAXN. */
+void factorial(long long p) {
+	fac[0] = 1;
+	for (int i = 1; i <= MAXN; i++) {
+		fac[i] = fac[i - 1] * i % p;
+	}
+}
+
+/** Precomputes all modular inverse factorials from 0 to MAXN in O(n log p) time */
+void inverses(long long p) {
+	inv[0] = 1;
+	for (int i = 1; i <= MAXN; i++) {
+		inv[i] = exp(fac[i], p - 2, p);
+	}
+}
+
+/** Computes nCr mod p */
+long long choose(long long n, long long r, long long p) {
+    if(n < r) return 0;
+    if(n == r) return 1;
+    if(r == 1) return n;
+	return fac[n] * inv[r] % p * inv[n - r] % p;
+}
+
 int main() {
-    ll t;
-    cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
-        FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
-        }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
-                }
-            }
-            if (!valid) {
-                break;
-            }
-        }
-        if (valid) {
-            cout << "YES\n";
-        } else {
-            cout << "NO\n";
-        }
+    factorial(MOD);
+    inverses(MOD);
+    ll n, rv = 0;
+    cin >> n;
+    vector<ll> a(n + 1), tmp;
+    FOR(i, n + 1) {
+        cin >> a[i];
+        tmp.pb(choose(a[i] + i, i + 1, MOD));
+        rv += tmp[i];
+        rv %= MOD;
     }
+    cout << rv << '\n';
     return 0;
 }

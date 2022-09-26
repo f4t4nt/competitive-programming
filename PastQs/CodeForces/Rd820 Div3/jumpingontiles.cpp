@@ -62,39 +62,32 @@ int main() {
     ll t;
     cin >> t;
     while (t--) {
-        ll n;
-        cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
-        FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
+        str s;
+        cin >> s;
+        vector<vector<ll>> ref(26);
+        FOR(i, sz(s)) {
+            ref[s[i] - 'a'].pb(i);
         }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
+        ll cost = s[sz(s) - 1] - s[0];
+        vector<ll> rv;
+        if (cost < 0) {
+            for (ll i = s[0] - 'a'; i >= s[sz(s) - 1] - 'a'; i--) {
+                FORE(j, ref[i]) {
+                    rv.pb(j);
                 }
             }
-            if (!valid) {
-                break;
+        } else {
+            for (ll i = s[0] - 'a'; i <= s[sz(s) - 1] - 'a'; i++) {
+                FORE(j, ref[i]) {
+                    rv.pb(j);
+                }
             }
         }
-        if (valid) {
-            cout << "YES\n";
-        } else {
-            cout << "NO\n";
+        cout << abs(cost) << ' ' << sz(rv) << '\n';
+        FORE(i, rv) {
+            cout << i + 1 << ' ';
         }
+        cout << '\n';
     }
     return 0;
 }

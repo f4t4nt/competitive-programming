@@ -18,7 +18,6 @@
 #include <stack>
 #include <stdio.h>
 #include <string>
-#include <string.h>
 #include <tuple>
 #include <unordered_set>
 #include <utility>
@@ -58,39 +57,56 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// http://www.usaco.org/index.php?page=viewproblem2&cpid=646
+
+struct DSU {
+	vector<ll> e;
+	DSU(ll N) { e = vector<ll>(N, -1); }
+	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
+	bool same_set(ll a, ll b) { return get(a) == get(b); }
+	ll size(ll x) { return -e[get(x)]; }
+	bool unite(ll x, ll y) {
+		x = get(x), y = get(y);
+		if (x == y) return false;
+		if (e[x] > e[y]) swap(x, y);
+		e[x] += e[y]; e[y] = x;
+		return true;
+	}
+};
+
 int main() {
-    ll t;
-    cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
-        FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
-        }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
-                }
-            }
-            if (!valid) {
-                break;
+    ifstream cin("closing.in");
+    ofstream cout("closing.out");
+
+    ll n, m;
+    cin >> n >> m;
+    vector<vector<ll>> e(n);
+    FOR(i, m) {
+        ll a, b;
+        cin >> a >> b;
+        a--, b--;
+        e[a].pb(b);
+        e[b].pb(a);
+    }
+    vector<ll> o(n);
+    FOR(i, n) {
+        cin >> o[i];
+        o[i]--;
+    }
+    DSU dsu(n);
+    vector<bool> v(n), rv(n);
+    FORR(i, n) {
+        ll &x = o[i];
+        v[x] = true;
+        FORE(y, e[x]) {
+            if (v[y]) {
+                dsu.unite(x, y);
             }
         }
-        if (valid) {
+        rv[i] = dsu.size(x) == (n - i);
+    }
+    FOR(i, n) {
+        if (rv[i]) {
             cout << "YES\n";
         } else {
             cout << "NO\n";

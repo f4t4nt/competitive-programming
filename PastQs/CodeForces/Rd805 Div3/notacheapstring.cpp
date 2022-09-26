@@ -18,9 +18,8 @@
 #include <stack>
 #include <stdio.h>
 #include <string>
-#include <string.h>
 #include <tuple>
-#include <unordered_set>
+#include <uNOrdered_set>
 #include <utility>
 #include <vector>
 
@@ -61,40 +60,37 @@ string test_file_name = "tests";
 int main() {
     ll t;
     cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
-        FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
+    while(t--) {
+        str s, rv = "";
+        cin >> s;
+        ll p, q = 0;
+        cin >> p;
+        vector<ll> ref0(26), ref1(26);
+        FOR(i, sz(s)) {
+            ll v = s[i] - 'a';
+            ref0[v]++;
+            q += v + 1;
         }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
-                }
+        FORR(i, 26) {
+            ll tmp = ref0[i];
+            if(q - ref0[i] * (i + 1) > p) {
+                ref0[i] = 0;
+            } else {
+                ref0[i] = (p - (q - ref0[i] * (i + 1))) / (i + 1);
             }
-            if (!valid) {
+            q -= (tmp - ref0[i]) * (i + 1);
+            if(q <= p) {
                 break;
             }
         }
-        if (valid) {
-            cout << "YES\n";
-        } else {
-            cout << "NO\n";
+        FOR(i, sz(s)) {
+            ll v = s[i] - 'a';
+            if(ref1[v] < ref0[v]) {
+                ref1[v]++;
+                rv += s[i];
+            }
         }
+        cout << rv << '\n';
     }
     return 0;
 }

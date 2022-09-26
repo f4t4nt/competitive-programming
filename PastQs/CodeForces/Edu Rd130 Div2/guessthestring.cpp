@@ -18,7 +18,6 @@
 #include <stack>
 #include <stdio.h>
 #include <string>
-#include <string.h>
 #include <tuple>
 #include <unordered_set>
 #include <utility>
@@ -48,53 +47,51 @@ using str = string;
 #define FOBI(x, b, e, i) for(ll x = (ll) b; x < (ll) e; x += (ll) i)
 #define FORE(x, C) for(auto &x : C)
 
-#ifdef LOCAL
-#include "tester.cpp"
-#define main test_main
-extern istringstream fin;
-extern ostringstream fout;
-string test_file_name = "tests";
-#define cin fin
-#define cout fout
-#endif
+// #ifdef LOCAL
+// #include "tester.cpp"
+// #define main test_main
+// extern istringstream fin;
+// extern ostringstream fout;
+// string test_file_name = "tests";
+// #define cin fin
+// #define cout fout
+// #endif
+
+// https://codeforces.com/contest/1697/problem/D
 
 int main() {
-    ll t;
-    cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
-        FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
-        }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
-                }
-            }
-            if (!valid) {
-                break;
-            }
-        }
-        if (valid) {
-            cout << "YES\n";
+    ll n, tmp0 = 0;
+    cin >> n;
+    map<ch, ll> ref0;
+    vector<ch> rv(n);
+    FOR(i, n) {
+        ll tmp1;
+        cout << "? 2 1 " << i + 1 << endl;
+        cin >> tmp1;
+        if(tmp1 > tmp0) {
+            cout << "? 1 " << i + 1 << endl;
+            cin >> rv[i];
+            ref0[rv[i]] = i + 1;
+            tmp0 = tmp1;
         } else {
-            cout << "NO\n";
+            vector<pair<ll, ch>> ref1;
+            FORE(r, ref0) ref1.pb(mp(r.second, r.first));
+            ssort(ref1);
+            ll lo = 0, hi = sz(ref1) - 1;
+            while(lo != hi) {
+                ll tmp2;
+                ll mid = (lo + hi) / 2;
+                cout << "? 2 " << ref1[mid].first + 1 << ' ' << i + 1 << endl;
+                cin >> tmp2;
+                if(tmp2 == tmp1 - mid - 1) lo = mid + 1; 
+                else hi = mid;
+            }
+            rv[i] = ref1[lo].second;
+            ref0[rv[i]] = i + 1;
         }
     }
+    cout << "! ";
+    FOR(i, n) cout << rv[i];
+    cout << '\n';
     return 0;
 }

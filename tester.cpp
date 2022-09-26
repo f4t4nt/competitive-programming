@@ -11,6 +11,8 @@ istringstream fin;
 ostringstream fout;
 extern string test_file_name;
 
+bool RESULT_ONLY = false;
+
 void trim(string& str)
 {
     string whitespaces = " \t\n\r\f\v";
@@ -59,10 +61,14 @@ vector<pair<string, string>> read_inputs()
 
 void print_result(ostream& cout, string& test_in, string& test_out, string& test_result, size_t& test_idx)
 {
-    if(test_result == test_out)
-    { cout << "test " << test_idx + 1 << " passed\n"; }
-    else
-    { cout << "TEST " << test_idx + 1 << " FAILED\n" << "input:\n" << test_in << '\n' << "expected:\n" << test_out << endl << "received:\n" << test_result << '\n'; }
+    if (RESULT_ONLY) {
+        cout << test_result << endl;
+    } else {
+        if(test_result == test_out)
+        { cout << "test " << test_idx + 1 << " passed\n"; }
+        else
+        { cout << "TEST " << test_idx + 1 << " FAILED\n" << "input:\n" << test_in << '\n' << "expected:\n" << test_out << endl << "received:\n" << test_result << '\n'; }
+    }
 }
 
 void run_test(ofstream& test_results, string& test_in, string& test_out, size_t test_idx)

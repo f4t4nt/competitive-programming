@@ -18,7 +18,6 @@
 #include <stack>
 #include <stdio.h>
 #include <string>
-#include <string.h>
 #include <tuple>
 #include <unordered_set>
 #include <utility>
@@ -58,43 +57,38 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+pair<ll, ll> dfs(ll i, vector<vector<ll>> &c, vector<pair<ll, ll>> &lr) {
+    pair<ll, ll> rv = mp(0, 0);
+    FORE(j, c[i]) {
+        pair<ll, ll> tmp = dfs(j, c, lr);
+        rv.first += tmp.first;
+        rv.second += tmp.second;
+    }
+    if(rv.second < lr[i].first) {
+        rv.first++;
+        rv.second = lr[i].second;
+    } else {
+        rv.second = min(rv.second, lr[i].second);
+    }
+    return rv;
+}
+
 int main() {
     ll t;
     cin >> t;
-    while (t--) {
+    while(t--) {
         ll n;
         cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
-        FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
+        vector<ll> p(n);
+        vector<vector<ll>> c(n);
+        FOB(i, 1, n) {
+            cin >> p[i];
+            p[i]--;
+            c[p[i]].pb(i);
         }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
-                }
-            }
-            if (!valid) {
-                break;
-            }
-        }
-        if (valid) {
-            cout << "YES\n";
-        } else {
-            cout << "NO\n";
-        }
+        vector<pair<ll, ll>> lr(n);
+        FOR(i, n) cin >> lr[i].first >> lr[i].second;
+        cout << dfs(0, c, lr).first << '\n';
     }
     return 0;
 }

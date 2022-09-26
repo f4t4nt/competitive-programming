@@ -62,38 +62,33 @@ int main() {
     ll t;
     cin >> t;
     while (t--) {
-        ll n;
+        ll n, tmp;
         cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
+        vector<ll> a(n);
         FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
+            cin >> a[i];
         }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
-                }
-            }
-            if (!valid) {
-                break;
-            }
+        if (n == 1) {
+            cout << 0 << '\n';
+            continue;
         }
-        if (valid) {
-            cout << "YES\n";
+        vector<pair<ll, ll>> rv;
+        rv.pb(mp(1, n));
+        if ((a[0] + a[n - 1]) % 2 == 0) {
+            tmp = a[n - 1];
         } else {
-            cout << "NO\n";
+            tmp = a[0];
+        }
+        FOB(i, 1, n - 1) {
+            if ((tmp + a[i]) % 2 == 0) {
+                rv.pb(mp(i + 1, n));
+            } else {
+                rv.pb(mp(1, i + 1));
+            }
+        }
+        cout << sz(rv) << '\n';
+        FORE(x, rv) {
+            cout << x.first << ' ' << x.second << '\n';
         }
     }
     return 0;

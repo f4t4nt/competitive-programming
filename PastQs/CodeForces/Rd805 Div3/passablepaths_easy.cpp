@@ -18,9 +18,8 @@
 #include <stack>
 #include <stdio.h>
 #include <string>
-#include <string.h>
 #include <tuple>
-#include <unordered_set>
+#include <uNOrdered_set>
 #include <utility>
 #include <vector>
 
@@ -58,39 +57,56 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+void parse(ll n, map<ll, ll> &a) {
+    FOR(i, n) {
+        ll x;
+        cin >> x;
+        a[x]++;
+    }
+    FORE(x, a) {
+        ll y = x.first, z = x.second;
+        while(y % 2 == 0) {
+            y /= 2;
+        }
+        a[y] += z;
+        a[x.first] -= z;
+    }
+    FORE(x, a) {
+        if(x.second == 0) {
+            a.erase(x.first);
+        }
+    }
+}
+
 int main() {
     ll t;
     cin >> t;
-    while (t--) {
+    while(t--) {
         ll n;
         cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
+        map<ll, ll> a, b;
+        parse(n, a);
+        parse(n, b);
         bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
-        FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
-        }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
+        for(auto x = b.rbegin(); x != b.rend(); x++) {
+            ll y = x->first, z = x->second;
+            while(y && z > 0) {
+                if(a[y] > z) {
+                    a[y] -= z;
+                    z = 0;
+                } else {
+                    z -= a[y];
+                    a[y] = 0;
                 }
+                y /= 2;
             }
-            if (!valid) {
+            b[x->first] = z;
+            if(z > 0) {
+                valid = false;
                 break;
             }
         }
-        if (valid) {
+        if(valid) {
             cout << "YES\n";
         } else {
             cout << "NO\n";

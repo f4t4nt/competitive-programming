@@ -58,43 +58,38 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://www.facebook.com/codingcompetitions/hacker-cup/2022/round-1/problems/B1
+
+constexpr ll MOD = 1e9 + 7;
+constexpr ll DIM = 3e3 + 5;
+
 int main() {
-    ll t;
-    cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
-        FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
-        }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
-                }
-            }
-            if (!valid) {
-                break;
+    vector<ll> squares(DIM);
+    FOR(i, DIM) {
+        squares[i] = i * i;
+    }
+    ll T;
+    cin >> T;
+    FOR(t, T) {
+        ll N, Q, rv = 0;
+        cin >> N;
+        vector<ll> xref(DIM), yref(DIM);
+        vector<pair<ll, ll>> trees(N);
+        FOR(i, N) {
+            cin >> trees[i].first >> trees[i].second;
+            FOR(j, DIM) {
+                xref[j] += squares[abs(trees[i].first - j)];
+                yref[j] += squares[abs(trees[i].second - j)];
             }
         }
-        if (valid) {
-            cout << "YES\n";
-        } else {
-            cout << "NO\n";
+        cin >> Q;
+        vector<pair<ll, ll>> wells(Q);
+        FOR(i, Q) {
+            cin >> wells[i].first >> wells[i].second;
+            rv += xref[wells[i].first] + yref[wells[i].second];
+            rv %= MOD;
         }
+        cout << "Case #" << t + 1 << ": " << rv << '\n';
     }
     return 0;
 }

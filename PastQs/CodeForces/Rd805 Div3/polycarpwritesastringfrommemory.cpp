@@ -18,9 +18,8 @@
 #include <stack>
 #include <stdio.h>
 #include <string>
-#include <string.h>
 #include <tuple>
-#include <unordered_set>
+#include <uNOrdered_set>
 #include <utility>
 #include <vector>
 
@@ -61,40 +60,23 @@ string test_file_name = "tests";
 int main() {
     ll t;
     cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
-        FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
+    while(t--) {
+        str s;
+        cin >> s;
+        set<char> r;
+        ll i = 0, rv = 0;
+        while(i < sz(s)) {
+            rv++;
+            r.clear();
+            while(i < sz(s) && sz(r) < 3) {
+                r.insert(s[i]);
+                i++;
             }
-            ref[x][y]++;
-        }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
-                }
-            }
-            if (!valid) {
-                break;
+            while(i < sz(s) && r.find(s[i]) != r.end()) {
+                i++;
             }
         }
-        if (valid) {
-            cout << "YES\n";
-        } else {
-            cout << "NO\n";
-        }
+        cout << rv << '\n';
     }
     return 0;
 }

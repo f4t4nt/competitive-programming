@@ -58,43 +58,41 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-int main() {
-    ll t;
-    cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        str s1, s2;
-        cin >> s1 >> s2;
-        bool valid = true;
-        vector<vector<ll>> ref(26, vector<ll>(26, 0));
-        FOR(i, n) {
-            ll x = s1[i] - 'a', y = s2[n - i - 1] - 'a';
-            if (x < y) {
-                swap(x, y);
-            }
-            ref[x][y]++;
+string canReach(int c, int x1, int y1, int x2, int y2) {
+    vector<bool> squares(2e3 + 1, false);
+    for (int i = 0; i * i <= 2e3; i++) {
+        squares[i * i] = true;
+    }
+    if (squares[x1 + y1] || squares[x2 + y2]) {
+        return "No";
+    }
+    queue<pair<int, int>> q;
+    q.push({x1, y1});
+    while (!q.empty()) {
+        auto [x, y] = q.front();
+        q.pop();
+        if (squares[x + y]) {
+            continue;
         }
-        bool center = false;
-        FOR(i, 26) {
-            FOR(j, 26) {
-                if (ref[i][j] % 2 == 1) {
-                    if (center || n % 2 == 0 || i != j) {
-                        valid = false;
-                        break;
-                    }
-                    center = true;
-                }
-            }
-            if (!valid) {
-                break;
-            }
+        if (x == x2 && y == y2) {
+            return "Yes";
         }
-        if (valid) {
-            cout << "YES\n";
-        } else {
-            cout << "NO\n";
+        if (x + c <= x2 && y + c <= y2) {
+            q.push({x + c, y + c});
+        }
+        if (x + y <= x2 && y <= y2) {
+            q.push({x + y, y});
+        }
+        if (x <= x2 && x + y <= y2) {
+            q.push({x, x + y});
         }
     }
+    return "No";
+}
+
+int main() {
+    ll c, x1, y1, x2, y2;
+    cin >> c >> x1 >> y1 >> x2 >> y2;
+    cout << canReach(c, x1, y1, x2, y2) << '\n';
     return 0;
 }

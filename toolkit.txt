@@ -1,39 +1,30 @@
-emergency toolkit in the case of mental shutdowns \('o')/
-
-void binsearch()
-{
+void binsearch() {
     ll lo = 0, hi = 1e9;
-    while(hi - lo > 0)
-    {
+    while(hi - lo > 0) {
         ll mid = lo + (hi - lo + 1) / 2;
         if(/*...*/) lo = mid;
         else hi = mid - 1;
     }
 }
 
-ll bitcount(ll x)
-{
+ll bitcount(ll x) {
 	ll rv = 0;
 	while(x > 0) { rv++; x &= (x - 1); }
 	return rv;
 }
 
-void bitmaskdp()
-{
+void bitmaskdp() {
     ll N;
     vector<ll> dp(1 << N);
-    FOR(x, 1 << N)
-    {
-        FOR(n, N)
-        {
+    FOR(x, 1 << N) {
+        FOR(n, N) {
             if(x & (1 << n)) continue;
             dp[x | (1 << n)]=/*...*/;
         }
     }
 }
 
-void customsort()
-{
+void customsort() {
     vector<ll> x;
     sort(x.begin(), x.end(),
         &[] (const ll &a, const ll &b) -> bool
@@ -56,14 +47,12 @@ struct DSU {
 	}
 };
 
-ll gcd(ll x, ll y)
-{
-	if(!y) { return x; }
-	else { return gcd(y, x % y); }
+ll gcd(ll x, ll y) {
+	if(!y) return x;
+	else return gcd(y, x % y);
 }
 
-ll pow(ll x, ll y)
-{
+ll pow(ll x, ll y) {
     if(!y) return 1;
     ll rv = pow(x, y / 2);
     rv = (rv * rv) % MOD;
