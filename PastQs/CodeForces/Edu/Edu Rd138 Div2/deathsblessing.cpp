@@ -58,61 +58,26 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-constexpr ll MOD = 998244353;
-
-vector<ll> pow(ll n, ll m) {
-    vector<ll> rv;
-    m %= MOD;
-    rv.pb(m);
-    FOR(i, n - 1) {
-        rv.pb((rv.back() * m) % MOD);
-    }
-    return rv;
-}
-
-ll sum_vec(vector<ll> v) {
-    ll rv = 0;
-    FORE(x, v) {
-        rv += x;
-        rv %= MOD;
-    }
-    return rv;
-}
-
-bool is_prime(ll x) {
-    if (x == 1) {
-        return false;
-    }
-    ll p = 2;
-    while (p*p <= x) {
-        if (x % p == 0) {
-            return false;
-        }
-        p++;
-    }
-    return true;
-}
-
-vector<ll> complement(ll n, ll m) {
-    vector<ll> rv(n);
-    ll prev = 1, prod = 1;
-    FOR(i, n) {
-        if (is_prime(i + 1)) {
-            prod *= (i + 1);
-        }
-        rv[i] = (prev * ((m / prod) % MOD)) % MOD;
-        prev = rv[i];
-    }
-    return rv;
-}
-
 int main() {
-    ll n, m;
-    cin >> n >> m;
-    vector<ll> rv = pow(n, m), comps = complement(n, m);
-    FOR(i, n) {
-        rv[i] = (rv[i] - comps[i] + MOD) % MOD;
+    ll t;
+    cin >> t;
+    while (t--) {
+        ll n, rv = 0, maxb = 0;
+        cin >> n;
+        vector<ll> a(n);
+        FOR(i, n) {
+            cin >> a[i];
+            rv += a[i];
+        }
+        vector<ll> b(n);
+        FOR(i, n) {
+            cin >> b[i];
+            rv += b[i];
+            maxb = max(maxb, b[i]);
+        }
+        // sum of all b[i] except largest
+        rv -= maxb;
+        cout << rv << '\n';
     }
-    cout << sum_vec(rv) << '\n';
     return 0;
 }

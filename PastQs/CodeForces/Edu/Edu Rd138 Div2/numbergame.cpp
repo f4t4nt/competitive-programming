@@ -58,61 +58,48 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-constexpr ll MOD = 998244353;
-
-vector<ll> pow(ll n, ll m) {
-    vector<ll> rv;
-    m %= MOD;
-    rv.pb(m);
-    FOR(i, n - 1) {
-        rv.pb((rv.back() * m) % MOD);
+bool possible(vector<ll> a, ll &k) {
+    multiset<ll> a_set;
+    FORE(x, a) {
+        a_set.insert(x);
     }
-    return rv;
-}
-
-ll sum_vec(vector<ll> v) {
-    ll rv = 0;
-    FORE(x, v) {
-        rv += x;
-        rv %= MOD;
-    }
-    return rv;
-}
-
-bool is_prime(ll x) {
-    if (x == 1) {
-        return false;
-    }
-    ll p = 2;
-    while (p*p <= x) {
-        if (x % p == 0) {
+    FOB(i, 1, k + 1) {
+        ll x = k - i + 1;
+        auto it = a_set.upper_bound(x);
+        if (it == a_set.begin()) {
             return false;
         }
-        p++;
+        it--;
+        a_set.erase(it);
+        if (a_set.empty()) {
+            return true;
+        }
+        it = a_set.upper_bound(1);
+        if (it != a_set.begin()) {
+            it--;
+        }
+        ll y = *it;
+        a_set.erase(it);
+        a_set.insert(x + y);
     }
     return true;
 }
 
-vector<ll> complement(ll n, ll m) {
-    vector<ll> rv(n);
-    ll prev = 1, prod = 1;
-    FOR(i, n) {
-        if (is_prime(i + 1)) {
-            prod *= (i + 1);
-        }
-        rv[i] = (prev * ((m / prod) % MOD)) % MOD;
-        prev = rv[i];
-    }
-    return rv;
-}
-
 int main() {
-    ll n, m;
-    cin >> n >> m;
-    vector<ll> rv = pow(n, m), comps = complement(n, m);
-    FOR(i, n) {
-        rv[i] = (rv[i] - comps[i] + MOD) % MOD;
+    ll t;
+    cin >> t;
+    while (t--) {
+        ll n;
+        cin >> n;
+        vector<ll> a(n);
+        FOR(i, n) cin >> a[i];
+        ll lo = 0, hi = n;
+        while (lo < hi) {
+            ll mid = (lo + hi + 1) / 2;
+            if (possible(a, mid)) lo = mid;
+            else hi = mid - 1;
+        }
+        cout << lo << '\n';
     }
-    cout << sum_vec(rv) << '\n';
     return 0;
 }

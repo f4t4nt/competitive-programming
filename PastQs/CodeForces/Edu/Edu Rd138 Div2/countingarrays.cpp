@@ -93,7 +93,7 @@ bool is_prime(ll x) {
     return true;
 }
 
-vector<ll> complement(ll n, ll m) {
+vector<ll> goobermagic(ll n, ll m) {
     vector<ll> rv(n);
     ll prev = 1, prod = 1;
     FOR(i, n) {
@@ -109,7 +109,7 @@ vector<ll> complement(ll n, ll m) {
 int main() {
     ll n, m;
     cin >> n >> m;
-    vector<ll> rv = pow(n, m), comps = complement(n, m);
+    vector<ll> rv = pow(n, m), comps = goobermagic(n, m);
     FOR(i, n) {
         rv[i] = (rv[i] - comps[i] + MOD) % MOD;
     }
