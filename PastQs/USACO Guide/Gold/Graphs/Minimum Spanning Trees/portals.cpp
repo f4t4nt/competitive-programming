@@ -58,52 +58,69 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-constexpr ll MOD = 1e9 + 7;
-
-struct Complex {
-    ll re, im;
-    Complex(ll re = 0, ll im = 0) : re((re % MOD + MOD) % MOD), im((im % MOD + MOD) % MOD) {}
-    Complex operator*(const Complex &other) const {
-        ll tmp = -im * other.im;
-        tmp = (tmp % MOD + MOD) % MOD;
-        return Complex((re * other.re % MOD + tmp) % MOD, (re * other.im % MOD + im * other.re % MOD) % MOD);
+struct Portal {
+    ll ends[2] = {-1, -1};
+    void add(ll a) {
+        if (ends[0] == -1) {
+            ends[0] = a;
+        } else {
+            ends[1] = a;
+        }
+    }
+    ll get(ll a) {
+        if (ends[0] == a) {
+            return ends[1];
+        } else {
+            return ends[0];
+        }
     }
 };
 
-ll pow(ll a, ll b) {
-    ll rv = 1;
-    while (b) {
-        if (b & 1) {
-            rv = rv * a % MOD;
-        }
-        a = a * a % MOD;
-        b >>= 1;
-    }
-    return rv;
-}
-
-ll inv(ll a, map<ll, ll> &inv_ref) {
-    if (inv_ref.find(a) != inv_ref.end()) {
-        return inv_ref[a];
-    }
-    return inv_ref[a] = pow(a, MOD - 2);
-}
+struct DSU {
+	vector<ll> e;
+	DSU(ll N) { e = vector<ll>(N, -1); }
+	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
+	bool same_set(ll a, ll b) { return get(a) == get(b); }
+	ll size(ll x) { return -e[get(x)]; }
+	bool unite(ll x, ll y) {
+		x = get(x), y = get(y);
+		if (x == y) return false;
+		if (e[x] > e[y]) swap(x, y);
+		e[x] += e[y]; e[y] = x;
+		return true;
+	}
+};
 
 int main() {
-    ll a, b, n;
-    cin >> a >> b >> n;
-    map<ll, ll> inv_ref;
-    Complex rv = Complex(-1, 0),
-        mul = Complex((a * a + ((-b * b) % MOD + MOD) % MOD) % MOD * inv(a * a % MOD + b * b % MOD, inv_ref) % MOD,
-                        (((MOD - 2) * a) % MOD * b) % MOD * inv(a * a % MOD + b * b % MOD, inv_ref) % MOD);
-    n++;
-    while (n) {
-        if (n & 1) {
-            rv = rv * mul;
+    ll n, rv = 0;
+    cin >> n;
+    vector<pair<ll, ll>> costs(n);
+    vector<Portal> portals(2 * n);
+    DSU dsu(2 * n);
+    FOR (i, n) {
+        cin >> costs[i].first;
+        costs[i].second = i;
+        vector<ll> p(4);
+        FOR (j, 4) {
+            cin >> p[j];
+            p[j]--;
         }
-        mul = mul * mul;
-        n >>= 1;
+        portals[p[0]].add(2 * i);
+        portals[p[1]].add(2 * i);
+        portals[p[2]].add(2 * i + 1);
+        portals[p[3]].add(2 * i + 1);
     }
-    cout << rv.re << '\n';
+    ssort(costs);
+    FORE (p, portals) {
+        dsu.unite(p.ends[0], p.ends[1]);
+    }
+    ll i = 0;
+    while (dsu.size(0) != 2 * n && i < n) {
+        if (dsu.unite(costs[i].second * 2, costs[i].second * 2 + 1)) {
+            rv += costs[i].first;
+        }
+        i++;
+    }
+    cout << rv << '\n';
     return 0;
 }
