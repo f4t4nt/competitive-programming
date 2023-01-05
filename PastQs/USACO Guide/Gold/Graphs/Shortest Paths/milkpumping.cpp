@@ -58,67 +58,53 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-struct DSU {
-	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
-        }
-        return rv;
-    }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
+struct pipe {
+    ll a, b, c, f;
 };
 
 int main() {
-    ll t;
-    cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        vector<ll> p(n);
-        FOR (i, n) {
-            cin >> p[i];
-            p[i]--;
+    // ifstream cin("pump.in");
+    // ofstream cout("pump.out");
+
+    ll n, m;
+    cin >> n >> m;
+    vector<pipe> pipes(m);
+    FOR (i, m) {
+        cin >> pipes[i].a >> pipes[i].b >> pipes[i].c >> pipes[i].f;
+        pipes[i].a--;
+        pipes[i].b--;
+    }
+    vector<vector<pipe>> adj(n);
+    FORE (p, pipes) {
+        adj[p.a].pb(p);
+        adj[p.b].pb(p);
+    }
+    vector<map<ll, ll>> dist(n);
+    dist[0][1e18] = 0;
+    priority_queue<pair<ll, pair<ll, ll>>, vector<pair<ll, pair<ll, ll>>>, greater<>> q;
+    q.push({0, {0, 1e18}});
+    while (!q.empty()) {
+        auto [d, p] = q.top();
+        q.pop();
+        if (dist[p.first].count(p.second) && dist[p.first][p.second] < d) {
+            continue;
         }
-        vector<bool> visited(n);
-        DSU dsu(n);
-        FOR (i, n) {
-            if (visited[i]) {
-                continue;
+        FORE (e, adj[p.first]) {
+            ll nd = d + e.c;
+            ll nf = min(p.second, e.f);
+            ll c = e.a ^ e.b ^ p.first;
+            if (!dist[c].count(nf) || dist[c][nf] > nd) {
+                dist[c][nf] = nd;
+                q.push({nd, {c, nf}});
             }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
-            }
-        }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
-                break;
-            }
-        }
-        if (some_case) {
-            cout << rv - 1 << '\n';
-        } else {
-            cout << rv + 1 << '\n';
         }
     }
+    pair<ll, ll> best = {0, 1};
+    FORE (p, dist[n - 1]) {
+        if (p.first * best.second > p.second * best.first) {
+            best = {p.first, p.second};
+        }
+    } 
+    cout << best.first * 1000000 / best.second << '\n';
     return 0;
 }

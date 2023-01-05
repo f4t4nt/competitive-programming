@@ -58,67 +58,24 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-struct DSU {
-	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
-        }
-        return rv;
-    }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
-};
-
 int main() {
     ll t;
     cin >> t;
     while (t--) {
-        ll n;
-        cin >> n;
+        ll n, k;
+        cin >> n >> k;
         vector<ll> p(n);
         FOR (i, n) {
             cin >> p[i];
             p[i]--;
         }
-        vector<bool> visited(n);
-        DSU dsu(n);
+        ll x = 0;
         FOR (i, n) {
-            if (visited[i]) {
-                continue;
-            }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
+            if (p[i] == x) {
+                x++;
             }
         }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
-                break;
-            }
-        }
-        if (some_case) {
-            cout << rv - 1 << '\n';
-        } else {
-            cout << rv + 1 << '\n';
-        }
+        cout << (n - x + k - 1) / k << '\n';
     }
     return 0;
 }

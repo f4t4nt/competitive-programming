@@ -58,66 +58,51 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-struct DSU {
-	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
-        }
-        return rv;
-    }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
-};
-
 int main() {
     ll t;
     cin >> t;
     while (t--) {
-        ll n;
-        cin >> n;
-        vector<ll> p(n);
+        ll n, m, s = 0;
+        cin >> n >> m;
+        vector<vector<ll>> a(n, vector<ll>(m));
+        vector<ll> b(n);
         FOR (i, n) {
-            cin >> p[i];
-            p[i]--;
-        }
-        vector<bool> visited(n);
-        DSU dsu(n);
-        FOR (i, n) {
-            if (visited[i]) {
-                continue;
+            FOR (j, m) {
+                cin >> a[i][j];
+                if (a[i][j] == 1) {
+                    b[i]++;
+                }
             }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
+            s += b[i];
+        }
+        if (s % n != 0) {
+            cout << "-1\n";
+            continue;
+        }
+        s /= n;
+        vector<tuple<ll, ll, ll>> rv;
+        FOR (j, m) {
+            vector<ll> less, more;
+            FOR (i, n) {
+                if (b[i] < s && a[i][j] == 0) {
+                    less.pb(i);
+                } elif (b[i] > s && a[i][j] == 1) {
+                    more.pb(i);
+                }
+            }
+            ll i = 0;
+            while (i < sz(less) && i < sz(more)) {
+                a[less[i]][j] = 1;
+                a[more[i]][j] = 0;
+                b[less[i]]++;
+                b[more[i]]--;
+                rv.pb({more[i] + 1, less[i] + 1, j + 1});
+                i++;
             }
         }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
-                break;
-            }
-        }
-        if (some_case) {
-            cout << rv - 1 << '\n';
-        } else {
-            cout << rv + 1 << '\n';
+        cout << sz(rv) << '\n';
+        FORE (x, rv) {
+            cout << get<0>(x) << ' ' << get<1>(x) << ' ' << get<2>(x) << '\n';
         }
     }
     return 0;

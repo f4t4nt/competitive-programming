@@ -58,67 +58,43 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-struct DSU {
-	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
-        }
-        return rv;
-    }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
-};
-
 int main() {
     ll t;
     cin >> t;
     while (t--) {
-        ll n;
+        ll n, rv = 0;
         cin >> n;
-        vector<ll> p(n);
+        vector<ll> a(n), zeros;
         FOR (i, n) {
-            cin >> p[i];
-            p[i]--;
-        }
-        vector<bool> visited(n);
-        DSU dsu(n);
-        FOR (i, n) {
-            if (visited[i]) {
-                continue;
-            }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
+            cin >> a[i];
+            if (a[i] == 0) {
+                zeros.pb(i);
             }
         }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
-                break;
+        zeros.pb(n);
+        ll s= 0;
+        FOR (i, zeros[0]) {
+            s += a[i];
+            if (s == 0) {
+                rv++;
             }
         }
-        if (some_case) {
-            cout << rv - 1 << '\n';
-        } else {
-            cout << rv + 1 << '\n';
+        FOR (z_i, sz(zeros) - 1) {
+            ll z = zeros[z_i], nz = zeros[z_i + 1];
+            ll s = 0;
+            map<ll, ll> ref;
+            ref[0] = 1;
+            FOR (i, nz - z - 1) {
+                s += a[z + i + 1];
+                ref[s]++;
+            }
+            ll mc = 0;
+            FORE (p, ref) {
+                mc = max(mc, p.second);
+            }
+            rv += mc;
         }
+        cout << rv << '\n';
     }
     return 0;
 }

@@ -58,66 +58,29 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-struct DSU {
-	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
-        }
-        return rv;
-    }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
-};
+int main () {
+    cout << fixed << setprecision(9);
 
-int main() {
-    ll t;
-    cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        vector<ll> p(n);
-        FOR (i, n) {
-            cin >> p[i];
-            p[i]--;
-        }
-        vector<bool> visited(n);
-        DSU dsu(n);
-        FOR (i, n) {
-            if (visited[i]) {
-                continue;
-            }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
-            }
-        }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
-                break;
-            }
-        }
-        if (some_case) {
-            cout << rv - 1 << '\n';
+    ld x_s, y_s, s_s, r_i, r_f, x_a, y_a, s_a, r_a;
+    cin >> x_s >> y_s >> s_s >> r_i >> r_f >> x_a >> y_a >> s_a;
+    r_a = sqrt((x_a - x_s) * (x_a - x_s) + (y_a - y_s) * (y_a - y_s));
+    if(r_a <= r_f || (r_a <= r_i && s_a >= s_s)) {
+        cout << 0.0;
+    } elif (r_a < r_i){
+        ld t0 = (r_i - r_a) / (ld) (s_s - s_a), t1 = (r_a - r_f) / (ld) s_a;
+        if (t1 < t0) {
+            cout << t1;
         } else {
-            cout << rv + 1 << '\n';
+            cout << t1 - t0;
+        }
+    } elif (s_a <= s_s){
+        cout << (r_a - r_f) / (ld) s_a;
+    } else {
+        ld t0 = (r_a - r_i) / (ld) (s_a - s_s), t1 = (r_a - r_f) / (ld) s_a;
+        if (t1 <= t0) {
+            cout << t1;
+        } else {
+            cout << t0;
         }
     }
     return 0;

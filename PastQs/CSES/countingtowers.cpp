@@ -58,67 +58,49 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-struct DSU {
-	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
+// https://cses.fi/problemset/task/2413/
+
+constexpr ll MOD = 1e9 + 7;
+
+map<ll, ll> inv_map;
+
+struct mod_ll {
+    ll val;
+    mod_ll(ll v = 0) : val(((v % MOD) + MOD) % MOD) {}
+    mod_ll operator+(const mod_ll &other) const { return mod_ll(val + other.val); }
+    mod_ll operator-(const mod_ll &other) const { return mod_ll(val - other.val); }
+    mod_ll operator*(const mod_ll &other) const { return mod_ll(val * other.val); }
+    mod_ll pow(ll p) const {
+        mod_ll rv = 1;
+        mod_ll base = *this;
+        while (p) {
+            if (p & 1) rv = rv * base;
+            base = base * base;
+            p >>= 1;
         }
         return rv;
     }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
+    mod_ll inv() const {
+        if (inv_map.find(val) != inv_map.end()) return mod_ll(inv_map[val]);
+        return inv_map[val] = pow(MOD - 2).val;
+    }
+    mod_ll operator/(const mod_ll &other) const { return *this * other.inv(); }
+    friend ostream &operator<<(ostream &os, const mod_ll &m) { return os << m.val; }
 };
 
 int main() {
     ll t;
     cin >> t;
+    vector<pair<mod_ll, mod_ll>> dp(1e6 + 1);
+    dp[1] = {1, 1};
+    FOB(i, 2, 1e6 + 1) {
+        dp[i].first = dp[i - 1].second + dp[i - 1].first * 4;
+        dp[i].second = dp[i - 1].second * 2 + dp[i - 1].first;
+    }
     while (t--) {
         ll n;
         cin >> n;
-        vector<ll> p(n);
-        FOR (i, n) {
-            cin >> p[i];
-            p[i]--;
-        }
-        vector<bool> visited(n);
-        DSU dsu(n);
-        FOR (i, n) {
-            if (visited[i]) {
-                continue;
-            }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
-            }
-        }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
-                break;
-            }
-        }
-        if (some_case) {
-            cout << rv - 1 << '\n';
-        } else {
-            cout << rv + 1 << '\n';
-        }
+        cout << dp[n].first + dp[n].second << '\n';
     }
     return 0;
 }

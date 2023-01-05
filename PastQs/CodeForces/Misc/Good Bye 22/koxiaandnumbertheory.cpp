@@ -58,67 +58,58 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-struct DSU {
-	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
-        }
-        return rv;
-    }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
-};
+constexpr ll PRIME_MAX = 10000;
 
 int main() {
     ll t;
     cin >> t;
+    vector<bool> is_prime(PRIME_MAX, true);
+    is_prime[0] = is_prime[1] = false;
+    for (ll i = 2; i * i < PRIME_MAX; i++) {
+        if (is_prime[i]) {
+            for (ll j = i * i; j < PRIME_MAX; j += i) {
+                is_prime[j] = false;
+            }
+        }
+    }
+    vector<ll> primes;
+    FOR (i, PRIME_MAX) {
+        if (is_prime[i]) {
+            primes.pb(i);
+        }
+    }
     while (t--) {
         ll n;
         cin >> n;
-        vector<ll> p(n);
+        set<ll> s;
+        vector<ll> a(n);
         FOR (i, n) {
-            cin >> p[i];
-            p[i]--;
+            cin >> a[i];
+            s.insert(a[i]);
         }
-        vector<bool> visited(n);
-        DSU dsu(n);
-        FOR (i, n) {
-            if (visited[i]) {
-                continue;
-            }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
-            }
+        if (sz(s) != n) {
+            cout << "NO\n";
+            continue;
         }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
+        bool valid = true;
+        FORE (prime, primes) {
+            vector<ll> residues(prime);
+            FOR (i, n) {
+                residues[a[i] % prime]++;
+            }
+            bool invalid = true;
+            FOR (i, prime) {
+                if (residues[i] < 2) {
+                    invalid = false;
+                    break;
+                }
+            }
+            if (invalid) {
+                valid = false;
                 break;
             }
         }
-        if (some_case) {
-            cout << rv - 1 << '\n';
-        } else {
-            cout << rv + 1 << '\n';
-        }
+        cout << (valid ? "YES\n" : "NO\n");
     }
     return 0;
 }

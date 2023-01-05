@@ -58,67 +58,61 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-struct DSU {
-	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
-        }
-        return rv;
-    }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
-};
-
 int main() {
-    ll t;
-    cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        vector<ll> p(n);
-        FOR (i, n) {
-            cin >> p[i];
-            p[i]--;
+    ifstream cin("timeline.in");
+    ofstream cout("timeline.out");
+
+    ll n, m, c;
+    cin >> n >> m >> c;
+    vector<ll> s(n);
+    FOR (i, n) {
+        cin >> s[i];
+    }
+    vector<tuple<ll, ll, ll>> edges(c);
+    vector<vector<pair<ll, ll>>> adj(n);
+    FOR (i, c) {
+        ll a, b, w;
+        cin >> a >> b >> w;
+        a--; b--;
+        edges[i] = mt(a, b, w);
+        adj[a].pb(mp(b, w));
+    }
+    vector<ll> in(n);
+    FOR (i, n) {
+        FORE (j, adj[i]) {
+            in[j.first]++;
         }
-        vector<bool> visited(n);
-        DSU dsu(n);
-        FOR (i, n) {
-            if (visited[i]) {
-                continue;
+    }
+    queue<ll> q;
+    FOR (i, n) {
+        if (in[i] == 0) {
+            q.push(i);
+        }
+    }
+    vector<ll> top_sort;
+    while (!q.empty()) {
+        ll cur = q.front();
+        q.pop();
+        top_sort.pb(cur);
+        FORE (j, adj[cur]) {
+            in[j.first]--;
+            if (in[j.first] == 0) {
+                q.push(j.first);
             }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
-            }
         }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
-                break;
-            }
+    }
+    vector<ll> dp(n);
+    FOR (i, n) {
+        dp[i] = s[i];
+    }
+    FOR (i, n) {
+        ll cur = top_sort[i];
+        FORE (j, adj[cur]) {
+            dp[j.first] = max(dp[j.first], dp[cur] + j.second);
         }
-        if (some_case) {
-            cout << rv - 1 << '\n';
-        } else {
-            cout << rv + 1 << '\n';
-        }
+    }
+    FOR (i, n) {
+        cout << dp[i] << '\n';
     }
     return 0;
 }

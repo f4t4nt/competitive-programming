@@ -58,66 +58,28 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-struct DSU {
-	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
-        }
-        return rv;
-    }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
-};
-
 int main() {
     ll t;
     cin >> t;
     while (t--) {
         ll n;
         cin >> n;
-        vector<ll> p(n);
+        ll a_max = 0;
+        vector<ll> a(n);
         FOR (i, n) {
-            cin >> p[i];
-            p[i]--;
+            cin >> a[i];
+            a_max = max(a_max, a[i]);
         }
-        vector<bool> visited(n);
-        DSU dsu(n);
-        FOR (i, n) {
-            if (visited[i]) {
-                continue;
-            }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
-            }
-        }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
-                break;
-            }
-        }
-        if (some_case) {
-            cout << rv - 1 << '\n';
+        if (n > 3) {
+            cout << n * a_max << '\n';
+        } elif (n == 3) {
+            cout << max(a[0] + a[1] + a[2],
+                    max(3 * abs(a[0] - a[2]),
+                    max(3 * abs(a[1] - a[2]),
+                    max(3 * abs(a[0] - a[1]),
+                    max(3 * a[0], 3 * a[2]))))) << '\n';
         } else {
-            cout << rv + 1 << '\n';
+            cout << max(a[0] + a[1], 2 * abs(a[0] - a[1])) << '\n';
         }
     }
     return 0;

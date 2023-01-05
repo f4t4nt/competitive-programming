@@ -58,67 +58,49 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-struct DSU {
-	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
+bool check(ll &i, ll tol, ll &n, vector<ll> &s, vector<bool> &visited) {
+    tol += s[i];
+    ll left = (i - 1 + n) % n, right = (i + 1) % n;
+    while (left != right && (s[left] <= tol || s[right] <= tol)) {
+        if (s[left] <= tol) {
+            tol += s[left];
+            visited[left] = true;
+            left = (left - 1 + n) % n;
+        } elif (s[right] <= tol) {
+            tol += s[right];
+            visited[right] = true;
+            right = (right + 1) % n;
         }
-        return rv;
     }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
-};
+    return left == right && s[left] <= tol;
+}
+
+bool valid(ll &tol, ll &n, vector<ll> &s) {
+    vector<bool> visited(n, false);
+    FOR (i, n) {
+        if (!visited[i] && s[i] <= tol && check(i, tol, n, s, visited)) {
+            return true;
+        }
+    }
+    return false;
+}
 
 int main() {
-    ll t;
-    cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        vector<ll> p(n);
-        FOR (i, n) {
-            cin >> p[i];
-            p[i]--;
-        }
-        vector<bool> visited(n);
-        DSU dsu(n);
-        FOR (i, n) {
-            if (visited[i]) {
-                continue;
-            }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
-            }
-        }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
-                break;
-            }
-        }
-        if (some_case) {
-            cout << rv - 1 << '\n';
+    ll n, lo = 0, hi = 0;
+    cin >> n;
+    vector<ll> s(n);
+    FOR (i, n) {
+        cin >> s[i];
+        hi = max(hi, s[i]);
+    }
+    while (lo < hi) {
+        ll tol = (lo + hi) / 2;
+        if (valid(tol, n, s)) {
+            hi = tol;
         } else {
-            cout << rv + 1 << '\n';
+            lo = tol + 1;
         }
     }
+    cout << lo << '\n';
     return 0;
 }

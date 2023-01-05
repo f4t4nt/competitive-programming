@@ -58,67 +58,46 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+// https://open.kattis.com/problems/swaptosort
+
 struct DSU {
 	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
-        }
-        return rv;
+    DSU(ll n) : e(n, -1) {}
+    bool same_set(ll a, ll b) { return find(a) == find(b); }
+    ll size(ll x) { return -e[find(x)]; }
+    ll find(ll x) { return e[x] < 0 ? x : e[x] = find(e[x]); }
+    bool unite(ll x, ll y) {
+        x = find(x), y = find(y);
+        if (x == y) return false;
+        if (e[x] > e[y]) swap(x, y);
+        e[x] += e[y]; e[y] = x;
+        return true;
     }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
 };
 
 int main() {
-    ll t;
-    cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        vector<ll> p(n);
-        FOR (i, n) {
-            cin >> p[i];
-            p[i]--;
+    ll n, k;
+    cin >> n >> k;
+    vector<pair<ll, ll>> a(k);
+    FOR (i, k) {
+        cin >> a[i].first >> a[i].second;
+        a[i].first--; a[i].second--;
+    }
+    DSU dsu(n);
+    FOR (i, k) {
+        dsu.unite(a[i].first, a[i].second);
+    }
+    bool valid = true;
+    FOR (i, n) {
+        if (!dsu.same_set(i, n - i - 1)) {
+            valid = false;
+            break;
         }
-        vector<bool> visited(n);
-        DSU dsu(n);
-        FOR (i, n) {
-            if (visited[i]) {
-                continue;
-            }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
-            }
-        }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
-                break;
-            }
-        }
-        if (some_case) {
-            cout << rv - 1 << '\n';
-        } else {
-            cout << rv + 1 << '\n';
-        }
+    }
+    if (valid) {
+        cout << "Yes\n";
+    } else {
+        cout << "No\n";
     }
     return 0;
 }

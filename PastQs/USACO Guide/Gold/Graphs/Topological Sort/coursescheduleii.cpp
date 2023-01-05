@@ -58,67 +58,47 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-struct DSU {
-	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
-        }
-        return rv;
-    }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
-};
-
 int main() {
-    ll t;
-    cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        vector<ll> p(n);
-        FOR (i, n) {
-            cin >> p[i];
-            p[i]--;
-        }
-        vector<bool> visited(n);
-        DSU dsu(n);
-        FOR (i, n) {
-            if (visited[i]) {
-                continue;
-            }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
-            }
-        }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
-                break;
-            }
-        }
-        if (some_case) {
-            cout << rv - 1 << '\n';
-        } else {
-            cout << rv + 1 << '\n';
+    ll n, m;
+    cin >> n >> m;
+    vector<pair<ll, ll>> edges;
+    FOR (i, m) {
+        ll a, b;
+        cin >> a >> b;
+        a--, b--;
+        edges.pb(mp(a, b));
+    }
+    vector<vector<ll>> adj(n);
+    FORE (e, edges) {
+        adj[e.second].pb(e.first);
+    }
+    vector<ll> in(n);
+    FORE (v, adj) {
+        FORE (u, v) {
+            in[u]++;
         }
     }
+    priority_queue<ll> q;
+    FOR (i, n) {
+        if (in[i] == 0) {
+            q.push(i);
+        }
+    }
+    vector<ll> top_sort;
+    while (!q.empty()) {
+        ll v = q.top();
+        q.pop();
+        top_sort.pb(v);
+        FORE (u, adj[v]) {
+            in[u]--;
+            if (in[u] == 0) {
+                q.push(u);
+            }
+        }
+    }
+    FORR (i, n) {
+        cout << top_sort[i] + 1 << ' ';
+    }
+    cout << '\n';
     return 0;
 }

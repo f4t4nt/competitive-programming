@@ -7,11 +7,15 @@ void binsearch() {
     }
 }
 
+//--------------------------------------------------
+
 ll bitcount(ll x) {
 	ll rv = 0;
 	while(x > 0) { rv++; x &= (x - 1); }
 	return rv;
 }
+
+//--------------------------------------------------
 
 void bitmaskdp() {
     ll N;
@@ -24,6 +28,8 @@ void bitmaskdp() {
     }
 }
 
+//--------------------------------------------------
+
 void customsort() {
     vector<ll> x;
     sort(x.begin(), x.end(),
@@ -31,6 +37,8 @@ void customsort() {
         { return a < b; });
     // equivalent to regular sort
 }
+
+//--------------------------------------------------
 
 struct DSU {
 	vector<ll> e;
@@ -47,15 +55,165 @@ struct DSU {
 	}
 };
 
+//--------------------------------------------------
+
+constexpr ll MOD = 1e9 + 7;
+constexpr ll MAX_N = 1e3;
+
+ll fact[MAX_N + 1];
+ll inv_fact[MAX_N + 1];
+ll inv[MAX_N + 1];
+ll choose[MAX_N + 1][MAX_N + 1];
+
+void init() {
+    fact[0] = 1;
+    inv_fact[0] = 1;
+    inv[1] = 1;
+    for (ll i = 1; i <= MAX_N; i++) {
+        fact[i] = (fact[i - 1] * i) % MOD;
+        if (i > 1) {
+            inv[i] = (MOD - (MOD / i) * inv[MOD % i] % MOD) % MOD;
+        }
+        inv_fact[i] = (inv_fact[i - 1] * inv[i]) % MOD;
+    }
+    for (ll i = 0; i <= MAX_N; i++) {
+        for (ll j = 0; j <= i; j++) {
+            choose[i][j] = (fact[i] * inv_fact[j] % MOD) * inv_fact[i - j] % MOD;
+        }
+    }
+}
+
+//--------------------------------------------------
+
+vector<vector<ll>> floyd_warshall(vector<vector<ll>> &dist) {
+    ll n = sz(dist);
+    FOR (k, n) {
+        FOR (i, n) {
+            FOR (j, n) {
+                dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
+            }
+        }
+    }
+    return dist;
+}
+
+//--------------------------------------------------
+
 ll gcd(ll x, ll y) {
 	if(!y) return x;
 	else return gcd(y, x % y);
 }
 
-ll pow(ll x, ll y) {
-    if(!y) return 1;
-    ll rv = pow(x, y / 2);
-    rv = (rv * rv) % MOD;
-    if(y % 2) rv = (rv * x) % MOD;
+//--------------------------------------------------
+
+map<ll, ll> inv_map;
+
+struct mod_ll {
+    ll val;
+    mod_ll(ll v = 0) : val(((v % MOD) + MOD) % MOD) {}
+    mod_ll operator+(const mod_ll &other) const { return mod_ll(val + other.val); }
+    mod_ll operator-(const mod_ll &other) const { return mod_ll(val - other.val); }
+    mod_ll operator*(const mod_ll &other) const { return mod_ll(val * other.val); }
+    mod_ll pow(ll p) const {
+        mod_ll rv = 1;
+        mod_ll base = *this;
+        while (p) {
+            if (p & 1) rv = rv * base;
+            base = base * base;
+            p >>= 1;
+        }
+        return rv;
+    }
+    mod_ll inv() const {
+        if (inv_map.find(val) != inv_map.end()) return mod_ll(inv_map[val]);
+        return inv_map[val] = pow(MOD - 2).val;
+    }
+    mod_ll operator/(const mod_ll &other) const { return *this * other.inv(); }
+    friend ostream &operator<<(ostream &os, const mod_ll &m) { return os << m.val; }
+};
+
+struct Complex {
+    mod_ll re, im;
+    Complex(mod_ll r = 0, mod_ll i = 0) : re(r), im(i) {}
+    Complex operator+(const Complex &other) const { return Complex(re + other.re, im + other.im); }
+    Complex operator-(const Complex &other) const { return Complex(re - other.re, im - other.im); }
+    Complex operator*(const Complex &other) const { return Complex(re * other.re - im * other.im, re * other.im + im * other.re); }
+    Complex operator/(const Complex &other) const { return Complex((re * other.re + im * other.im) / (other.re * other.re + other.im * other.im), (im * other.re - re * other.im) / (other.re * other.re + other.im * other.im)); }
+};
+
+//--------------------------------------------------
+
+bool is_simple_polygon(vector<pair<ld, ld>> coords, vector<ll> ordering) {
+    FOR (i, sz(ordering)) {
+        FOR (j, sz(ordering)) {
+            if (i == j) {
+                continue;
+            }
+            ld x1 = coords[ordering[i]].first;
+            ld y1 = coords[ordering[i]].second;
+            ld x2 = coords[ordering[(i + 1) % 7]].first;
+            ld y2 = coords[ordering[(i + 1) % 7]].second;
+            ld x3 = coords[ordering[j]].first;
+            ld y3 = coords[ordering[j]].second;
+            ld x4 = coords[ordering[(j + 1) % 7]].first;
+            ld y4 = coords[ordering[(j + 1) % 7]].second;
+            ld denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+            if (denom == 0) {
+                continue;
+            }
+            ld t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom;
+            ld u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denom;
+            if (t > 0 && t < 1 && u > 0 && u < 1) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+//--------------------------------------------------
+
+ll pow(ll x, ll p) {
+    ll rv = 1;
+    while(p) {
+        if(p & 1) rv *= x;
+        x *= x;
+        p >>= 1;
+    }
     return rv;
+}
+
+//--------------------------------------------------
+
+ld pow(ld x, ll n) {
+    ld res = 1;
+    while (n > 0) {
+        if (n & 1) res *= x;
+        x *= x;
+        n >>= 1;
+    }
+    return res;
+}
+
+ld probability_a_before_b(ld a, ld b, ld s, ld p) {
+    if (s == a) {
+        return 1;
+    } elif (s == b) {
+        return 0;
+    } elif (s < a && a < b) {
+        return 1;
+    } elif (s < b && b < a) {
+        return 0;
+    } elif (a < b && b < s) {
+        return 0;
+    } elif (b < a && a < s) {
+        return 1;
+    } else {
+        ld q = p / (1 - p);
+        if (q == 1) {
+            return (ld) (s - b) / (a - b);
+        } else {
+            return (pow(q, a - s) * (1 - pow(q, s - b))) / (1 - pow(q, a - b));
+        }
+    }
 }

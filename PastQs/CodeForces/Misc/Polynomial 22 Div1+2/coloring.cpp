@@ -58,66 +58,29 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-struct DSU {
-	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
-        }
-        return rv;
-    }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
-};
-
 int main() {
     ll t;
     cin >> t;
     while (t--) {
-        ll n;
-        cin >> n;
-        vector<ll> p(n);
-        FOR (i, n) {
-            cin >> p[i];
-            p[i]--;
+        ll n, m, k;
+        cin >> n >> m >> k;
+        vector<ll> a(m);
+        FOR(i, m) {
+            cin >> a[i];
         }
-        vector<bool> visited(n);
-        DSU dsu(n);
-        FOR (i, n) {
-            if (visited[i]) {
-                continue;
-            }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
-            }
-        }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
+        ll threshold = (n + k - 1) / k, count = 0;
+        FOR (i, m) {
+            if (a[i] == threshold) {
+                count++;
+            } elif (a[i] > threshold) {
+                count = 1e18;
                 break;
             }
         }
-        if (some_case) {
-            cout << rv - 1 << '\n';
+        if (count <= (n - 1) % k + 1) {
+            cout << "YES\n";
         } else {
-            cout << rv + 1 << '\n';
+            cout << "NO\n";
         }
     }
     return 0;

@@ -58,66 +58,61 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-struct DSU {
-	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
-        }
-        return rv;
-    }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
-};
-
 int main() {
-    ll t;
-    cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        vector<ll> p(n);
-        FOR (i, n) {
-            cin >> p[i];
-            p[i]--;
+    ll n;
+    cin >> n;
+    vector<str> authors(n);
+    FOR (i, n) {
+        cin >> authors[i];
+    }
+    vector<pair<ll, ll>> edges;
+    bool valid = true;
+    FOB (i, 1, n) {
+        ll j = 0;
+        while (j < sz(authors[i]) && j < sz(authors[i - 1]) && authors[i][j] == authors[i - 1][j]) {
+            j++;
         }
-        vector<bool> visited(n);
-        DSU dsu(n);
-        FOR (i, n) {
-            if (visited[i]) {
-                continue;
-            }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
+        if (j == sz(authors[i]) && j < sz(authors[i - 1])) {
+            valid = false;
+            break;
+        }
+        if (j < sz(authors[i]) && j < sz(authors[i - 1])) {
+            edges.pb(mp(authors[i - 1][j] - 'a', authors[i][j] - 'a'));
+        }
+    }
+    if (!valid) {
+        cout << "Impossible\n";
+        return 0;
+    }
+    vector<vector<ll>> adj(26);
+    vector<ll> in(26);
+    FORE (e, edges) {
+        adj[e.first].pb(e.second);
+        in[e.second]++;
+    }
+    queue<ll> q;
+    FOR (i, 26) {
+        if (in[i] == 0) {
+            q.push(i);
+        }
+    }
+    vector<ll> top_sort;
+    while (!q.empty()) {
+        ll u = q.front();
+        q.pop();
+        top_sort.pb(u);
+        FORE (v, adj[u]) {
+            in[v]--;
+            if (in[v] == 0) {
+                q.push(v);
             }
         }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
-                break;
-            }
-        }
-        if (some_case) {
-            cout << rv - 1 << '\n';
-        } else {
-            cout << rv + 1 << '\n';
+    }
+    if (sz(top_sort) != 26) {
+        cout << "Impossible\n";
+    } else {
+        FORE (c, top_sort) {
+            cout << (char) (c + 'a');
         }
     }
     return 0;

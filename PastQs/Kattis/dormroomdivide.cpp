@@ -58,67 +58,40 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-struct DSU {
-	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
-        }
-        return rv;
+ld shoelace(vector<pair<ld, ld>> &coords) {
+    ld area = 0;
+    FOR(i, sz(coords)) {
+        area += (coords[i].first * coords[(i + 1) % sz(coords)].second - coords[(i + 1) % sz(coords)].first * coords[i].second);
     }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
-};
+    return abs(area) / 2;
+}
+
+ld triangle_area(pair<ld, ld> &a, pair<ld, ld> &b, pair<ld, ld> &c) {
+    return abs((a.first * (b.second - c.second) + b.first * (c.second - a.second) + c.first * (a.second - b.second)) / 2);
+}
 
 int main() {
-    ll t;
-    cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        vector<ll> p(n);
-        FOR (i, n) {
-            cin >> p[i];
-            p[i]--;
-        }
-        vector<bool> visited(n);
-        DSU dsu(n);
-        FOR (i, n) {
-            if (visited[i]) {
-                continue;
-            }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
-            }
-        }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
-                break;
-            }
-        }
-        if (some_case) {
-            cout << rv - 1 << '\n';
-        } else {
-            cout << rv + 1 << '\n';
-        }
+    ll n;
+    cin >> n;
+    vector<pair<ld, ld>> coords(n);
+    FORE(coord, coords) {
+        cin >> coord.first >> coord.second;
+    }
+    ld total_area = shoelace(coords), target_area = total_area / 2;
+    ld curr_area = 0, prev_area = 0;
+    ll i = 0;
+    while (curr_area < target_area) {
+        prev_area = curr_area;
+        curr_area += triangle_area(coords[0], coords[i], coords[(i + 1) % n]);
+        i++;
+    }
+    if (curr_area == target_area) {
+        cout << fixed << setprecision(10) << coords[i].first <<  ' ' << coords[i].second << endl;
+    } else {
+        ld ratio = (target_area - prev_area) / (curr_area - prev_area);
+        ld x = coords[i - 1].first + ratio * (coords[i].first - coords[i - 1].first);
+        ld y = coords[i - 1].second + ratio * (coords[i].second - coords[i - 1].second);
+        cout << fixed << setprecision(10) << x <<  ' ' << y << endl;
     }
     return 0;
 }

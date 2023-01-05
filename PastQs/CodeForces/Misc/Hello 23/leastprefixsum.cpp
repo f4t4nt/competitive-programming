@@ -58,67 +58,45 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-struct DSU {
-	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
-        }
-        return rv;
-    }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
-};
-
 int main() {
     ll t;
     cin >> t;
     while (t--) {
-        ll n;
-        cin >> n;
-        vector<ll> p(n);
+        ll n, m, rv = 0;
+        cin >> n >> m;
+        vector<ll> a(n);
         FOR (i, n) {
-            cin >> p[i];
-            p[i]--;
+            cin >> a[i];
         }
-        vector<bool> visited(n);
-        DSU dsu(n);
-        FOR (i, n) {
-            if (visited[i]) {
-                continue;
+        ll presum = 0;
+        multiset<ll> pre;
+        for (ll i = m - 1; i > 0; i--) {
+            presum += a[i];
+            if (a[i] > 0) {
+                pre.insert(a[i]);
             }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
-            }
-        }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
-                break;
+            while (presum > 0) {
+                auto it = pre.rbegin();
+                presum -= *it * 2;
+                pre.erase(--it.base());
+                rv++;
             }
         }
-        if (some_case) {
-            cout << rv - 1 << '\n';
-        } else {
-            cout << rv + 1 << '\n';
+        ll postsum = 0;
+        multiset<ll> post;
+        for (ll i = m; i < n; i++) {
+            postsum += a[i];
+            if (a[i] < 0) {
+                post.insert(a[i]);
+            }
+            while (postsum < 0) {
+                auto it = post.begin();
+                postsum -= *it * 2;
+                post.erase(it);
+                rv++;
+            }
         }
+        cout << rv << '\n';
     }
     return 0;
 }

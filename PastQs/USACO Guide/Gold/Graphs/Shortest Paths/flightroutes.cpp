@@ -58,67 +58,55 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-struct DSU {
-	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
-        }
-        return rv;
-    }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
-};
-
 int main() {
-    ll t;
-    cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        vector<ll> p(n);
-        FOR (i, n) {
-            cin >> p[i];
-            p[i]--;
+    ll n, m, k;
+    cin >> n >> m >> k;
+    ll k2 = k + 1;
+    vector<tuple<ll, ll, ll>> edges;
+    FOR (i, m) {
+        ll a, b, c;
+        cin >> a >> b >> c;
+        a--, b--;
+        edges.pb(mt(c, a, b));
+    }
+    vector<vector<pair<ll, ll>>> adj(n);
+    ssort(edges);
+    FORE (e, edges) {
+        ll c, a, b;
+        tie(c, a, b) = e;
+        adj[a].pb(mp(b, c));
+    }
+    vector<multiset<ll>> dists(n);
+    dists[0].insert(0);
+    priority_queue<pair<ll, ll>, vector<pair<ll, ll>>, greater<pair<ll, ll>>> pq;
+    pq.push(mp(0, 0));
+    while (!pq.empty()) {
+        ll d, u;
+        tie(d, u) = pq.top();
+        pq.pop();
+        if (d > *dists[u].rbegin()) {
+            continue;
         }
-        vector<bool> visited(n);
-        DSU dsu(n);
-        FOR (i, n) {
-            if (visited[i]) {
-                continue;
+        FORE (v, adj[u]) {
+            ll nd = d + v.second;
+            if (sz(dists[v.first]) < k2) {
+                dists[v.first].insert(nd);
+                pq.push(mp(nd, v.first));
+            } elif (nd < *dists[v.first].rbegin()) {
+                dists[v.first].erase(*dists[v.first].rbegin());
+                dists[v.first].insert(nd);
+                pq.push(mp(nd, v.first));
             }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
-            }
-        }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
-                break;
-            }
-        }
-        if (some_case) {
-            cout << rv - 1 << '\n';
-        } else {
-            cout << rv + 1 << '\n';
         }
     }
+    ll i = 0;
+    FORE (d, dists[n - 1]) {
+        if (i == k) {
+            break;
+        }
+        cout << d << ' ';
+        i++;
+    }
+    cout << '\n';
     return 0;
 }

@@ -58,66 +58,40 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-struct DSU {
-	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
-        }
-        return rv;
-    }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
-};
-
 int main() {
     ll t;
     cin >> t;
     while (t--) {
         ll n;
         cin >> n;
-        vector<ll> p(n);
+        str s;
+        cin >> s;
+        ll left_most_r = -1, right_most_l = n;
         FOR (i, n) {
-            cin >> p[i];
-            p[i]--;
-        }
-        vector<bool> visited(n);
-        DSU dsu(n);
-        FOR (i, n) {
-            if (visited[i]) {
-                continue;
-            }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
-            }
-        }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
+            if (s[i] == 'R') {
+                left_most_r = i;
                 break;
             }
         }
-        if (some_case) {
-            cout << rv - 1 << '\n';
+        FORR (i, n) {
+            if (s[i] == 'L') {
+                right_most_l = i;
+                break;
+            }
+        }
+        if (left_most_r == -1 || right_most_l == n) {
+            cout << -1 << '\n';
+        } elif (left_most_r < right_most_l) {
+            cout << 0 << '\n';
         } else {
-            cout << rv + 1 << '\n';
+            ll rv = 0;
+            FOB (i, 1, n) {
+                if (s[i] != s[i - 1]) {
+                    rv = i;
+                    break;
+                }
+            }
+            cout << rv << '\n';
         }
     }
     return 0;

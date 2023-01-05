@@ -58,30 +58,6 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-struct DSU {
-	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
-        }
-        return rv;
-    }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
-};
-
 int main() {
     ll t;
     cin >> t;
@@ -91,33 +67,23 @@ int main() {
         vector<ll> p(n);
         FOR (i, n) {
             cin >> p[i];
-            p[i]--;
         }
-        vector<bool> visited(n);
-        DSU dsu(n);
+        ll a = 0, b = 0, c = 0;
         FOR (i, n) {
-            if (visited[i]) {
-                continue;
-            }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
+            if (p[i] != i + 1 && p[i] != n - i) {
+                c++;
+            } elif (p[i] != i + 1) {
+                a++;
+            } elif (p[i] != n - i) {
+                b++;
             }
         }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
-                break;
-            }
-        }
-        if (some_case) {
-            cout << rv - 1 << '\n';
+        if (a + c <= b) {
+            cout << "First\n";
+        } elif (b + c < a) {
+            cout << "Second\n";
         } else {
-            cout << rv + 1 << '\n';
+            cout << "Tie\n";
         }
     }
     return 0;

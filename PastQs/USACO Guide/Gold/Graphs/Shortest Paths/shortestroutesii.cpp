@@ -58,66 +58,41 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-struct DSU {
-	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
-        }
-        return rv;
-    }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
-};
-
 int main() {
-    ll t;
-    cin >> t;
-    while (t--) {
-        ll n;
-        cin >> n;
-        vector<ll> p(n);
+    ll n, m, q;
+    cin >> n >> m >> q;
+    vector<tuple<ll, ll, ll>> edges;
+    FOR (i, m) {
+        ll a, b, c;
+        cin >> a >> b >> c;
+        a--, b--;
+        edges.pb(mt(a, b, c));
+    }
+    vector<vector<ll>> dist(n, vector<ll>(n, 1e18));
+    FOR (i, n) {
+        dist[i][i] = 0;
+    }
+    FORE (edge, edges) {
+        ll a, b, c;
+        tie(a, b, c) = edge;
+        dist[a][b] = min(dist[a][b], c);
+        dist[b][a] = min(dist[b][a], c);
+    }
+    FOR (k, n) {
         FOR (i, n) {
-            cin >> p[i];
-            p[i]--;
-        }
-        vector<bool> visited(n);
-        DSU dsu(n);
-        FOR (i, n) {
-            if (visited[i]) {
-                continue;
-            }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
-            }
-        }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
-                break;
+            FOR (j, n) {
+                dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
             }
         }
-        if (some_case) {
-            cout << rv - 1 << '\n';
+    }
+    FOR (i, q) {
+        ll a, b;
+        cin >> a >> b;
+        a--, b--;
+        if (dist[a][b] == 1e18) {
+            cout << -1 << endl;
         } else {
-            cout << rv + 1 << '\n';
+            cout << dist[a][b] << '\n';
         }
     }
     return 0;

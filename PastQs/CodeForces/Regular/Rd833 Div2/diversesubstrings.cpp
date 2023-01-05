@@ -58,29 +58,14 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-struct DSU {
-	vector<ll> e;
-	DSU(ll N) { e = vector<ll>(N, -1); }
-	ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
-	bool same_set(ll a, ll b) { return get(a) == get(b); }
-	ll size(ll x) { return -e[get(x)]; }
-    ll count() {
-        ll rv = 0;
-        FORE (x, e) {
-            if (x < 0) {
-                rv++;
-            }
+bool helper(vector<ll> &cnt, ll distinct) {
+    FOR (j, 10) {
+        if (cnt[j] > distinct) {
+            return false;
         }
-        return rv;
     }
-	bool unite(ll x, ll y) {
-		x = get(x), y = get(y);
-		if (x == y) return false;
-		if (e[x] > e[y]) swap(x, y);
-		e[x] += e[y]; e[y] = x;
-		return true;
-	}
-};
+    return true;
+}
 
 int main() {
     ll t;
@@ -88,37 +73,46 @@ int main() {
     while (t--) {
         ll n;
         cin >> n;
-        vector<ll> p(n);
-        FOR (i, n) {
-            cin >> p[i];
-            p[i]--;
-        }
-        vector<bool> visited(n);
-        DSU dsu(n);
-        FOR (i, n) {
-            if (visited[i]) {
-                continue;
-            }
-            ll j = i;
-            while (!visited[j]) {
-                dsu.unite(i, j);
-                visited[j] = true;
-                j = p[j];
+        str s;
+        cin >> s;
+        ll rv = n;
+        FOB (i, 1, n) {
+            if (s[i] != s[i - 1]) {
+                rv++;
             }
         }
-        ll rv = n - dsu.count();
-        bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
-                some_case = true;
-                break;
+        FOB (i, 2, n) {
+            if (!(s[i] == s[i - 1] && s[i] == s[i - 2])) {
+                rv++;
             }
         }
-        if (some_case) {
-            cout << rv - 1 << '\n';
-        } else {
-            cout << rv + 1 << '\n';
+        FOB (len, 4, min(n + 1, 101LL)) {
+            ll distinct = 0;
+            vector<ll> cnt(10);
+            FOR (i, len) {
+                cnt[s[i] - '0']++;
+                if (cnt[s[i] - '0'] == 1) {
+                    distinct++;
+                }
+            }
+            if (helper(cnt, distinct)) {
+                rv++;
+            }
+            FOB (i, len, n) {
+                cnt[s[i - len] - '0']--;
+                if (cnt[s[i - len] - '0'] == 0) {
+                    distinct--;
+                }
+                cnt[s[i] - '0']++;
+                if (cnt[s[i] - '0'] == 1) {
+                    distinct++;
+                }
+                if (helper(cnt, distinct)) {
+                    rv++;
+                }
+            }
         }
+        cout << rv << '\n';
     }
     return 0;
 }
