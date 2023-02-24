@@ -63,6 +63,23 @@
         "iomanip": "cpp",
         "xlocmon": "cpp",
         "xloctime": "cpp",
-        "*.rh": "cpp"
+        "*.rh": "cpp",
+        "array": "cpp",
+        "forward_list": "cpp",
+        "string_view": "cpp",
+        "regex": "cpp",
+        "valarray": "cpp",
+        "bitset": "cpp",
+        "*.tcc": "cpp",
+        "chrono": "cpp",
+        "complex": "cpp",
+        "condition_variable": "cpp",
+        "future": "cpp",
+        "mutex": "cpp",
+        "ratio": "cpp",
+        "scoped_allocator": "cpp",
+        "shared_mutex": "cpp",
+        "thread": "cpp",
+        "typeindex": "cpp"
     }
 }

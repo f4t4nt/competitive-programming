@@ -34,6 +34,7 @@
             "command": "/usr/bin/g++",
             "args": [
                 "-fdiagnostics-color=always",
+                "-DLOCAL",
                 "-g",
                 "${file}",
                 "-o",

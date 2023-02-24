@@ -2,4 +2,4 @@
 *.ilk
 *.obj
 *.pdb
-bin\
+bin/

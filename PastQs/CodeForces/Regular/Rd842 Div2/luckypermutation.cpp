@@ -108,8 +108,8 @@ int main() {
         }
         ll rv = n - dsu.count();
         bool some_case = false;
-        FOR (i, n) {
-            if (dsu.same_set(i, i + 1)) {
+        FOB (i, 1, n) {
+            if (dsu.same_set(i - 1, i)) {
                 some_case = true;
                 break;
             }
