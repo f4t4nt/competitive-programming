@@ -1,13 +1,42 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+using ll = long long;
+using ull = unsigned long long;
+using ld = long double;
+using ch = char;
+using str = string;
+
+#define pb push_back
+#define elif else if
+#define sz(C) (ll) C.size()
+#define mp make_pair
+#define mt make_tuple
+#define all(C) C.begin(), C.end()
+#define flip(C) reverse(all(C))
+#define ssort(C) sort(all(C))
+#define rsort(C) sort(all(C), greater<>())
+
+#define FOR(x, e) for(ll x = 0; x < (ll) e; x++)
+#define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
+#define FOB(x, b, e) for(auto x = b; x < e; x++)
+#define FOI(x, e, i) for(ll x = 0; x < (ll) e; x += (ll) i)
+#define FOBI(x, b, e, i) for(ll x = (ll) b; x < (ll) e; x += (ll) i)
+#define FORE(x, C) for(auto &x : C)
+
+//--------------------------------------------------
+
 ll bin_search_find_last(vector<ll> &a) {
-    ll lo = 0, hi = sz(a) - 1;
-    while (lo < hi) {
-        ll mid = lo + (hi - lo + 1) / 2;
-        if (a[mid] == 1) {
-            lo = mid;
-        } else {
-            hi = mid - 1;
+        ll lo = 0, hi = sz(a) - 1;
+        while (lo < hi) {
+            ll mid = lo + (hi - lo + 1) / 2;
+            if (a[mid] == 1) {
+                lo = mid;
+            } else {
+                hi = mid - 1;
+            }
         }
-    }
 }
 
 ll bin_search_find_first(vector<ll> &a) {
@@ -45,6 +74,40 @@ void bitmaskdp() {
         }
     }
 }
+
+//--------------------------------------------------
+
+struct BIT {
+    vector<ll> tree;
+    ll n;
+
+    BIT(ll n) {
+        this->n = n;
+        tree.resize(n + 1);
+    }
+
+    void update(ll idx, ll val) {
+        idx++;
+        while (idx <= n) {
+            tree[idx] += val;
+            idx += idx & (-idx);
+        }
+    }
+
+    ll query(ll idx) {
+        idx++;
+        ll sum = 0;
+        while (idx > 0) {
+            sum += tree[idx];
+            idx -= idx & (-idx);
+        }
+        return sum;
+    }
+
+    ll query(ll l, ll r) {
+        return query(r) - query(l - 1);
+    }
+};
 
 //--------------------------------------------------
 
@@ -284,6 +347,94 @@ vector<vector<ll>> floyd_warshall(vector<vector<ll>> &dist) {
 
 //--------------------------------------------------
 
+ll gauss_jordan(vector<vector<ld>> &A, vector<ld> &b, vector<ld> &x) {
+    ll n = A.size(), m = A[0].size();
+    vector<vector<ld>> a(n, vector<ld>(m + 1));
+    FOR(i, n) {
+        FOR(j, m) {
+            a[i][j] = A[i][j];
+        }
+        a[i][m] = b[i];
+    }
+    vector<ll> where(m, -1);
+    for (ll col = 0, row = 0; col < m && row < n; col++) {
+        ll sel = row;
+        FOB (i, row, n) {
+            if (abs(a[i][col]) > abs(a[sel][col])) {
+                sel = i;
+            }
+        }
+        if (abs(a[sel][col]) < EPS) {
+            continue;
+        }
+        FOB (i, col, m + 1) {
+            swap(a[sel][i], a[row][i]);
+        }
+        where[col] = row;
+        FOR (i, n) {
+            if (i != row) {
+                ld c = a[i][col] / a[row][col];
+                FOB (j, col, m + 1) {
+                    a[i][j] -= a[row][j] * c;
+                }
+            }
+        }
+        row++;
+    }
+    x.assign(m, 0);
+    FOR (i, m) {
+        if (where[i] != -1) {
+            x[i] = a[where[i]][m] / a[where[i]][i];
+        }
+    }
+    FOR (i, n) {
+        ld sum = 0;
+        FOR (j, m) {
+            sum += a[i][j] * x[j];
+        }
+        if (abs(sum - a[i][m]) > EPS) { // may need to change for modulo
+            return 0;
+        }
+    }
+    FOR (i, m) {
+        if (where[i] == -1) {
+            return INF;
+        }
+    }
+    return 1;
+}
+
+int gauss_jordan_binary(
+    vector<bitset<MAXN>> A,
+    bitset<MAXN> &b,
+    bitset<MAXN> &x,
+    int n,
+    int m
+) {
+    FOR (i, n) A[i][m] = b[i];
+    vector<int> where(m, -1);
+    for (int col = 0, row = 0; col < m && row < n; col++) {
+        FOB (i, row, n) {
+            if (A[i][col] != 0) {
+                swap(A[i], A[row]);
+                break;
+            }
+        }
+        if (A[row][col] == 0) continue;
+        where[col] = row;
+        FOR (i, n) {
+            if (i != row && A[i][col] != 0) {
+                A[i] ^= A[row];
+            }
+        }
+        row++;
+    }
+    x = bitset<MAXN>(0);
+    ...
+}
+
+//--------------------------------------------------
+
 ll gcd(ll a, ll b) {
     if (a == 0) return b;
     return gcd(b % a, a);
@@ -443,6 +594,16 @@ pair<ll, ll> manacher(str &s) {
     }
 
     return {len, (idx - len) / 2};
+}
+
+//--------------------------------------------------
+
+ll mask(ll x) {
+    ll rv = x;
+    while (rv & (rv + 1)) {
+        rv |= rv / 2;
+    }
+    return rv;
 }
 
 //--------------------------------------------------
