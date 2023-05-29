@@ -11,8 +11,6 @@ using str = string;
 #define pb push_back
 #define elif else if
 #define sz(C) (ll) C.size()
-#define mp make_pair
-#define mt make_tuple
 #define all(C) C.begin(), C.end()
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
@@ -21,17 +19,28 @@ using str = string;
 #define FOR(x, e) for(ll x = 0; x < (ll) e; x++)
 #define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
 #define FOB(x, b, e) for(auto x = b; x < e; x++)
-#define FOI(x, e, i) for(ll x = 0; x < (ll) e; x += (ll) i)
-#define FOBI(x, b, e, i) for(ll x = (ll) b; x < (ll) e; x += (ll) i)
 #define FORE(x, C) for(auto &x : C)
+
+//--------------------------------------------------
+
+// clockwise angle from (x1, y1) to (x0, y0) to (x2, y2)
+ld angle(ld x1, ld y1, ld x0, ld y0, ld x2, ld y2) {
+    ld dot = (x1 - x0) * (x2 - x0) + (y1 - y0) * (y2 - y0),
+        det = (x1 - x0) * (y2 - y0) - (y1 - y0) * (x2 - x0),
+        rv = atan2(det, dot);
+    if (rv < 0) {
+        rv += 2 * M_PI;
+    }
+    return rv;
+}
 
 //--------------------------------------------------
 
 ll bin_search_find_last(vector<ll> &a) {
         ll lo = 0, hi = sz(a) - 1;
         while (lo < hi) {
-            ll mid = lo + (hi - lo + 1) / 2;
-            if (a[mid] == 1) {
+            ll mid = (lo + hi + 1) / 2;
+            if (valid(mid)) {
                 lo = mid;
             } else {
                 hi = mid - 1;
@@ -42,8 +51,8 @@ ll bin_search_find_last(vector<ll> &a) {
 ll bin_search_find_first(vector<ll> &a) {
     ll lo = 0, hi = sz(a) - 1;
     while (lo < hi) {
-        ll mid = lo + (hi - lo) / 2;
-        if (a[mid] == 1) {
+        ll mid = (lo + hi) / 2;
+        if (valid(mid)) {
             hi = mid;
         } else {
             lo = mid + 1;
@@ -111,6 +120,24 @@ struct BIT {
 
 //--------------------------------------------------
 
+pair<ld, ld> get_com(vector<pair<ld, ld>> &poly) {
+    ld x = 0, y = 0;
+    ld area = 0;
+    FOR (i, sz(poly)) {
+        ll j = (i + 1) % sz(poly);
+        ld a = poly[i].first * poly[j].second - poly[j].first * poly[i].second;
+        area += a;
+        x += (poly[i].first + poly[j].first) * a;
+        y += (poly[i].second + poly[j].second) * a;
+    }
+    area /= 2;
+    x /= 6 * area;
+    y /= 6 * area;
+    return {x, y};
+}
+
+//--------------------------------------------------
+
 vector<pair<ld, ld>> convex_hull(vector<pair<ld, ld>> points) {
     // sort points by x-coordinate
     ssort(points);
@@ -163,6 +190,29 @@ void customsort() {
         &[] (const ll &a, const ll &b) -> bool
         { return a < b; });
     // equivalent to regular sort
+}
+
+//--------------------------------------------------
+
+vector<ll> dist(n, INF);
+dist[0] = 0;
+priority_queue<pair<ll, ll>, vector<pair<ll, ll>>, greater<>> pq;
+pq.push({0, 0});
+while (!pq.empty()) {
+    ll cur_d, u;
+    tie(cur_d, u) = pq.top();
+    pq.pop();
+    if (cur_d > dist[u]) {
+        continue;
+    }
+    FORE (elem, adj_s[u]) {
+        ll v, w;
+        tie(v, w) = elem;
+        if (dist[v] > dist[u] + w) {
+            dist[v] = dist[u] + w;
+            pq.push({dist[v], v});
+        }
+    }
 }
 
 //--------------------------------------------------
@@ -333,7 +383,7 @@ void init() {
 
 //--------------------------------------------------
 
-vector<vector<ll>> floyd_warshall(vector<vector<ll>> &dist) {
+void floyd_warshall(vector<vector<ll>> &dist) {
     ll n = sz(dist);
     FOR (k, n) {
         FOR (i, n) {
@@ -342,7 +392,21 @@ vector<vector<ll>> floyd_warshall(vector<vector<ll>> &dist) {
             }
         }
     }
-    return dist;
+}
+
+void bellman_ford(ll v, vector<tuple<ll, ll, ll>> &edges, vector<ll> &dist) {
+    ll n = sz(dist);
+    FOR (i, n) {
+        dist[i] = INF;
+    }
+    dist[v] = 0;
+    FOR (i, n - 1) {
+        for (auto [a, b, w] : edges) {
+            if (dist[a] != INF && dist[a] + w < dist[b]) {
+                dist[b] = dist[a] + w;
+            }
+        }
+    }
 }
 
 //--------------------------------------------------
@@ -843,6 +907,53 @@ ld probability_a_before_b(ld a, ld b, ld s, ld p) {
 
 //--------------------------------------------------
 
+vector<vector<ll>> scc(vector<vector<ll>> adj) {
+    ll n = sz(adj);
+    vector<ll> order;
+    vector<bool> vis(n);
+    function<void(ll)> dfs = [&](ll u) {
+        vis[u] = true;
+        FORE(v, adj[u]) {
+            if (!vis[v]) {
+                dfs(v);
+            }
+        }
+        order.pb(u);
+    };
+    FOR(i, n) {
+        if (!vis[i]) {
+            dfs(i);
+        }
+    }
+    vector<vector<ll>> adjt(n);
+    FOR(i, n) {
+        FORE(j, adj[i]) {
+            adjt[j].pb(i);
+        }
+    }
+    vector<vector<ll>> sccs;
+    vis.assign(n, false);
+    function<void(ll, vector<ll> &)> dfs2 = [&](ll u, vector<ll> &scc) {
+        vis[u] = true;
+        scc.pb(u);
+        FORE(v, adjt[u]) {
+            if (!vis[v]) {
+                dfs2(v, scc);
+            }
+        }
+    };
+    FORR(i, n) {
+        if (!vis[order[i]]) {
+            vector<ll> scc;
+            dfs2(order[i], scc);
+            sccs.pb(scc);
+        }
+    }
+    return sccs;
+}
+
+//--------------------------------------------------
+
 struct SegTree {
     ll n;
     vector<ll> data, lazy;
@@ -1210,6 +1321,33 @@ ll sum(ll p, ll q, ll N) {
 using namespace __gnu_pbds;
 
 template<class T> using Tree = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+
+//--------------------------------------------------
+
+void make_clockwise(vector<pair<ld, ld>> &points) {
+    pair<ld, ld> center = mp(0, 0);
+    FORE (p, points) {
+        center.first += p.first;
+        center.second += p.second;
+    }
+    center.first /= sz(points);
+    center.second /= sz(points);
+    sort(all(points), [center](pair<ld, ld> &p1, pair<ld, ld> &p2) {
+        return atan2(p1.second - center.second, p1.first - center.first) <
+               atan2(p2.second - center.second, p2.first - center.first);
+    });
+}
+
+bool in_triangle(pair<ld, ld> &point, vector<pair<ld, ld>> &triangle) {
+    vector<ld> d(3);
+    FOR (i, 3) {
+        auto &p1 = triangle[i];
+        auto &p2 = triangle[(i + 1) % 3];
+        d[i] = (p2.first - p1.first) * (point.second - p1.second) -
+            (p2.second - p1.second) * (point.first - p1.first);
+    }
+    return (d[0] >= 0 && d[1] >= 0 && d[2] >= 0) || (d[0] <= 0 && d[1] <= 0 && d[2] <= 0);
+}
 
 //--------------------------------------------------
 

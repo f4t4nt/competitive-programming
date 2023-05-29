@@ -79,7 +79,8 @@ void gen_adj(ll &a1, ll &a2,
                 ll dq, tq, aq;
                 tie(dq, tq, aq) = q;
                 if ((a_lo <= aq && aq <= a_hi) ||
-                    (a_lo <= aq + 360 && aq + 360 <= a_hi)) {
+                    (a_lo <= aq + 360 && aq + 360 <= a_hi))
+                {
                     adj[road_to_idx[{j.idx, d}]].pb({road_to_idx[{dq, j.idx}], tq});
                 }
             }
