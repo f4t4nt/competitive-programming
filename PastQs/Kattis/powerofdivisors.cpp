@@ -30,12 +30,45 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+ll cnt_factors(ll x) {
+    ll rv = 0;
+    for (ll i = 1; i * i <= x; i++) {
+        if (x % i == 0) {
+            rv++;
+            if (i * i != x) {
+                rv++;
+            }
+        }
+    }
+    return rv;
+}
+
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    // icpc world finals 2023 c:
+    ll x;
+    cin >> x;
+    if (x == 1) {
+        cout << 1 << '\n';
+        return 0;
+    }
+    for (ll p = 60; p >= 2; p--) {
+        ld nd = pow(x, (ld) 1 / p);
+        ll n = (ll) round(nd);
+        if (abs(nd - n) < 1e-6) {
+            ll xn = 1, pn = p;
+            while (pn--) {
+                xn *= n;
+            }
+            if (x == xn && cnt_factors(n) == p) {
+                cout << n << '\n';
+                return 0;
+            }
+        }
+    }
 
+    cout << -1 << '\n';
     return 0;
 }

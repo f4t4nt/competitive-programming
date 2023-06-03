@@ -1,35 +1,9 @@
 =
-2
-9
-PUSH
-DUP
-ADD
-PUSH
-ADD
-DUP
-ADD
-DUP
-UNION
-5
-PUSH
-PUSH
-ADD
-PUSH
-INTERSECT
+4 4
+1 2 10
+2 3 3
+3 4 1
+1 4 4
 =
-0
-0
 1
-0
-1
-1
-2
-2
-2
-***
-0
-0
-1
-0
-0
-***
+1 4

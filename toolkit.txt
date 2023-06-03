@@ -3,7 +3,6 @@
 using namespace std;
 
 using ll = long long;
-using ull = unsigned long long;
 using ld = long double;
 using ch = char;
 using str = string;
@@ -20,6 +19,10 @@ using str = string;
 #define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
 #define FOB(x, b, e) for(auto x = b; x < e; x++)
 #define FORE(x, C) for(auto &x : C)
+
+// Run -> Add configuration... -> in launch.json:
+// "program": "${fileDirname}/${fileBasenameNoExtension}",
+// "preLaunchTask": "C/C++: g++ build active file",
 
 //--------------------------------------------------
 
