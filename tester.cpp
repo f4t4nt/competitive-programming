@@ -1,8 +1,4 @@
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <vector>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -59,15 +55,18 @@ vector<pair<string, string>> read_inputs()
     return tests;
 }
 
-void print_result(ostream& cout, string& test_in, string& test_out, string& test_result, size_t& test_idx)
+void print_result(ostream& cout, string& test_in, string& test_out, string& test_result, size_t& test_idx, double diff)
 {
     if (RESULT_ONLY) {
         cout << test_result << endl;
     } else {
         if(test_result == test_out)
-        { cout << "test " << test_idx + 1 << " passed\n"; }
+        { cout << "test " << test_idx + 1 << " passed; " << diff << "ms" << endl; }
         else
-        { cout << "TEST " << test_idx + 1 << " FAILED\n" << "input:\n" << test_in << '\n' << "expected:\n" << test_out << endl << "received:\n" << test_result << '\n'; }
+        { cout << "TEST " << test_idx + 1 << " FAILED; " << diff << "ms" << endl
+            << "input:\n" << test_in << endl <<
+            "expected:\n" << test_out << endl <<
+            "received:\n" << test_result << endl; }
     }
 }
 
@@ -77,7 +76,10 @@ void run_test(ofstream& test_results, string& test_in, string& test_out, size_t 
     fout.clear();
     fin.str(test_in);
     fout.str("");
+    auto start = chrono::steady_clock::now();
     test_main();
+    auto end = chrono::steady_clock::now();
+    double diff = chrono::duration<double, milli>(end - start).count();
 
     auto test_result = fout.str();
 
@@ -85,8 +87,8 @@ void run_test(ofstream& test_results, string& test_in, string& test_out, size_t 
     fin.str(test_result);
     test_result = read_block(fin);
     
-    print_result(cout, test_in, test_out, test_result, test_idx);
-    print_result(test_results, test_in, test_out, test_result, test_idx);
+    print_result(cout, test_in, test_out, test_result, test_idx, diff);
+    print_result(test_results, test_in, test_out, test_result, test_idx, diff);
 }
 
 int main()

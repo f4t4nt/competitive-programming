@@ -19,7 +19,7 @@ using str = string;
 #define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
 #define FOB(x, b, e) for(auto x = b; x != e; x++)
 #define FORE(x, C) for(auto &x : C)
-
+    
 #ifdef LOCAL
 #include "tester.cpp"
 #define main test_main
@@ -34,5 +34,18 @@ int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
+
+    ll t;
+    cin >> t;
+    while (t--) {
+        ll n, k;
+        cin >> n >> k;
+        ll rv = 1;
+        while (k-- && rv < n + 1) {
+            rv *= 2;
+        }
+        cout << min(n + 1, rv) << '\n';
+    }
+
     return 0;
 }

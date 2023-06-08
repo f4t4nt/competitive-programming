@@ -1,1 +1,3 @@
-test 1 passed
+test 1 passed; 0.042123ms
+test 2 passed; 0.003918ms
+test 3 passed; 0.001632ms

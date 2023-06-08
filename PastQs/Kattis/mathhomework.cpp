@@ -34,5 +34,29 @@ int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
+
+    ll b, d, c, l;
+    cin >> b >> d >> c >> l;
+    set<tuple<ll, ll, ll>> rv;
+    FOR (i, 251) {
+        if (i * b > l) break;
+        FOR (j, 251) {
+            if (i * b + j * d > l) break;
+            FOR (k, 251) {
+                if (i * b + j * d + k * c > l) break;
+                if (i * b + j * d + k * c == l) {
+                    rv.insert({i, j, k});
+                }
+            }
+        }
+    }
+    if (rv.empty()) {
+        cout << "impossible\n";
+    } else {
+        FORE (x, rv) {
+            cout << get<0>(x) << ' ' << get<1>(x) << ' ' << get<2>(x) << '\n';
+        }
+    }
+
     return 0;
 }

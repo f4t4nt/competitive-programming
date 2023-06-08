@@ -30,9 +30,45 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+vector<ll> fibs = {1, 1};
+
+void solve(ll n) {
+    FOB (b, 1, 1e6) {
+        ll min_a = 1e9;
+        FOR (k, sz(fibs)) {
+            // fibs[k] * a + fibs[k + 1] * b == n
+            // a = (n - fibs[k + 1] * b) / fibs[k]
+            ll num = n - fibs[k + 1] * b, den = fibs[k];
+            if (num % den == 0 && num > 0) {
+                ll a = num / den;
+                if (b >= a) {
+                    min_a = min(min_a, a);
+                }
+            }
+        }
+        if (min_a != 1e9) {
+            cout << min_a << ' ' << b << '\n';
+            return;
+        }
+    }
+}
+
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
+
+    while (fibs.back() < 1e9) {
+        fibs.pb(fibs.back() + fibs[sz(fibs) - 2]);
+    }
+
+    ll t;
+    cin >> t;
+    while (t--) {
+        ll n;
+        cin >> n;
+        solve(n);
+    }
+
     return 0;
 }

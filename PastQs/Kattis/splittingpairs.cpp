@@ -17,9 +17,9 @@ using str = string;
     
 #define FOR(x, e) for(ll x = 0; x < (ll) e; x++)
 #define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
-#define FOB(x, b, e) for(auto x = b; x != e; x++)
+#define FOB(x, b, e) for(auto x = b; x < e; x++)
 #define FORE(x, C) for(auto &x : C)
-
+    
 #ifdef LOCAL
 #include "tester.cpp"
 #define main test_main
@@ -34,5 +34,31 @@ int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
+
+    ll t;
+    cin >> t;
+    while (t--) {
+        ll n;
+        cin >> n;
+        vector<ll> s(n);
+        FOR (i, n) cin >> s[i];
+        if (n % 2 == 0) {
+            bool ok = false;
+            FOR (i, n) ok |= (s[i] % 2 == 0);
+            cout << (ok ? 1 : 0) << '\n';
+        } else {
+            ll max2 = (1LL << 40);
+            FOR (i, n) {
+                while (s[i] % max2 != 0) {
+                    max2 /= 2;
+                }
+            }
+            FOR (i, n) s[i] /= max2;
+            bool ok = true;
+            FOR (i, n) ok &= (s[i] % 2 == 1);
+            cout << (!ok ? 1 : 0) << '\n';
+        }
+    }
+
     return 0;
 }
