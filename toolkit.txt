@@ -1,11 +1,14 @@
 #include <bits/stdc++.h>
+#include <bits/extc++.h>
 
 using namespace std;
+using namespace __gnu_pbds;
 
 using ll = long long;
 using ld = long double;
 using ch = char;
 using str = string;
+using ost = tree<str, null_type, less<str>, rb_tree_tag, tree_order_statistics_node_update>;
 
 #define pb push_back
 #define elif else if
@@ -76,25 +79,11 @@ ll bitcount(ll x) {
 
 //--------------------------------------------------
 
-void bitmaskdp() {
-    ll N;
-    vector<ll> dp(1 << N);
-    FOR(x, 1 << N) {
-        FOR(n, N) {
-            if(x & (1 << n)) continue;
-            dp[x | (1 << n)]=/*...*/;
-        }
-    }
-}
-
-//--------------------------------------------------
-
 struct BIT {
     vector<ll> tree;
     ll n;
 
-    BIT(ll n) {
-        this->n = n;
+    BIT(ll n) : n(n) {
         tree.resize(n + 1);
     }
 
@@ -414,6 +403,27 @@ void bellman_ford(ll v, vector<tuple<ll, ll, ll>> &edges, vector<ll> &dist) {
 
 //--------------------------------------------------
 
+bool game(auto state, bool alice) {
+    if (mem.find(state) != mem.end()) {
+        return mem[state];
+    }
+    FORE (move, all_moves) {
+        if (valid(move)) {
+            change_state();
+            if (!game(state, !alice)) {
+                restore_state();
+                mem[state] = true;
+                return true;
+            }
+            restore_state();
+        }
+    }
+    mem[state] = false;
+    return false;
+}
+
+//--------------------------------------------------
+
 ll gauss_jordan(vector<vector<ld>> &A, vector<ld> &b, vector<ld> &x) {
     ll n = A.size(), m = A[0].size();
     vector<vector<ld>> a(n, vector<ld>(m + 1));
@@ -532,60 +542,33 @@ ll crt(ll m, ll n, ll a, ll b) {
 //--------------------------------------------------
 
 struct LCA_Tree {
-    vector<vector<ll>> parent;
-    vector<ll> pre, post;
+    vector<vector<ll>> parent, adj;
+    vector<ll> pre, post, depth;
     ll n, timer;
 
-    LCA_Tree(vector<ll> &parent, ll root = 0) {
-        n = sz(parent);
+    LCA_Tree(ll &n0, vector<vector<ll>> &adj0) {
+        n = n0;
         timer = 0;
-        pre = vector<ll>(n);
-        post = vector<ll>(n);
-        this->parent = vector<vector<ll>>(n, vector<ll>(30));
-        FOR (i, n) {
-            this->parent[i][0] = parent[i];
-        }
-        vector<vector<ll>> adj(n);
-        FOR (i, n) {
-            if (parent[i] != -1) {
-                adj[parent[i]].pb(i);
-                adj[i].pb(parent[i]);
+        pre = vector<ll>(n), post = pre, depth = pre;
+        parent = vector<vector<ll>>(n, vector<ll>(30));
+        adj = adj0;
+        dfs(0, 0, 0);
+        gen();
+    }
+
+    void dfs(ll node, ll par, ll d) {
+        pre[node] = timer++;
+        depth[node] = d;
+        parent[node][0] = par;
+        FORE (child, adj[node]) {
+            if (child != par) {
+                dfs(child, node, d + 1);
             }
         }
-        dfs(adj, root, 0);
-        generate();
+        post[node] = timer++;
     }
 
-    LCA_Tree(vector<vector<ll>> &adj, ll root = 0) {
-        n = sz(adj);
-        timer = 0;
-        pre = vector<ll>(n);
-        post = vector<ll>(n);
-        parent = vector<vector<ll>>(n, vector<ll>(30));
-        dfs(adj, root, 0);
-        generate();
-    }
-
-    LCA_Tree(vector<pair<ll, ll>> &edges, ll root = 0) {
-        n = 0;
-        FORE (edge, edges) {
-            n = max(n, edge.first + 1);
-            n = max(n, edge.second + 1);
-        }
-        timer = 0;
-        pre = vector<ll>(n);
-        post = vector<ll>(n);
-        parent = vector<vector<ll>>(n, vector<ll>(30));
-        vector<vector<ll>> adj(n);
-        FORE (edge, edges) {
-            adj[edge.first].pb(edge.second);
-            adj[edge.second].pb(edge.first);
-        }
-        dfs(adj, root, 0);
-        generate();
-    }
-
-    void generate(ll root = 0) {
+    void gen() {
         FOR (i, 29) {
             FOR (j, n) {
                 parent[j][i + 1] = parent[parent[j][i]][i];
@@ -593,34 +576,44 @@ struct LCA_Tree {
         }
     }
 
-    void dfs(vector<vector<ll>> &adj, ll node, ll par) {
-        pre[node] = timer++;
-        parent[node][0] = par;
-        FORE (child, adj[node]) {
-            if (child != par) {
-                dfs(adj, child, node);
-            }
-        }
-        post[node] = timer++;
-    }
-
-    bool is_ancestor(ll u, ll v) {
+    bool is_anc(ll u, ll v) {
         return pre[u] <= pre[v] && post[u] >= post[v];
     }
 
     ll lca(ll u, ll v) {
-        if (is_ancestor(u, v)) {
-            return u;
-        }
-        if (is_ancestor(v, u)) {
-            return v;
-        }
+        if (is_anc(u, v)) return u;
+        if (is_anc(v, u)) return v;
         FORR (i, 30) {
-            if (!is_ancestor(parent[u][i], v)) {
+            if (!is_anc(parent[u][i], v)) {
                 u = parent[u][i];
             }
         }
         return parent[u][0];
+    }
+
+    ll dist(ll u, ll v) {
+        return depth[u] + depth[v] - 2 * depth[lca(u, v)];
+    }
+
+    bool disjoint(vector<pair<ll, ll>> paths) {
+        vector<pair<ll, ll>> p;
+        FORE (path, paths) {
+            ll u, v;
+            tie(u, v) = path;
+            ll w = lca(u, v);
+            p.pb({w, u});
+            p.pb({w, v});
+        }
+        FOR (i, sz(p)) {
+            FOR (j, i - i % 2) {
+                if (!(lca(p[i].second, p[j].first) != p[j].first ||
+                    lca(p[j].second, p[i].first) != p[i].first))
+                {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 };
 
@@ -675,191 +668,154 @@ ll mask(ll x) {
 
 //--------------------------------------------------
 
-ll max_flow(ll s, ll t, vector<vector<pair<ll, ll>>> adj) {
-    ll flow = 0;
-    vector<ll> parent(sz(adj));
-    while (true) {
-        fill(parent.begin(), parent.end(), -1);
-        queue<ll> q;
-        q.push(s);
-        parent[s] = -2;
-        while (!q.empty()) {
-            ll cur = q.front();
-            q.pop();
-            FORE (next, adj[cur]) {
-                if (parent[next.first] == -1 && next.second > 0) {
-                    parent[next.first] = cur;
-                    q.push(next.first);
-                }
-            }
-        }
-        if (parent[t] == -1) break;
-        ll path_flow = LLONG_MAX;
-        for (ll cur = t; cur != s; cur = parent[cur]) {
-            ll prev = parent[cur];
-            FORE (next, adj[prev]) {
-                if (next.first == cur) {
-                    path_flow = min(path_flow, next.second);
-                    break;
-                }
-            }
-        }
-        for (ll cur = t; cur != s; cur = parent[cur]) {
-            ll prev = parent[cur];
-            FORE (next, adj[prev]) {
-                if (next.first == cur) {
-                    next.second -= path_flow;
-                    break;
-                }
-            }
-            FORE (next, adj[cur]) {
-                if (next.first == prev) {
-                    next.second += path_flow;
-                    break;
-                }
-            }
-        }
-        flow += path_flow;
-    }
-    return flow;
-}
+struct Edge {
+    ll s, t, cap, cost;
+    Edge (ll s, ll t, ll cap, ll cost) : s(s), t(t), cap(cap), cost(cost) {}
+};
 
-ll min_cost_flow(ll s, ll t, ll target_flow, vector<vector<tuple<ll, ll, ll>>> adj) {
-    ll flow = 0, cost = 0;
-    vector<ll> dist(sz(adj)), parent(sz(adj));
-    while (flow < target_flow) {
-        vector<bool> in_queue(sz(adj), false);
-        fill(dist.begin(), dist.end(), LLONG_MAX);
-        fill(parent.begin(), parent.end(), -1);
-        queue<ll> q;
-        q.push(s);
-        dist[s] = 0;
-        in_queue[s] = true;
+struct Flow {
+    ll n;
+    vector<vector<ll>> adj, cap, cost;
+
+    Flow(ll n, vector<Edge> &edges) : n(n), adj(n), cap(n, vector<ll>(n)), cost(n, vector<ll>(n)) {
+        FORE (e, edges) {
+            adj[e.s].pb(e.t);
+            adj[e.t].pb(e.s);
+            cap[e.s][e.t] = e.cap;
+            cap[e.t][e.s] = 0;
+            cost[e.s][e.t] = e.cost;
+        }
+    }
+
+    ll bfs(ll s, ll t, vector<ll>& par) {
+        fill(all(par), -1);
+        par[s] = -2;
+        queue<pair<ll, ll>> q;
+        q.push({s, INF});
         while (!q.empty()) {
-            ll cur = q.front();
+            ll cur = q.front().first;
+            ll flow = q.front().second;
             q.pop();
-            in_queue[cur] = false;
             FORE (next, adj[cur]) {
-                if (get<1>(next) > 0 && dist[get<0>(next)] > dist[cur] + get<2>(next)) {
-                    dist[get<0>(next)] = dist[cur] + get<2>(next);
-                    parent[get<0>(next)] = cur;
-                    if (!in_queue[get<0>(next)]) {
-                        q.push(get<0>(next));
-                        in_queue[get<0>(next)] = true;
+                if (par[next] == -1 && cap[cur][next]) {
+                    par[next] = cur;
+                    ll new_flow = min(flow, cap[cur][next]);
+                    if (next == t)
+                        return new_flow;
+                    q.push({next, new_flow});
+                }
+            }
+        }
+
+        return 0;
+    }
+
+    ll max_flow(ll s, ll t) {
+        auto cap_copy = cap;
+        ll flow = 0;
+        vector<ll> par(n);
+        ll new_flow;
+        while (true) {
+            new_flow = bfs(s, t, par);
+            if (!new_flow) {
+                break;
+            }
+            flow += new_flow;
+            ll cur = t;
+            while (cur != s) {
+                ll prev = par[cur];
+                cap[prev][cur] -= new_flow;
+                cap[cur][prev] += new_flow;
+                cur = prev;
+            }
+        }
+        cap = cap_copy;
+        return flow;
+    }
+
+    void shortest_paths(ll n, ll v0, vector<ll>& d, vector<ll>& p) {
+        d.assign(n, INF);
+        d[v0] = 0;
+        vector<bool> inq(n, false);
+        queue<ll> q;
+        q.push(v0);
+        p.assign(n, -1);
+
+        while (!q.empty()) {
+            ll u = q.front();
+            q.pop();
+            inq[u] = false;
+            FORE (v, adj[u]) {
+                if (cap[u][v] > 0 && d[v] > d[u] + cost[u][v]) {
+                    d[v] = d[u] + cost[u][v];
+                    p[v] = u;
+                    if (!inq[v]) {
+                        inq[v] = true;
+                        q.push(v);
                     }
                 }
             }
         }
-        if (parent[t] == -1) break;
-        ll path_flow = target_flow - flow;
-        for (ll cur = t; cur != s; cur = parent[cur]) {
-            ll prev = parent[cur];
-            FORE (next, adj[prev]) {
-                if (get<0>(next) == cur) {
-                    path_flow = min(path_flow, get<1>(next));
-                    break;
-                }
+    }
+
+    ll min_cost_flow(ll s, ll t, ll k) {
+        auto cap_copy = cap;
+        ll flow = 0;
+        ll cost = 0;
+        vector<ll> d, p;
+        while (flow < k) {
+            shortest_paths(n, s, d, p);
+            if (d[t] == INF) {
+                break;
+            }
+            ll f = k - flow;
+            ll cur = t;
+            while (cur != s) {
+                f = min(f, cap[p[cur]][cur]);
+                cur = p[cur];
+            }
+            flow += f;
+            cost += f * d[t];
+            cur = t;
+            while (cur != s) {
+                cap[p[cur]][cur] -= f;
+                cap[cur][p[cur]] += f;
+                cur = p[cur];
             }
         }
-        flow += path_flow;
-        cost += path_flow * dist[t];
-        for (ll cur = t; cur != s; cur = parent[cur]) {
-            ll prev = parent[cur];
-            FORE (next, adj[cur]) {
-                if (get<0>(next) == prev) {
-                    get<1>(next) += path_flow;
-                    break;
-                }
-            }
-            FORE (next, adj[prev]) {
-                if (get<0>(next) == cur) {
-                    get<1>(next) -= path_flow;
-                    break;
-                }
+        cap = cap_copy;
+        if (flow < k) {
+            return -1;
+        } else {
+            return cost;
+        }
+    }
+
+    void dfs(ll u, vector<bool> &vis) {
+        vis[u] = true;
+        FORE (v, adj[u]) {
+            if (!vis[v] && cap[u][v]) {
+                dfs(v, vis);
             }
         }
     }
 
-    if (flow < target_flow) {
-        return -1;
-    } else  {
-        return cost;
-    }
-}
-
-//--------------------------------------------------
-
-vector<ll> inv_map = vector<ll>(1e5 + 10, -1);
-
-struct mod_ll {
-    ll val;
-    mod_ll(ll v = 0) : val(((v % MOD) + MOD) % MOD) {}
-    mod_ll operator+(const mod_ll &other) const { return mod_ll(val + other.val); }
-    mod_ll operator-(const mod_ll &other) const { return mod_ll(val - other.val); }
-    mod_ll operator*(const mod_ll &other) const { return mod_ll(val * other.val); }
-    mod_ll pow(ll p) const {
-        mod_ll rv = 1;
-        mod_ll base = *this;
-        while (p) {
-            if (p & 1) rv = rv * base;
-            base = base * base;
-            p >>= 1;
+    vector<pair<ll, ll>> min_cut(ll s) {
+        vector<bool> vis(n);
+        vector<pair<ll, ll>> rv;
+        dfs(s, vis);
+        FOR (u, n) {
+            if (vis[u]) {
+                FORE (v, adj[u]) {
+                    if (!vis[v]) {
+                        rv.pb({u, v});
+                    }
+                }
+            }
         }
         return rv;
     }
-    mod_ll inv() const {
-        if (inv_map[val] != -1) return mod_ll(inv_map[val]);
-        return inv_map[val] = pow(MOD - 2).val;
-    }
-    mod_ll operator/(const mod_ll &other) const { return *this * other.inv(); }
-    mod_ll &operator+=(const mod_ll &other) { return *this = *this + other; }
-    mod_ll &operator-=(const mod_ll &other) { return *this = *this - other; }
-    mod_ll &operator*=(const mod_ll &other) { return *this = *this * other; }
-    mod_ll &operator/=(const mod_ll &other) { return *this = *this / other; }
-    bool operator==(const mod_ll &other) const { return val == other.val; }
-    bool operator!=(const mod_ll &other) const { return val != other.val; }
-    friend istream &operator>>(istream &is, mod_ll &m) { return is >> m.val; }
-    friend ostream &operator<<(ostream &os, const mod_ll &m) { return os << m.val; }
 };
-
-struct Complex {
-    mod_ll re, im;
-    Complex(mod_ll r = 0, mod_ll i = 0) : re(r), im(i) {}
-    Complex operator+(const Complex &other) const { return Complex(re + other.re, im + other.im); }
-    Complex operator-(const Complex &other) const { return Complex(re - other.re, im - other.im); }
-    Complex operator*(const Complex &other) const { return Complex(re * other.re - im * other.im, re * other.im + im * other.re); }
-    Complex operator/(const Complex &other) const { return Complex((re * other.re + im * other.im) / (other.re * other.re + other.im * other.im), (im * other.re - re * other.im) / (other.re * other.re + other.im * other.im)); }
-};
-
-//--------------------------------------------------
-
-bool is_simple_polygon(vector<pair<ld, ld>> coords, vector<ll> ordering) {
-    FOR (i, sz(ordering)) {
-        FOR (j, sz(ordering)) {
-            if (i == j) {
-                continue;
-            }
-            ld x1 = coords[ordering[i]].first;
-            ld y1 = coords[ordering[i]].second;
-            ld x2 = coords[ordering[(i + 1) % 7]].first;
-            ld y2 = coords[ordering[(i + 1) % 7]].second;
-            ld x3 = coords[ordering[j]].first;
-            ld y3 = coords[ordering[j]].second;
-            ld x4 = coords[ordering[(j + 1) % 7]].first;
-            ld y4 = coords[ordering[(j + 1) % 7]].second;
-            ld denom = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-            if (denom == 0) {
-                continue;
-            }
-            ld t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / denom;
-            ld u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / denom;
-            if (t > 0 && t < 1 && u > 0 && u < 1) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
 
 //--------------------------------------------------
 
@@ -871,41 +827,6 @@ ll pow(ll x, ll p) {
         p >>= 1;
     }
     return rv;
-}
-
-//--------------------------------------------------
-
-ld pow(ld x, ll n) {
-    ld res = 1;
-    while (n > 0) {
-        if (n & 1) res *= x;
-        x *= x;
-        n >>= 1;
-    }
-    return res;
-}
-
-ld probability_a_before_b(ld a, ld b, ld s, ld p) {
-    if (s == a) {
-        return 1;
-    } elif (s == b) {
-        return 0;
-    } elif (s < a && a < b) {
-        return 1;
-    } elif (s < b && b < a) {
-        return 0;
-    } elif (a < b && b < s) {
-        return 0;
-    } elif (b < a && a < s) {
-        return 1;
-    } else {
-        ld q = p / (1 - p);
-        if (q == 1) {
-            return (ld) (s - b) / (a - b);
-        } else {
-            return (pow(q, a - s) * (1 - pow(q, s - b))) / (1 - pow(q, a - b));
-        }
-    }
 }
 
 //--------------------------------------------------
@@ -1251,70 +1172,6 @@ int main() {
     }
 
     return 0;
-}
-
-//--------------------------------------------------
-
-vector<ll> fraction(ll p, ll q) {
-    vector<ll> a;
-    while (q) {
-        a.push_back(p / q);
-        p %= q;
-        swap(p, q);
-    }
-    return a;
-}
-
-pair<vector<ll>, vector<ll>> convergents(vector<ll> a) {
-    vector<ll> p = {0, 1};
-    vector<ll> q = {1, 0};
-    FORE (it, a) {
-        p.pb(p[sz(p) - 1] * it + p[sz(p) - 2]);
-        q.pb(q[sz(q) - 1] * it + q[sz(q) - 2]);
-    }
-    return {p, q};
-}
-
-tuple<vector<ll>, vector<ll>, vector<ll>> hull(vector<ll> a, ll N) {
-    vector<ll> p, q;
-    tie(p, q) = convergents(a);
-    ll t = N / q[sz(q) - 1];
-    vector<ll> ah = {t};
-    vector<ll> ph = {0, t * p[sz(p) - 1]};
-    vector<ll> qh = {0, t * q[sz(q) - 1]};
-    FORR (i, sz(q)) {
-        if (i % 2 == 1) {
-            while (qh[sz(qh) - 1] + q[i - 1] <= N) {
-                ll t = (N - qh[sz(qh) - 1] - q[i - 1]) / q[i];
-                ll dp = p[i - 1] + t * p[i];
-                ll dq = q[i - 1] + t * q[i];
-                ll k = (N - qh[sz(qh) - 1]) / dq;
-                ah.pb(k);
-                ph.pb(ph[sz(ph) - 1] + k * dp);
-                qh.pb(qh[sz(qh) - 1] + k * dq);
-            }
-        }
-    }
-    return {ah, ph, qh};
-}
-
-// sum of floor(p / q * x) for x in [0, N]
-ll sum(ll p, ll q, ll N) {
-    N++;
-    vector<ll> ah, ph, qh;
-    tie(ah, ph, qh) = hull(fraction(p, q), N);
-
-    auto picks = [&](ll y1, ll y2, ll dx, ll a) {
-        ll b = y1 + y2 + a + dx;
-        ll A = (y1 + y2) * dx;
-        return (A - b + 2) / 2 + b - (y2 + 1);
-    };
-
-    ll ans = 0;
-    FOB (i, 1, sz(qh)) {
-        ans += picks(ph[i - 1], ph[i], qh[i] - qh[i - 1], ah[i - 1]);
-    }
-    return ans - N;
 }
 
 //--------------------------------------------------

@@ -30,34 +30,40 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-vector<str> keyboard = {
-    "`1234567890-=",
-    "QWERTYUIOP[]\\",
-    "ASDFGHJKL;'",
-    "ZXCVBNM,./"
-};
-
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    map<ch, ch> ref;
-    FORE (row, keyboard) {
-        FOB (i, 1, sz(row)) {
-            ref[row[i]] = row[i - 1];
+    ll t;
+    cin >> t;
+    while (t--) {
+        ll n;
+        cin >> n;
+        vector<pair<ll, ll>> segs(n);
+        FOR (i, n) {
+            cin >> segs[i].first >> segs[i].second;
         }
-    }
-    str line;
-    while (getline(cin, line)) {
-        FORE (ch, line) {
-            if (ch == ' ') {
-                cout << ' ';
-            } else {
-                cout << ref[ch];
+        ssort(segs);
+        vector<ll> dp(n + 1);
+        FORR (i, n) {
+            dp[i] = dp[i + 1];
+            ll hi = 1e18;
+            FOB (j, i + 1, n) {
+                if (segs[j].first <= segs[i].second) {
+                    hi = min(hi, segs[j].second);
+                }
             }
+            if (hi == 1e18) {
+                continue;
+            }
+            ll j = i;
+            while (j < n && segs[j].first <= max(segs[i].second, hi)) {
+                j++;
+            }
+            dp[i] = max(dp[i], 1 + dp[j]);
         }
-        cout << '\n';
+        cout << n - 2 * dp[0] << '\n';
     }
 
     return 0;

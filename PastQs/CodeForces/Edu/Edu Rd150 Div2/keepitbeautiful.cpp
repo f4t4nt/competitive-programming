@@ -30,31 +30,41 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-vector<str> keyboard = {
-    "`1234567890-=",
-    "QWERTYUIOP[]\\",
-    "ASDFGHJKL;'",
-    "ZXCVBNM,./"
-};
-
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    map<ch, ch> ref;
-    FORE (row, keyboard) {
-        FOB (i, 1, sz(row)) {
-            ref[row[i]] = row[i - 1];
-        }
-    }
-    str line;
-    while (getline(cin, line)) {
-        FORE (ch, line) {
-            if (ch == ' ') {
-                cout << ' ';
+    ll t;
+    cin >> t;
+    while (t--) {
+        ll q;
+        cin >> q;
+        bool dec = false;
+        ll x0 = -1, xp = -1, x = -1;
+        FOR (i, q) {
+            cin >> x;
+            if (x0 == -1) {
+                x0 = x;
+            }
+            if (!dec) {
+                if (x < xp && x <= x0) {
+                    dec = true;
+                    cout << 1;
+                    xp = x;
+                } elif (x >= xp) {
+                    cout << 1;
+                    xp = x;
+                } else {
+                    cout << 0;
+                }
             } else {
-                cout << ref[ch];
+                if (x >= xp && x <= x0) {
+                    cout << 1;
+                    xp = x;
+                } else {
+                    cout << 0;
+                }
             }
         }
         cout << '\n';

@@ -81,6 +81,8 @@
         "shared_mutex": "cpp",
         "thread": "cpp",
         "typeindex": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "rope": "cpp",
+        "slist": "cpp"
     }
 }

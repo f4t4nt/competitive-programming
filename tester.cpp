@@ -61,10 +61,12 @@ void print_result(ostream& cout, string& test_in, string& test_out, string& test
         cout << test_result << endl;
     } else {
         if(test_result == test_out)
-        { cout << "test " << test_idx + 1 << " passed; " << diff << "ms" << endl; }
+        { cout << fixed << setprecision(6) <<
+            "test " << test_idx + 1 << " passed; " << diff << "ms" << endl; }
         else
-        { cout << "TEST " << test_idx + 1 << " FAILED; " << diff << "ms" << endl
-            << "input:\n" << test_in << endl <<
+        { cout << fixed << setprecision(6) <<
+            "TEST " << test_idx + 1 << " FAILED; " << diff << "ms" << endl <<
+            "input:\n" << test_in << endl <<
             "expected:\n" << test_out << endl <<
             "received:\n" << test_result << endl; }
     }
