@@ -83,6 +83,18 @@
         "typeindex": "cpp",
         "variant": "cpp",
         "rope": "cpp",
-        "slist": "cpp"
+        "slist": "cpp",
+        "any": "cpp",
+        "cfenv": "cpp",
+        "charconv": "cpp",
+        "cinttypes": "cpp",
+        "codecvt": "cpp",
+        "csetjmp": "cpp",
+        "csignal": "cpp",
+        "cstdarg": "cpp",
+        "cuchar": "cpp",
+        "cwctype": "cpp",
+        "memory_resource": "cpp",
+        "optional": "cpp"
     }
 }

@@ -33,8 +33,18 @@ string test_file_name = "tests";
 
 int main() {
     ios_base::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    ld n, rv = 0;
+    cin >> n;
+    FOR (i, n) {
+        ld x, y;
+        cin >> x >> y;
+        rv += y - x;
+    }
+    rv /= n;
+    cout << fixed << setprecision(10) << rv << '\n';
 
     return 0;
 }

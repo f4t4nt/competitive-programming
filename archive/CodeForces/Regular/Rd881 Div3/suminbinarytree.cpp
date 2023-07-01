@@ -33,8 +33,21 @@ string test_file_name = "tests";
 
 int main() {
     ios_base::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    ll t;
+    cin >> t;
+    while (t--) {
+        ll n;
+        cin >> n;
+        ll rv = 0;
+        while (n) {
+            rv += n;
+            n /= 2;
+        }
+        cout << rv << '\n';
+    }
 
     return 0;
 }

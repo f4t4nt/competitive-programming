@@ -33,8 +33,31 @@ string test_file_name = "tests";
 
 int main() {
     ios_base::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    while (true) {
+        ll n;
+        cin >> n;
+        if (n == 0) {
+            break;
+        }
+        vector<ld> a(n);
+        FOR (i, n) {
+            cin >> a[i];
+        }
+        ssort(a);
+        bool ok = false;
+        ld sum = 0;
+        FOR (i, n) {
+            if (sum >= a[i]) {
+                ok = true;
+                break;
+            }
+            sum += a[i];
+        }
+        cout << (ok ? "YES" : "NO") << '\n';
+    }
 
     return 0;
 }

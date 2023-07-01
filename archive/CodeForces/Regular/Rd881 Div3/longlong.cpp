@@ -33,8 +33,33 @@ string test_file_name = "tests";
 
 int main() {
     ios_base::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    ll t;
+    cin >> t;
+    while (t--) {
+        ll n;
+        cin >> n;
+        vector<ll> a(n);
+        FOR (i, n) {
+            cin >> a[i];
+        }
+        ll rv0 = 0, rv1 = 0, cnt = 0;
+        FOR (i, n) {
+            if (a[i] < 0) {
+                cnt = 1;
+            } elif (a[i] == 0 && cnt == 1) {
+                cnt = 1;
+            } else {
+                rv1 += cnt;
+                cnt = 0;
+            }
+            rv0 += abs(a[i]);
+        }
+        rv1 += cnt;
+        cout << rv0 << ' ' << rv1 << '\n';
+    }
 
     return 0;
 }

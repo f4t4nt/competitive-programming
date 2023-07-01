@@ -36,5 +36,23 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
+    ll t;
+    cin >> t;
+    while (t--) {
+        ll yp, lp, ys, ls;
+        cin >> yp >> lp >> ys >> ls;
+        ll rv = ys * yp;
+        if (ys > ls) {
+            if (yp <= lp) {
+                rv = min(rv, ls * lp);
+            } else {
+                ll tmp = lp + (yp - lp) * 2;
+                rv = min(rv, tmp * ls);
+                rv = min(rv, ys * (yp - lp) + lp * ls);
+            }
+        }
+        cout << rv << '\n';
+    }
+
     return 0;
 }

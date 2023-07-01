@@ -18,7 +18,7 @@ using str = string;
 
 #define FOR(x, e) for(ll x = 0; x < (ll) e; x++)
 #define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
-#define FOB(x, b, e) for(auto x = b; x < e; x++)
+#define FOB(x, b, e) for(auto x = b; x != e; x++)
 #define FORE(x, C) for(auto &x : C)
 
 #ifdef LOCAL
@@ -33,8 +33,34 @@ string test_file_name = "tests";
 
 int main() {
     ios_base::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    ll n;
+    cin >> n;
+    ll sqrtn = sqrt(n) + 5;
+    vector<ll> bs(n + 1);
+    FOB (i, 1, n + 1) {
+        cin >> bs[i];
+    }
+    ll q;
+    cin >> q;
+    while (q--) {
+        ll t;
+        cin >> t;
+        if (t == 0) {
+            ll a, b;
+            cin >> a >> b;
+            bs[a] = min(bs[a], b);
+        } else {
+            ll a, rv = 1e18;
+            cin >> a;
+            FOB (x, max(1LL, a - sqrtn), min(n + 1, a + sqrtn)) {
+                rv = min(rv, (x - a) * (x - a) + bs[x]);
+            }
+            cout << rv << '\n';
+        }
+    }
 
     return 0;
 }

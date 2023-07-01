@@ -209,81 +209,64 @@ while (!pq.empty()) {
 
 //--------------------------------------------------
 
-struct Dinic {
-    struct Edge {
-        ll from, to, cap, flow = 0;
-        Edge(ll from, ll to, ll cap) : from(from), to(to), cap(cap) {}
-    };
+struct Edge {
+    ll s, t, cap = 0, cost = 0, flow = 0;
+};
 
-    ll n, m = 0;
+struct Dinic { // matrix
+    ll n;
     vector<Edge> edges;
-    vector<vector<ll>> adj;
-    vector<ll> level, ptr;
+    vector<vector<ll>> adj, caps, flows, costs;
+    vector<ll> lvl, ptr;
     queue<ll> q;
 
-    Dinic(ll n) : n(n) {
-        adj.resize(n);
-        level.resize(n);
-        ptr.resize(n);
-    }
-
-    Dinic(vector<vector<pair<ll, ll>>> adj) {
-        n = sz(adj);
-        this->adj.resize(n);
-        level.resize(n);
-        ptr.resize(n);
-        FOR (i, n) {
-            FORE (e, adj[i]) {
-                add_edge(i, e.first, e.second);
-            }
+    Dinic(ll n, vector<Edge> &edges) :
+        n(n), adj(n), edges(edges),
+        caps(n, vector<ll>(n)),
+        flows(n, vector<ll>(n)),
+        costs(n, vector<ll>(n))
+    {
+        FORE (e, edges) {
+            adj[e.s].pb(e.t);
+            adj[e.t].pb(e.s);
+            caps[e.s][e.t] = e.cap;
+            costs[e.s][e.t] = e.cost;
         }
-    }
-
-    void add_edge(ll from, ll to, ll cap) {
-        edges.pb({from, to, cap});
-        edges.pb({to, from, 0});
-        adj[from].pb(m);
-        adj[to].pb(m + 1);
-        m += 2;
     }
 
     bool bfs(ll s, ll t) {
+        lvl.assign(n, -1);
+        lvl[s] = 0;
+        q.push(s);
         while (!q.empty()) {
             ll v = q.front();
             q.pop();
-            for (ll id : adj[v]) {
-                if (edges[id].cap - edges[id].flow < 1) {
+            FORE (u, adj[v]) {
+                if (lvl[u] != -1 || caps[v][u] <= flows[v][u]) {
                     continue;
                 }
-                if (level[edges[id].to] != -1) {
-                    continue;
-                }
-                level[edges[id].to] = level[v] + 1;
-                q.push(edges[id].to);
+                lvl[u] = lvl[v] + 1;
+                q.push(u);
             }
         }
-        return level[t] != -1;
+        return lvl[t] != -1;
     }
 
-    ll dfs(ll v, ll t, ll pushed) {
-        if (pushed == 0) {
-            return 0;
+    ll dfs(ll v, ll t, ll f) {
+        if (v == t || f == 0) {
+            return f;
         }
-        if (v == t) {
-            return pushed;
-        }
-        for (ll &cid = ptr[v]; cid < (ll) adj[v].size(); cid++) {
-            ll id = adj[v][cid];
-            ll u = edges[id].to;
-            if (level[v] + 1 != level[u] || edges[id].cap - edges[id].flow < 1) {
+        for (ll &cid = ptr[v]; cid < sz(adj[v]); cid++) {
+            ll u = adj[v][cid];
+            if (lvl[v] + 1 != lvl[u] || caps[v][u] <= flows[v][u]) {
                 continue;
             }
-            ll tr = dfs(u, t, min(pushed, edges[id].cap - edges[id].flow));
+            ll tr = dfs(u, t, min(f, caps[v][u] - flows[v][u]));
             if (tr == 0) {
                 continue;
             }
-            edges[id].flow += tr;
-            edges[id ^ 1].flow -= tr;
+            flows[v][u] += tr;
+            flows[u][v] -= tr;
             return tr;
         }
         return 0;
@@ -292,29 +275,325 @@ struct Dinic {
     ll max_flow(ll s, ll t) {
         ll flow = 0;
         while (true) {
-            fill(level.begin(), level.end(), -1);
-            level[s] = 0;
-            q.push(s);
             if (!bfs(s, t)) {
                 break;
             }
-            fill(ptr.begin(), ptr.end(), 0);
+            ptr.assign(n, 0);
             while (ll pushed = dfs(s, t, LLONG_MAX)) {
                 flow += pushed;
             }
         }
         return flow;
     }
-    
+
     vector<pair<ll, ll>> min_cut(ll s) {
         bfs(s, -1);
         vector<pair<ll, ll>> cut;
-        FOR (i, m) {
-            if (level[edges[i].from] != -1 && level[edges[i].to] == -1 && edges[i].cap) {
-                cut.pb({edges[i].from, edges[i].to});
+        FORE (e, edges) {
+            if (lvl[e.s] != -1 && lvl[e.t] == -1 && caps[e.s][e.t] > 0) {
+                cut.pb({e.s, e.t});
             }
         }
         return cut;
+    }
+
+    void undo_flow(vector<ll> path, ll f) {
+        FOB (i, 1, sz(path)) {
+            flows[path[i - 1]][path[i]] -= f;
+            flows[path[i]][path[i - 1]] += f;
+            assert(flows[path[i - 1]][path[i]] >= 0);
+            assert(flows[path[i]][path[i - 1]] >= 0);
+            assert(flows[path[i - 1]][path[i]] <= caps[path[i - 1]][path[i]]);
+            assert(flows[path[i]][path[i - 1]] <= caps[path[i]][path[i - 1]]);
+        }
+    }
+};
+
+struct Dinic { // edge list
+    ll n;
+    vector<Edge> edges;
+    vector<vector<ll>> adj;
+    vector<ll> lvl, ptr;
+    queue<ll> q;
+
+    Dinic(ll n, vector<Edge> &edges0) :
+        n(n), adj(n), lvl(n), ptr(n) {
+        ll i = 0;
+        FORE (e, edges0) {
+            edges.pb(e);
+            edges.pb({e.t, e.s});
+            adj[e.s].pb(i++);
+            adj[e.t].pb(i++);
+        }
+    }
+
+    bool bfs(ll s, ll t) {
+        lvl.assign(n, -1);
+        lvl[s] = 0;
+        q.push(s);
+        while (!q.empty()) {
+            ll v = q.front();
+            q.pop();
+            FORE (e, adj[v]) {
+                ll u = edges[e].t;
+                if (lvl[u] != -1 || edges[e].cap <= edges[e].flow) continue;
+                lvl[u] = lvl[v] + 1;
+                q.push(u);
+            }
+        }
+        return lvl[t] != -1;
+    }
+
+    ll dfs(ll v, ll t, ll f) {
+        if (v == t || f == 0) return f;
+        for (ll &cid = ptr[v]; cid < sz(adj[v]); cid++) {
+            ll e = adj[v][cid];
+            ll u = edges[e].t;
+            if (lvl[v] + 1 != lvl[u]) continue;
+            ll pushed = dfs(u, t, min(f, edges[e].cap - edges[e].flow));
+            if (pushed) {
+                edges[e].flow += pushed;
+                edges[e ^ 1].flow -= pushed;
+                return pushed;
+            }
+        }
+        return 0;
+    }
+
+    ll max_flow(ll s, ll t) {
+        ll flow = 0;
+        while (bfs(s, t)) {
+            ptr.assign(n, 0);
+            while (ll pushed = dfs(s, t, INF)) {
+                flow += pushed;
+            }
+        }
+        return flow;
+    }
+
+    vector<pair<ll, ll>> min_cut(ll s) {
+        bfs(s, n - 1);
+        vector<pair<ll, ll>> cut;
+        FORE (e,edges) {
+            if (lvl[e.s] != -1 && lvl[e.t] == -1 && e.cap > 0) {
+                cut.pb({e.s, e.t});
+            }
+        }
+        return cut;
+    }
+
+    void undo_flow(vector<ll> path, ll f) {
+        FOR (i, sz(path) - 1) {
+            FORE (e, adj[path[i]]) {
+                if (edges[e].t == path[i + 1]) {
+                    edges[e].flow -= f;
+                    edges[e ^ 1].flow += f;
+                    assert(edges[e].flow <= edges[e].cap);
+                    assert(edges[e ^ 1].flow <= edges[e ^ 1].cap);
+                    break;
+                }
+            }
+        }
+    }
+};
+
+struct MinCostMaxFlow { // matrix
+    ll n;
+    vector<Edge> edges;
+    vector<vector<ll>> adj, caps, flows, costs;
+    vector<ll> vis, dist, pi;
+    vector<pair<ll, ll>> par;
+ 
+    MinCostMaxFlow(ll n, vector<Edge> &edges) :
+        n(n), adj(n), edges(edges),
+        caps(n, vector<ll>(n)),
+        flows(n, vector<ll>(n)),
+        costs(n, vector<ll>(n)),
+        vis(n), dist(n), pi(n), par(n)
+    {
+        FORE (e, edges) {
+            adj[e.s].pb(e.t);
+            adj[e.t].pb(e.s);
+            caps[e.s][e.t] = e.cap;
+            costs[e.s][e.t] = e.cost;
+        }
+    }
+ 
+    void path(ll s) {
+        vis.assign(n, 0);
+        dist.assign(n, INF);
+        dist[s] = 0;
+        ll di;
+ 
+        priority_queue<pair<ll, ll>, vector<pair<ll, ll>>, greater<pair<ll, ll>>> pq;
+        pq.push({0, s});
+        
+        auto relax = [&](ll i, ll cap, ll cost, ll dir) {
+            ll val = di - pi[i] + cost;
+            if (cap && val < dist[i]) {
+                dist[i] = val;
+                par[i] = {s, dir};
+                pq.push({dist[i], i});
+            }
+        };
+ 
+        while (!pq.empty()) {
+            s = pq.top().second;
+            pq.pop();
+            vis[s] = 1;
+            di = dist[s] + pi[s];
+            FORE (i, adj[s]) {
+                if (!vis[i]) {
+                    relax(i, caps[s][i] - flows[s][i], costs[s][i], 1);
+                }
+            }
+            FORE (i, adj[s]) {
+                if (!vis[i]) {
+                    relax(i, flows[i][s], -costs[i][s], 0);
+                }
+            }
+        }
+ 
+        FOR (i, n) {
+            pi[i] = min(pi[i] + dist[i], INF);
+        }
+    }
+    
+    pair<ll, ll> max_flow(ll s, ll t) {
+        ll flow = 0, cost = 0;
+        while (path(s), vis[t]) {
+            ll fl = INF;
+            for (ll p, r, x = t; tie(p, r) = par[x], x != s; x = p) {
+                fl = min(fl, r ? caps[p][x] - flows[p][x] : flows[x][p]);
+            }
+            flow += fl;
+            for (ll p, r, x = t; tie(p, r) = par[x], x != s; x = p) {
+                if (r) flows[p][x] += fl;
+                else flows[x][p] -= fl;
+            }
+        }
+        FOR (i, n) {
+            FOR (j, n) {
+                cost += costs[i][j] * flows[i][j];
+            }
+        }
+        return {flow, cost};
+    }
+ 
+    void set_pi(ll s) { // for negative costs
+        pi.assign(n, INF);
+        pi[s] = 0;
+        ll it = n, ch = 1, v;
+        while (ch-- && it--) {
+            FOR (i, n) {
+                if (pi[i] != INF) {
+                    FORE (j, adj[i]) {
+                        if (caps[i][j]) {
+                            if ((v = pi[i] + costs[i][j]) < pi[j]) {
+                                pi[j] = v;
+                                ch = 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        assert(it >= 0);
+    }
+};
+
+struct MinCostMaxFlow { // edge list
+    ll n, m;
+    vector<Edge> edges;
+    vector<vector<ll>> adj;
+    vector<ll> dist, pi, vis;
+    vector<pair<ll, ll>> par;
+
+    MinCostMaxFlow(ll n, vector<Edge> &edges0) :
+        n(n), m(sz(edges0)), adj(n),
+        vis(n), dist(n), pi(n), par(n) {
+        ll i = 0;
+        FORE (e, edges0) {
+            edges.pb(e);
+            edges.pb({e.t, e.s});
+            adj[e.s].pb(i++);
+            adj[e.t].pb(i++);
+        }
+    }
+
+    void path(ll s) {
+        vis.assign(n, false);
+        dist.assign(n, INF);
+        dist[s] = 0;
+        ll di;
+
+        priority_queue<pair<ll, ll>, vector<pair<ll, ll>>, greater<>> pq;
+        pq.push({0, s});
+
+        auto relax = [&](ll t, ll e, ll cap, ll cost, ll dir) {
+            ll val = di - pi[t] + cost;
+            if (cap && val < dist[t]) {
+                dist[t] = val;
+                par[t] = {e, dir};
+                pq.push({val, t});
+            }
+        };
+
+        while (!pq.empty()) {
+            s = pq.top().second;
+            pq.pop();
+            vis[s] = 1;
+            di = dist[s] + pi[s];
+            FORE (e, adj[s]) {
+                ll t = edges[e].t;
+                if (!vis[t]) {
+                    relax(t, e, edges[e].cap - edges[e].flow, edges[e].cost, 1);
+                }
+            }
+            FORE (e, adj[s]) {
+                ll t = edges[e].t;
+                if (!vis[t]) {
+                    relax(t, e, edges[e ^ 1].flow, -edges[e ^ 1].cost, 0);
+                }
+            }
+        }
+    }
+
+    pair<ll, ll> max_flow(ll s, ll t) {
+        ll flow = 0, cost = 0;
+        while (path(s), vis[t]) {
+            ll f = INF;
+            for (ll p, r, x = t; tie(p, r) = par[x], x != s; x = edges[p].s) {
+                f = min(f, r ? edges[p].cap - edges[p].flow : edges[p ^ 1].flow);
+            }
+            flow += f;
+            for (ll p, r, x = t; tie(p, r) = par[x], x != s; x = edges[p].s) {
+                if (r) edges[p].flow += f;
+                else edges[p ^ 1].flow -= f;
+            }
+        }
+        FORE (e, edges) {
+            cost += e.flow * e.cost;
+        }
+        return {flow, cost};
+    }
+
+    void set_pi(ll s) { // for negative costs
+        pi.assign(n, INF);
+        pi[s] = 0;
+        ll it = n, ch = 1, v;
+        while (ch-- && it--) {
+            FOR (i, n) {
+                if (pi[i] == INF) continue;
+                FORE (e, adj[i]) {
+                    if (edges[e].cap && (v = pi[i] + edges[e].cost) < pi[edges[e].t]) {
+                        pi[edges[e].t] = v;
+                        ch = 1;
+                    }
+                }
+            }
+        }
+        assert(it >= 0);
     }
 };
 
@@ -488,7 +767,10 @@ int gauss_jordan_binary(
     int n,
     int m
 ) {
-    FOR (i, n) A[i][m] = b[i];
+    FOR (i, n) {
+        A[i][m] = b[i];
+    }
+
     vector<int> where(m, -1);
     for (int col = 0, row = 0; col < m && row < n; col++) {
         FOB (i, row, n) {
@@ -497,7 +779,9 @@ int gauss_jordan_binary(
                 break;
             }
         }
-        if (A[row][col] == 0) continue;
+        if (A[row][col] == 0) {
+            continue;
+        }
         where[col] = row;
         FOR (i, n) {
             if (i != row && A[i][col] != 0) {
@@ -506,8 +790,28 @@ int gauss_jordan_binary(
         }
         row++;
     }
+
     x = bitset<MAXN>(0);
-    ...
+    FOR (i, m) {
+        if (where[i] != -1) {
+            x[i] = A[where[i]][m] / A[where[i]][i];
+        }
+    }
+    FOR (i, n) {
+        int sum = 0;
+        FOR (j, m) {
+            sum += A[i][j] * x[j];
+        }
+        if (sum != A[i][m]) {
+            return 0;
+        }
+    }
+    FOR (i, m) {
+        if (where[i] == -1) {
+            return INF;
+        }
+    }
+    return 1;
 }
 
 //--------------------------------------------------
@@ -668,157 +972,6 @@ ll mask(ll x) {
 
 //--------------------------------------------------
 
-struct Edge {
-    ll s, t, cap, cost;
-    Edge (ll s, ll t, ll cap, ll cost) : s(s), t(t), cap(cap), cost(cost) {}
-};
-
-struct Flow {
-    ll n;
-    vector<vector<ll>> adj, cap, cost;
-
-    Flow(ll n, vector<Edge> &edges) : n(n), adj(n), cap(n, vector<ll>(n)), cost(n, vector<ll>(n)) {
-        FORE (e, edges) {
-            adj[e.s].pb(e.t);
-            adj[e.t].pb(e.s);
-            cap[e.s][e.t] = e.cap;
-            cap[e.t][e.s] = 0;
-            cost[e.s][e.t] = e.cost;
-        }
-    }
-
-    ll bfs(ll s, ll t, vector<ll>& par) {
-        fill(all(par), -1);
-        par[s] = -2;
-        queue<pair<ll, ll>> q;
-        q.push({s, INF});
-        while (!q.empty()) {
-            ll cur = q.front().first;
-            ll flow = q.front().second;
-            q.pop();
-            FORE (next, adj[cur]) {
-                if (par[next] == -1 && cap[cur][next]) {
-                    par[next] = cur;
-                    ll new_flow = min(flow, cap[cur][next]);
-                    if (next == t)
-                        return new_flow;
-                    q.push({next, new_flow});
-                }
-            }
-        }
-
-        return 0;
-    }
-
-    ll max_flow(ll s, ll t) {
-        auto cap_copy = cap;
-        ll flow = 0;
-        vector<ll> par(n);
-        ll new_flow;
-        while (true) {
-            new_flow = bfs(s, t, par);
-            if (!new_flow) {
-                break;
-            }
-            flow += new_flow;
-            ll cur = t;
-            while (cur != s) {
-                ll prev = par[cur];
-                cap[prev][cur] -= new_flow;
-                cap[cur][prev] += new_flow;
-                cur = prev;
-            }
-        }
-        cap = cap_copy;
-        return flow;
-    }
-
-    void shortest_paths(ll n, ll v0, vector<ll>& d, vector<ll>& p) {
-        d.assign(n, INF);
-        d[v0] = 0;
-        vector<bool> inq(n, false);
-        queue<ll> q;
-        q.push(v0);
-        p.assign(n, -1);
-
-        while (!q.empty()) {
-            ll u = q.front();
-            q.pop();
-            inq[u] = false;
-            FORE (v, adj[u]) {
-                if (cap[u][v] > 0 && d[v] > d[u] + cost[u][v]) {
-                    d[v] = d[u] + cost[u][v];
-                    p[v] = u;
-                    if (!inq[v]) {
-                        inq[v] = true;
-                        q.push(v);
-                    }
-                }
-            }
-        }
-    }
-
-    ll min_cost_flow(ll s, ll t, ll k) {
-        auto cap_copy = cap;
-        ll flow = 0;
-        ll cost = 0;
-        vector<ll> d, p;
-        while (flow < k) {
-            shortest_paths(n, s, d, p);
-            if (d[t] == INF) {
-                break;
-            }
-            ll f = k - flow;
-            ll cur = t;
-            while (cur != s) {
-                f = min(f, cap[p[cur]][cur]);
-                cur = p[cur];
-            }
-            flow += f;
-            cost += f * d[t];
-            cur = t;
-            while (cur != s) {
-                cap[p[cur]][cur] -= f;
-                cap[cur][p[cur]] += f;
-                cur = p[cur];
-            }
-        }
-        cap = cap_copy;
-        if (flow < k) {
-            return -1;
-        } else {
-            return cost;
-        }
-    }
-
-    void dfs(ll u, vector<bool> &vis) {
-        vis[u] = true;
-        FORE (v, adj[u]) {
-            if (!vis[v] && cap[u][v]) {
-                dfs(v, vis);
-            }
-        }
-    }
-
-    vector<pair<ll, ll>> min_cut(ll s) {
-        vector<bool> vis(n);
-        vector<pair<ll, ll>> rv;
-        dfs(s, vis);
-        FOR (u, n) {
-            if (vis[u]) {
-                FORE (v, adj[u]) {
-                    if (!vis[v]) {
-                        rv.pb({u, v});
-                    }
-                }
-            }
-        }
-        return rv;
-    }
-};
-
-//--------------------------------------------------
-
 ll pow(ll x, ll p) {
     ll rv = 1;
     while(p) {
@@ -885,11 +1038,8 @@ struct SegTree {
         n(n),
         data(4 * n, 0),
         lazy(4 * n, 0) {}
-    // [lo, hi)
-    void update(ll lo, ll hi, ll val, ll i = 1, ll l = 0, ll r = -1) {
-        if (r == -1) {
-            r = n;
-        }
+    void update(ll lo, ll hi, ll val, ll i = 1, ll l = 0, ll r = -1) { // [lo, hi)
+        if (r == -1) r = n;
         if (lazy[i] != 0) {
             data[i] += (r - l) * lazy[i];
             if (r - l > 1) {
@@ -906,18 +1056,14 @@ struct SegTree {
             }
             return;
         }
-        if (r <= lo || hi <= l) {
-            return;
-        }
+        if (r <= lo || hi <= l) return;
         ll m = (l + r) / 2;
         update(lo, hi, val, 2 * i, l, m);
         update(lo, hi, val, 2 * i + 1, m, r);
         data[i] = data[2 * i] + data[2 * i + 1];
     }
     ll query(ll lo, ll hi, ll i = 1, ll l = 0, ll r = -1) {
-        if (r == -1) {
-            r = n;
-        }
+        if (r == -1) r = n;
         if (lazy[i] != 0) {
             data[i] += (r - l) * lazy[i];
             if (r - l > 1) {
@@ -926,16 +1072,46 @@ struct SegTree {
             }
             lazy[i] = 0;
         }
-        if (lo <= l && r <= hi) {
-            return data[i];
-        }
-        if (r <= lo || hi <= l) {
-            return 0;
-        }
+        if (lo <= l && r <= hi) return data[i];
+        if (r <= lo || hi <= l) return 0;
         ll m = (l + r) / 2;
         return query(lo, hi, 2 * i, l, m) + query(lo, hi, 2 * i + 1, m, r);
     }
 };
+
+//--------------------------------------------------
+
+struct Vertex { // persistent segtree, sum
+    Vertex *l, *r;
+    ll sum;
+
+    Vertex(ll val) : l(nullptr), r(nullptr), sum(val) {}
+    Vertex(Vertex *l, Vertex *r) : l(l), r(r), sum(0) {
+        if (l) sum += l->sum;
+        if (r) sum += r->sum;
+    }
+};
+
+Vertex* build(vector<ll> &a, ll tl, ll tr) {
+    if (tl == tr) return new Vertex(a[tl]);
+    ll tm = (tl + tr) / 2;
+    return new Vertex(build(a, tl, tm), build(a, tm + 1, tr));
+}
+
+ll get_sum(Vertex* v, ll tl, ll tr, ll l, ll r) {
+    if (l > r) return 0;
+    if (l == tl && tr == r) return v->sum;
+    ll tm = (tl + tr) / 2;
+    return get_sum(v->l, tl, tm, l, min(r, tm))
+         + get_sum(v->r, tm + 1, tr, max(l, tm + 1), r);
+}
+
+Vertex* update(Vertex* v, ll tl, ll tr, ll pos, ll new_val) {
+    if (tl == tr) return new Vertex(new_val);
+    ll tm = (tl + tr) / 2;
+    if (pos <= tm) return new Vertex(update(v->l, tl, tm, pos, new_val), v->r);
+    else return new Vertex(v->l, update(v->r, tm + 1, tr, pos, new_val));
+}
 
 //--------------------------------------------------
 

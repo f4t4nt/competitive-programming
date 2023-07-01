@@ -37,21 +37,40 @@ constexpr ll MAX_A = 1e7 + 1;
 vector<bool> sieve(MAX_A);
 set<ll> primes;
 
-bool gen(ll lo, ll hi, vector<pair<ll, ll>> &bounds, vector<ll> &trees, ll par = -1) {
+bool gen0(ll lo, ll hi, vector<pair<ll, ll>> &bounds, vector<ll> &trees, ll par = -1) {
     if (hi <= lo) {
         trees[lo] = par;
         return true;
     }
-    FOB (i, lo, hi + 1) {
-        if (bounds[i].first <= lo && bounds[i].second >= hi) {
-            if (gen(lo, i - 1, bounds, trees, i) &&
-                gen(i + 1, hi, bounds, trees, i)) {
-                trees[i] = par;
+    ll l = lo, r = hi;
+    while (l <= r) {
+        if (bounds[l].first <= lo && bounds[l].second >= hi) {
+            if (gen0(lo, l - 1, bounds, trees, l) &&
+                gen0(l + 1, hi, bounds, trees, l)) {
+                trees[l] = par;
                 return true;
+            } else {
+                return false;
             }
         }
+        if (bounds[r].first <= lo && bounds[r].second >= hi) {
+            if (gen0(lo, r - 1, bounds, trees, r) &&
+                gen0(r + 1, hi, bounds, trees, r)) {
+                trees[r] = par;
+                return true;
+            } else {
+                return false;
+            }
+        }
+        l++;
+        r--;
     }
     return false;
+}
+
+ll gcd(ll a, ll b) {
+    if (a == 0) return b;
+    return gcd(b % a, a);
 }
 
 int main() {
@@ -115,9 +134,12 @@ int main() {
         }
     }
     vector<ll> tree(n, -1);
-    if (gen(0, n - 1, bounds, tree)) {
-        FORE (t, tree) {
-            cout << t + 1 << ' ';
+    if (gen0(0, n - 1, bounds, tree)) {
+        FOR (i, n) {
+            if (i != tree[i]) {
+                assert(gcd(a[i], a[tree[i]]) == 1);
+            }
+            cout << tree[i] + 1 << ' ';
         }
         cout << '\n';
     } else {

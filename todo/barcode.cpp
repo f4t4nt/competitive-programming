@@ -3,7 +3,6 @@
 using namespace std;
 
 using ll = long long;
-using ull = unsigned long long;
 using ld = long double;
 using ch = char;
 using str = string;
@@ -31,10 +30,31 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+bool solve(
+    ll i, ll j, bool is_row,
+    vector<ll> &rows,
+    vector<ll> &cols,
+    vector<str> &rowg,
+    vector<str> &colg)
+{
+    if (is_row) {
+    } else {
+    }
+}
+
 int main() {
     ios_base::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+ 
+    ll n;
+    cin >> n;
+    vector<ll> rows(n), cols(n);
+    FOR (i, n) cin >> rows[i];
+    FOR (i, n) cin >> cols[i];
+
+    vector<str> rowg(n, str(n + 1, '.')), colg(n + 1, str(n, '.'));
+    solve(0, 0, true, rows, cols, rowg, colg);
 
     return 0;
 }

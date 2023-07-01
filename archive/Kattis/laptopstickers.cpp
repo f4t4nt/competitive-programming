@@ -3,7 +3,6 @@
 using namespace std;
 
 using ll = long long;
-using ull = unsigned long long;
 using ld = long double;
 using ch = char;
 using str = string;
@@ -33,8 +32,29 @@ string test_file_name = "tests";
 
 int main() {
     ios_base::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+
+    ll L, H, k;
+    cin >> L >> H >> k;
+    vector<vector<ch>> grid(H, vector<ch>(L, '_'));
+    ch c = 'a';
+    FOR (i, k) {
+        ll l, h, a, b;
+        cin >> l >> h >> a >> b;
+        FOB (x, b, min(b + h, H)) {
+            FOB (y, a, min(a + l, L)) {
+                grid[x][y] = c;
+            }
+        }
+        c++;
+    }
+    FOR (i, H) {
+        FOR (j, L) {
+            cout << grid[i][j];
+        }
+        cout << '\n';
+    }
 
     return 0;
 }
