@@ -130,48 +130,39 @@ pair<ld, ld> get_com(vector<pair<ld, ld>> &poly) {
 
 //--------------------------------------------------
 
-vector<pair<ld, ld>> convex_hull(vector<pair<ld, ld>> points) {
-    // sort points by x-coordinate
-    ssort(points);
-
-    // lower hull
-    vector<pair<ld, ld>> lower;
-    for (auto &p : points) {
-        while (sz(lower) >= 2) {
-            auto &p1 = lower[sz(lower) - 2];
-            auto &p2 = lower[sz(lower) - 1];
+vector<pair<ld, ld>> convex_hull(vector<pair<ld, ld>> pts) {
+    ssort(pts); // sort points by x-coordinate
+    vector<pair<ld, ld>> lo; // lower hull
+    for (auto &p : pts) {
+        while (sz(lo) >= 2) {
+            auto &p1 = lo[sz(lo) - 2];
+            auto &p2 = lo[sz(lo) - 1];
             if ((p2.second - p1.second) * (p.first - p2.first) >= (p.second - p2.second) * (p2.first - p1.first)) {
-                lower.pop_back();
+                lo.pop_back();
             } else {
                 break;
             }
         }
-        lower.pb(p);
+        lo.pb(p);
     }
-
-    // upper hull
-    vector<pair<ld, ld>> upper;
-    for (auto it = points.rbegin(); it != points.rend(); it++) {
+    vector<pair<ld, ld>> hi; // upper hull
+    for (auto it = pts.rbegin(); it != pts.rend(); it++) {
         auto &p = *it;
-        while (sz(upper) >= 2) {
-            auto &p1 = upper[sz(upper) - 2];
-            auto &p2 = upper[sz(upper) - 1];
+        while (sz(hi) >= 2) {
+            auto &p1 = hi[sz(hi) - 2];
+            auto &p2 = hi[sz(hi) - 1];
             if ((p2.second - p1.second) * (p.first - p2.first) >= (p.second - p2.second) * (p2.first - p1.first)) {
-                upper.pop_back();
+                hi.pop_back();
             } else {
                 break;
             }
         }
-        upper.pb(p);
+        hi.pb(p);
     }
-
-    // remove duplicates
-    lower.pop_back();
-    upper.pop_back();
-
-    // merge lower and upper hulls
-    lower.insert(lower.end(), upper.begin(), upper.end());
-    return lower;
+    lo.pop_back(); // remove duplicates
+    hi.pop_back();
+    lo.insert(lo.end(), hi.begin(), hi.end()); // merge lower and upper hulls
+    return lo;
 }
 
 //--------------------------------------------------
@@ -962,13 +953,43 @@ pair<ll, ll> manacher(str &s) {
 
 //--------------------------------------------------
 
-ll mask(ll x) {
-    ll rv = x;
-    while (rv & (rv + 1)) {
-        rv |= rv / 2;
+struct Matrix {
+    vector<vector<ll>> mat;
+    ll n, m;
+
+    Matrix(ll n, ll m) : n(n), m(m) {
+        mat.resize(n, vector<ll>(m));
     }
-    return rv;
-}
+
+    Matrix operator*(const Matrix &other) const {
+        Matrix rv(n, other.m);
+        FOR(i, n) {
+            FOR(j, other.m) {
+                FOR(k, m) {
+                    rv.mat[i][j] += mat[i][k] * other.mat[k][j];
+                    rv.mat[i][j] %= MOD;
+                }
+            }
+        }
+        return rv;
+    }
+
+    Matrix operator^(ll p) const {
+        Matrix rv(n, n);
+        FOR(i, n) {
+            rv.mat[i][i] = 1;
+        }
+        Matrix a = *this;
+        while (p) {
+            if (p & 1) {
+                rv = rv * a;
+            }
+            a = a * a;
+            p >>= 1;
+        }
+        return rv;
+    }
+};
 
 //--------------------------------------------------
 
@@ -1092,13 +1113,13 @@ struct Vertex { // persistent segtree, sum
     }
 };
 
-Vertex* build(vector<ll> &a, ll tl, ll tr) {
+Vertex* build(vector<ll> &a, ll tl, ll tr) { // [tl, tr]
     if (tl == tr) return new Vertex(a[tl]);
     ll tm = (tl + tr) / 2;
     return new Vertex(build(a, tl, tm), build(a, tm + 1, tr));
 }
 
-ll get_sum(Vertex* v, ll tl, ll tr, ll l, ll r) {
+ll get_sum(Vertex* v, ll tl, ll tr, ll l, ll r) { // [tl, tr] = [0, n - 1], [l, r]
     if (l > r) return 0;
     if (l == tl && tr == r) return v->sum;
     ll tm = (tl + tr) / 2;
@@ -1106,7 +1127,7 @@ ll get_sum(Vertex* v, ll tl, ll tr, ll l, ll r) {
          + get_sum(v->r, tm + 1, tr, max(l, tm + 1), r);
 }
 
-Vertex* update(Vertex* v, ll tl, ll tr, ll pos, ll new_val) {
+Vertex* update(Vertex* v, ll tl, ll tr, ll pos, ll new_val) { // [tl, tr] = [0, n - 1]
     if (tl == tr) return new Vertex(new_val);
     ll tm = (tl + tr) / 2;
     if (pos <= tm) return new Vertex(update(v->l, tl, tm, pos, new_val), v->r);
