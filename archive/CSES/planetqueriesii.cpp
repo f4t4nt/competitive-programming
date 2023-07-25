@@ -104,8 +104,8 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    ll n;
-    cin >> n;
+    ll n, q;
+    cin >> n >> q;
     vector<ll> par(n);
     vector<vector<ll>> rev_adj(n);
     FOR (i, n) {
@@ -144,8 +144,33 @@ int main() {
             dfs2(i, type[i][1], i, rev_adj, type, cnt);
         }
     }
-    FOR (i, n) {
-        cout << type[i][5] + cyc_sz[type[i][1]] << ' ';
+    while (q--) {
+        ll a, b, rv = -1;
+        cin >> a >> b;
+        a--, b--;
+        // both have to be in same cycle
+        if (type[a][1] == type[b][1]) {
+            // if b is in the cycle
+            if (type[b][0] == 1) {
+                // lift a to the cycle
+                rv = type[a][5];
+                a = type[a][2];
+                // find pos(b) - pos(a)
+                ll dist = type[b][6] - type[a][6];
+                if (dist < 0) {
+                    dist += cyc_sz[type[a][1]];
+                }
+                rv += dist;
+            // if b is in the same tree
+            } elif (type[a][2] == type[b][2]) {
+                // if b is ancestor of a
+                if (type[b][3] <= type[a][3] && type[a][4] <= type[b][4]) {
+                    // find depth(b) - depth(a)
+                    rv = type[a][5] - type[b][5];
+                }
+            }
+        }
+        cout << rv << '\n';
     }
 
     return 0;
