@@ -20,7 +20,7 @@ using indexed_set = tree<
     tree_order_statistics_node_update
 >;
 
-#pragma GCC target("popcnt,lzcnt")
+#pragma GCC target("popcnt")
 
 #define pb push_back
 #define elif else if
@@ -50,7 +50,34 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    
+    ll n, k;
+    cin >> n >> k;
+    vector<ll> p(k);
+    FOR (i, k) {
+        cin >> p[i];
+    }
+    ll rv = 0;
+    vector<ll> prod(1 << k, 1);
+    FOR (i, 1 << k) {
+        FOR (j, k) {
+            if (i & (1 << j)) {
+                if (prod[i ^ (1 << j)] > n / p[j]) {
+                    prod[i] = n + 1;
+                } else {
+                    prod[i] = prod[i ^ (1 << j)] * p[j];
+                }
+                break;
+            }
+        }
+        ll m = __builtin_popcount(i) % 2;
+        if (m == 0) {
+            rv += n / prod[i];
+        } else {
+            rv -= n / prod[i];
+        }
+    }
+    rv = n - rv;
+    cout << rv << '\n';
 
     return 0;
 }

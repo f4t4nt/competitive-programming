@@ -50,7 +50,13 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    
+    ll t;
+    cin >> t;
+    while (t--) {
+        ll b, c, h;
+        cin >> b >> c >> h;
+        cout << min(2 * b - 1, 2 * (c + h) + 1) << '\n';
+    }
 
     return 0;
 }

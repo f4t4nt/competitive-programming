@@ -45,12 +45,35 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+constexpr ll MOD = 1e9 + 7;
+
+ll pow_mod(ll a, ll b) {
+    ll rv = 1;
+    while (b) {
+        if (b & 1) {
+            rv = rv * a % MOD;
+        }
+        a = a * a % MOD;
+        b >>= 1;
+    }
+    return rv;
+}
+
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
 
-    
+    ll n;
+    cin >> n;
+    // (2 ^ (n ^ 2) +
+    //  2 * 2 ^ ((n ^ 2 + 3 * (n % 2)) / 4)
+    //  + 2 ^ ((n ^ 2 + n % 2) / 2)
+    // ) / 4
+    ll rv = ((pow_mod(2, n * n) +
+             2 * pow_mod(2, (n * n + 3 * (n % 2)) / 4) +
+             pow_mod(2, (n * n + n % 2) / 2)) % MOD) * pow_mod(4, MOD - 2) % MOD;
+    cout << rv << '\n';
 
     return 0;
 }

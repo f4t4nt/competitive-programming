@@ -20,6 +20,8 @@ using indexed_set = tree<
     tree_order_statistics_node_update
 >;
 
+#pragma GCC target("popcnt,lzcnt") // __builtin_popcountll, __builtin_clzll
+
 #define pb push_back
 #define elif else if
 #define sz(C) (ll) C.size()
@@ -78,25 +80,12 @@ ll bin_search_find_first(vector<ll> &a) {
 
 //--------------------------------------------------
 
-ll bitcount(ll x) {
-    ll rv = 0;
-    while(x > 0) {
-        rv++;
-        x &= (x - 1);
-    }
-    return rv;
-}
-
-//--------------------------------------------------
-
 struct BIT {
     vector<ll> tree;
     ll n;
-
     BIT(ll n) : n(n) {
         tree.resize(n + 1);
     }
-
     void update(ll idx, ll val) {
         idx++;
         while (idx <= n) {
@@ -104,7 +93,6 @@ struct BIT {
             idx += idx & (-idx);
         }
     }
-
     ll query(ll idx) {
         idx++;
         ll sum = 0;
@@ -114,7 +102,6 @@ struct BIT {
         }
         return sum;
     }
-
     ll query(ll l, ll r) {
         return query(r) - query(l - 1);
     }
@@ -622,36 +609,41 @@ struct DSU {
 //--------------------------------------------------
 
 constexpr ll MOD = 1e9 + 7;
-constexpr ll MAX_N = 1e3;
+constexpr ll MAXN = 1e6 + 1;
 
-ll fact[MAX_N + 1];
-ll inv_fact[MAX_N + 1];
-ll inv[MAX_N + 1];
-ll choose[MAX_N + 1][MAX_N + 1];
-ll perm[MAX_N + 1][MAX_N + 1];
-
-void init() {
-    fact[0] = 1;
-    inv_fact[0] = 1;
-    inv[1] = 1;
-    for (ll i = 1; i <= MAX_N; i++) {
-        fact[i] = (fact[i - 1] * i) % MOD;
-        if (i > 1) {
-            inv[i] = (MOD - (MOD / i) * inv[MOD % i] % MOD) % MOD;
+struct Binom {
+    ll n;
+    vector<ll> fac, ifac;
+    Binom(ll n) : n(n) {
+        fac.resize(n + 1);
+        ifac.resize(n + 1);
+        fac[0] = 1;
+        FOB (i, 1, n + 1) {
+            fac[i] = fac[i - 1] * i % MOD;
         }
-        inv_fact[i] = (inv_fact[i - 1] * inv[i]) % MOD;
-    }
-    for (ll i = 0; i <= MAX_N; i++) {
-        for (ll j = 0; j <= i; j++) {
-            choose[i][j] = (fact[i] * inv_fact[j] % MOD) * inv_fact[i - j] % MOD;
+        ifac[n] = pow(fac[n], MOD - 2);
+        FORR (i, n) {
+            ifac[i] = ifac[i + 1] * (i + 1) % MOD;
         }
     }
-    for (ll i = 0; i <= MAX_N; i++) {
-        for (ll j = 0; j <= i; j++) {
-            perm[i][j] = (fact[i] * inv_fact[i - j]) % MOD;
+    ll pow(ll a, ll b) {
+        ll res = 1;
+        while (b) {
+            if (b & 1) {
+                res = res * a % MOD;
+            }
+            a = a * a % MOD;
+            b >>= 1;
         }
+        return res;
     }
-}
+    ll choose(ll n, ll k) {
+        if (k < 0 || k > n) {
+            return 0;
+        }
+        return fac[n] * ifac[k] % MOD * ifac[n - k] % MOD;
+    }
+};
 
 //--------------------------------------------------
 
@@ -771,7 +763,6 @@ int gauss_jordan_binary(
     FOR (i, n) {
         A[i][m] = b[i];
     }
-
     vector<int> where(m, -1);
     for (int col = 0, row = 0; col < m && row < n; col++) {
         FOB (i, row, n) {
@@ -791,7 +782,6 @@ int gauss_jordan_binary(
         }
         row++;
     }
-
     x = bitset<MAXN>(0);
     FOR (i, m) {
         if (where[i] != -1) {
@@ -850,7 +840,6 @@ struct LCA_Tree {
     vector<vector<ll>> parent, adj;
     vector<ll> pre, post, depth;
     ll n, timer;
-
     LCA_Tree(ll &n0, vector<vector<ll>> &adj0) {
         n = n0;
         timer = 0;
@@ -860,7 +849,6 @@ struct LCA_Tree {
         dfs(0, 0, 0);
         gen();
     }
-
     void dfs(ll node, ll par, ll d) {
         pre[node] = timer++;
         depth[node] = d;
@@ -872,7 +860,6 @@ struct LCA_Tree {
         }
         post[node] = timer++;
     }
-
     void gen() {
         FOR (i, 29) {
             FOR (j, n) {
@@ -880,11 +867,9 @@ struct LCA_Tree {
             }
         }
     }
-
     bool is_anc(ll u, ll v) {
         return pre[u] <= pre[v] && post[u] >= post[v];
     }
-
     ll lca(ll u, ll v) {
         if (is_anc(u, v)) return u;
         if (is_anc(v, u)) return v;
@@ -895,11 +880,9 @@ struct LCA_Tree {
         }
         return parent[u][0];
     }
-
     ll dist(ll u, ll v) {
         return depth[u] + depth[v] - 2 * depth[lca(u, v)];
     }
-
     bool disjoint(vector<pair<ll, ll>> paths) {
         vector<pair<ll, ll>> p;
         FORE (path, paths) {
@@ -930,7 +913,6 @@ pair<ll, ll> manacher(str &s) {
         t += c;
         t += '#';
     }
-
     ll n = sz(t);
     ll center = 0, max_rad = -1, rad;
     vector<ll> p(n);
@@ -949,7 +931,6 @@ pair<ll, ll> manacher(str &s) {
             max_rad = i + rad;
         }
     }
-
     ll len = 0, idx = 0;
     FOR (i, n) {
         if (p[i] > len) {
@@ -957,7 +938,6 @@ pair<ll, ll> manacher(str &s) {
             idx = i;
         }
     }
-
     return {len, (idx - len) / 2};
 }
 
@@ -966,11 +946,9 @@ pair<ll, ll> manacher(str &s) {
 struct Matrix {
     vector<vector<ll>> mat;
     ll n, m;
-
     Matrix(ll n, ll m) : n(n), m(m) {
         mat.resize(n, vector<ll>(m));
     }
-
     Matrix operator*(const Matrix &other) const {
         Matrix rv(n, other.m);
         FOR(i, n) {
@@ -983,11 +961,40 @@ struct Matrix {
         }
         return rv;
     }
-
     Matrix operator^(ll p) const {
         Matrix rv(n, n);
         FOR(i, n) {
             rv.mat[i][i] = 1;
+        }
+        Matrix a = *this;
+        while (p) {
+            if (p & 1) {
+                rv = rv * a;
+            }
+            a = a * a;
+            p >>= 1;
+        }
+        return rv;
+    }
+    // min dist
+    Matrix operator*(const Matrix &other) const {
+        Matrix rv(n, other.m);
+        rv.mat.assign(n, vector<ll>(other.m, INF));
+        FOR(i, n) {
+            FOR(j, other.m) {
+                FOR(k, m) {
+                    rv.mat[i][j] = min(rv.mat[i][j], mat[i][k] + other.mat[k][j]);
+                }
+            }
+        }
+        return rv;
+    }
+
+    Matrix operator^(ll p) const {
+        Matrix rv(n, n);
+        rv.mat.assign(n, vector<ll>(n, INF));
+        FOR (i, n) {
+            rv.mat[i][i] = 0;
         }
         Matrix a = *this;
         while (p) {
@@ -1015,60 +1022,68 @@ ll pow(ll x, ll p) {
 
 //--------------------------------------------------
 
-vector<vector<ll>> scc(vector<vector<ll>> adj) {
-    ll n = sz(adj);
-    vector<ll> order;
-    vector<bool> vis(n);
-    function<void(ll)> dfs = [&](ll u) {
-        vis[u] = true;
-        FORE(v, adj[u]) {
-            if (!vis[v]) {
+struct SCCs {
+    ll n, idx, scc_cnt;
+    vector<vector<ll>> adj, adj_scc;
+    vector<ll> ord, low, ids;
+    vector<bool> on_stack;
+    stack<ll> st;
+
+    SCCs(ll n0, vector<vector<ll>> &adj0) {
+        n = n0, idx = 0, scc_cnt = 0;
+        adj = adj0;
+        ord = vector<ll>(n, -1);
+        low = vector<ll>(n, -1);
+        ids = vector<ll>(n, -1);
+        on_stack = vector<bool>(n, false);
+        FOR (u, n) {
+            if (ord[u] == -1) {
+                dfs(u);
+            }
+        }
+        adj_scc = vector<vector<ll>>(scc_cnt);
+        FOR (u, n) {
+            FORE (v, adj[u]) {
+                if (ids[u] != ids[v]) {
+                    adj_scc[ids[u]].pb(ids[v]);
+                }
+            }
+        }
+    }
+
+    void dfs(ll u) {
+        ord[u] = low[u] = idx++;
+        st.push(u);
+        on_stack[u] = true;
+        FORE (v, adj[u]) {
+            if (ord[v] == -1) {
                 dfs(v);
+                low[u] = min(low[u], low[v]);
+            } elif (on_stack[v]) {
+                low[u] = min(low[u], ord[v]);
             }
         }
-        order.pb(u);
-    };
-    FOR(i, n) {
-        if (!vis[i]) {
-            dfs(i);
-        }
-    }
-    vector<vector<ll>> adjt(n);
-    FOR(i, n) {
-        FORE(j, adj[i]) {
-            adjt[j].pb(i);
-        }
-    }
-    vector<vector<ll>> sccs;
-    vis.assign(n, false);
-    function<void(ll, vector<ll> &)> dfs2 = [&](ll u, vector<ll> &scc) {
-        vis[u] = true;
-        scc.pb(u);
-        FORE(v, adjt[u]) {
-            if (!vis[v]) {
-                dfs2(v, scc);
+        if (low[u] == ord[u]) {
+            while (true) {
+                ll v = st.top();
+                st.pop();
+                ids[v] = scc_cnt;
+                on_stack[v] = false;
+                if (u == v) {
+                    break;
+                }
             }
-        }
-    };
-    FORR(i, n) {
-        if (!vis[order[i]]) {
-            vector<ll> scc;
-            dfs2(order[i], scc);
-            sccs.pb(scc);
+            scc_cnt++;
         }
     }
-    return sccs;
-}
+};
 
 //--------------------------------------------------
 
 struct SegTree {
     ll n;
     vector<ll> data, lazy;
-    SegTree (ll n) :
-        n(n),
-        data(4 * n, 0),
-        lazy(4 * n, 0) {}
+    SegTree (ll n) : n(n), data(4 * n, 0), lazy(4 * n, 0) {}
     void update(ll lo, ll hi, ll val, ll i = 1, ll l = 0, ll r = -1) { // [lo, hi)
         if (r == -1) r = n;
         if (lazy[i] != 0) {
@@ -1380,14 +1395,6 @@ int main() {
 
     return 0;
 }
-
-//--------------------------------------------------
-
-#include <ext/pb_ds/assoc_container.hpp>
-
-using namespace __gnu_pbds;
-
-template<class T> using Tree = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
 
 //--------------------------------------------------
 

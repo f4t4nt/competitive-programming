@@ -20,7 +20,7 @@ using indexed_set = tree<
     tree_order_statistics_node_update
 >;
 
-#pragma GCC target("popcnt,lzcnt")
+#pragma GCC target("popcnt")
 
 #define pb push_back
 #define elif else if
@@ -45,12 +45,30 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+ll pow_(ll a, ll b, ll MOD) {
+    ll rv = 1;
+    while (b > 0) {
+        if (b & 1) {
+            rv = (rv * a) % MOD;
+        }
+        a = (a * a) % MOD;
+        b >>= 1;
+    }
+    return rv;
+}
+
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
 
-    
+    ll t;
+    cin >> t;
+    while (t--) {
+        ll a, b, c;
+        cin >> a >> b >> c;
+        cout << pow_(a, pow_(b, c, 1e9 + 6), 1e9 + 7) << '\n';
+    }
 
     return 0;
 }

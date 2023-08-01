@@ -20,7 +20,7 @@ using indexed_set = tree<
     tree_order_statistics_node_update
 >;
 
-#pragma GCC target("popcnt,lzcnt")
+#pragma GCC target("popcnt")
 
 #define pb push_back
 #define elif else if
@@ -50,7 +50,46 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    
+    vector<ll> primes;
+    vector<bool> is_prime(1e6 + 1, true);
+    is_prime[0] = is_prime[1] = false;
+    FOB (p, 2LL, 1e6 + 1) {
+        if (is_prime[p]) {
+            primes.pb(p);
+            for (ll q = p * p; q <= 1e6; q += p) {
+                is_prime[q] = false;
+            }
+        }
+    }
+
+    ll t;
+    cin >> t;
+    while (t--) {
+        ll n;
+        cin >> n;
+        vector<ll> cnts;
+        FORE (p, primes) {
+            if (p * p > n) {
+                break;
+            }
+            ll e = 0;
+            while (n % p == 0) {
+                n /= p;
+                e++;
+            }
+            if (e > 0) {
+                cnts.pb(e);
+            }
+        }
+        if (n > 1) {
+            cnts.pb(1);
+        }
+        ll rv = 1;
+        FORE (e, cnts) {
+            rv *= e + 1;
+        }
+        cout << rv << '\n';
+    }
 
     return 0;
 }

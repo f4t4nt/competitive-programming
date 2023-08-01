@@ -13,9 +13,9 @@ using str = string;
 using namespace __gnu_pbds;
 
 using indexed_set = tree<
-    ll,
+    pair<ll, ll>,
     null_type,
-    less<ll>,
+    less<pair<ll, ll>>,
     rb_tree_tag,
     tree_order_statistics_node_update
 >;
@@ -50,7 +50,27 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    
+    ll n, q;
+    cin >> n >> q;
+    vector<ll> a(n);
+    indexed_set s;
+    FOR (i, n) {
+        cin >> a[i];
+        s.insert({a[i], i});
+    }
+    while (q--) {
+        ch c;
+        ll x, y;
+        cin >> c >> x >> y;
+        if (c == '?') {
+            cout << s.order_of_key({y + 1, 0}) - s.order_of_key({x, 0}) << '\n';
+        } else if (c == '!') {
+            x--;
+            s.erase({a[x], x});
+            a[x] = y;
+            s.insert({a[x], x});
+        }
+    }
 
     return 0;
 }

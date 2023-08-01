@@ -4,7 +4,8 @@ using namespace std;
 
 using ll = long long;
 using ull = unsigned long long;
-using cd = complex<long double>;
+using db = double;
+using cd = complex<double>;
 using ld = long double;
 using ch = char;
 using str = string;
@@ -19,8 +20,6 @@ using indexed_set = tree<
     rb_tree_tag,
     tree_order_statistics_node_update
 >;
-
-#pragma GCC target("popcnt,lzcnt")
 
 #define pb push_back
 #define elif else if
@@ -45,12 +44,34 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+int solution(vector<int> &a, vector<int> &b, int n) {
+    FORE (v, a) v--;
+    FORE (v, b) v--;
+    vector<set<int>> adj(n);
+    FOR (i, sz(a)) {
+        adj[a[i]].insert(b[i]);
+        adj[b[i]].insert(a[i]);
+    }
+    ll rv = 0;
+    FOR (i, n) {
+        FORE (j, adj[i]) {
+            rv = max(rv, sz(adj[i]) + sz(adj[j]) - 1);
+        }
+    }
+    return rv;
+}
+
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
 
-    
+    int n, m;
+    cin >> n >> m;
+    vector<int> a(m), b(m);
+    FOR (i, m) cin >> a[i];
+    FOR (i, m) cin >> b[i];
+    cout << solution(a, b, n) << '\n';
 
     return 0;
 }

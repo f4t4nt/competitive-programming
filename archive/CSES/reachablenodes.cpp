@@ -20,7 +20,7 @@ using indexed_set = tree<
     tree_order_statistics_node_update
 >;
 
-#pragma GCC target("popcnt,lzcnt")
+#pragma GCC target("popcnt")
 
 #define pb push_back
 #define elif else if
@@ -35,6 +35,7 @@ using indexed_set = tree<
 #define FOB(x, b, e) for(auto x = b; x < e; x++)
 #define FORE(x, C) for(auto &x : C)
 
+
 #ifdef LOCAL
 #include "tester.cpp"
 #define main test_main
@@ -45,12 +46,42 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+void dfs(ll u, vector<vector<ll>> &adj, vector<bitset<50000>> &dp, vector<bool> &vis) {
+    vis[u] = true;
+    FORE (v, adj[u]) {
+        if (!vis[v]) {
+            dfs(v, adj, dp, vis);
+        }
+        dp[u] |= dp[v];
+    }
+    dp[u][u] = 1;
+}
+
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
 
-    
+    ll n, m;
+    cin >> n >> m;
+    vector<vector<ll>> adj(n);
+    FOR (i, m) {
+        ll a, b;
+        cin >> a >> b;
+        a--; b--;
+        adj[a].pb(b);
+    }
+    vector<bitset<50000>> dp(n);
+    vector<bool> vis(n);
+    FOR (i, n) {
+        if (!vis[i]) {
+            dfs(i, adj, dp, vis);
+        }
+    }
+    FOR (i, n) {
+        cout << dp[i].count() << ' ';
+    }
+    cout << '\n';
 
     return 0;
 }

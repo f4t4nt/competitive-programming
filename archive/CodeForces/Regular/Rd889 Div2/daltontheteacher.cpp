@@ -50,7 +50,21 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    
+    ll t;
+    cin >> t;
+    while (t--) {
+        ll n, rv = 0;
+        cin >> n;
+        vector<ll> p(n);
+        FOR (i, n) {
+            cin >> p[i];
+            if (p[i] == i + 1) {
+                rv++;
+            }
+        }
+        rv = (rv + 1) / 2;
+        cout << rv << '\n';
+    }
 
     return 0;
 }

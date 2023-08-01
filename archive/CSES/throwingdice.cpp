@@ -45,12 +45,61 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+constexpr ll MOD = 1e9 + 7;
+
+struct Matrix {
+    vector<vector<ll>> mat;
+    ll n, m;
+
+    Matrix(ll n, ll m) : n(n), m(m) {
+        mat.resize(n, vector<ll>(m));
+    }
+
+    Matrix operator*(const Matrix &other) const {
+        Matrix rv(n, other.m);
+        FOR(i, n) {
+            FOR(j, other.m) {
+                FOR(k, m) {
+                    rv.mat[i][j] += mat[i][k] * other.mat[k][j];
+                    rv.mat[i][j] %= MOD;
+                }
+            }
+        }
+        return rv;
+    }
+
+    Matrix operator^(ll p) const {
+        Matrix rv(n, n);
+        FOR(i, n) {
+            rv.mat[i][i] = 1;
+        }
+        Matrix a = *this;
+        while (p) {
+            if (p & 1) {
+                rv = rv * a;
+            }
+            a = a * a;
+            p >>= 1;
+        }
+        return rv;
+    }
+};
+
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
 
-    
+    ll n;
+    cin >> n;
+    Matrix a(6, 6);
+    FOR (i, 5) {
+        a.mat[i][i + 1] = 1;
+        a.mat[5][i] = 1;
+    }
+    a.mat[5][5] = 1;
+    a = a ^ n;
+    cout << a.mat[5][5] << '\n';
 
     return 0;
 }

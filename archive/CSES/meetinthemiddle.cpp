@@ -20,8 +20,6 @@ using indexed_set = tree<
     tree_order_statistics_node_update
 >;
 
-#pragma GCC target("popcnt,lzcnt")
-
 #define pb push_back
 #define elif else if
 #define sz(C) (ll) C.size()
@@ -50,7 +48,39 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    
+    ll n, x;
+    cin >> n >> x;
+    vector<ll> a(n);
+    FOR (i, n) {
+        cin >> a[i];
+    }
+    ll n0 = n / 2;
+    n -= n0;
+    ssort(a);
+    vector<ll> dp0(1 << n), dp1(1 << n0);
+    unordered_map<ll, ll> cnts;
+    FOR (i, 1 << n) {
+        FOR (j, n) {
+            if (i & (1 << j)) {
+                dp0[i] = dp0[i ^ (1 << j)] + a[j];
+                break;
+            }
+        }
+        cnts[dp0[i]]++;
+    }
+    ll rv = 0;
+    FOR (i, 1 << n0) {
+        FOR (j, n0) {
+            if (i & (1 << j)) {
+                dp1[i] = dp1[i ^ (1 << j)] + a[j + n];
+                break;
+            }
+        }
+        if (cnts.count(x - dp1[i])) {
+            rv += cnts[x - dp1[i]];
+        }
+    }
+    cout << rv << '\n';
 
     return 0;
 }

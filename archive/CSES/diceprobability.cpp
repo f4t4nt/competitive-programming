@@ -50,7 +50,26 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    
+    ll n, x, y;
+    cin >> n >> x >> y;
+    vector<ld> dp0(601);
+    dp0[0] = 1;
+    FOR (i, n) {
+        vector<ld> dp1(601);
+        FOR (j, 601) {
+            FOB (k, 1, 7) {
+                if (j + k < 601) {
+                    dp1[j + k] += dp0[j] / 6;
+                }
+            }
+        }
+        dp0 = dp1;
+    }
+    ld rv = 0;
+    FOB (i, x, y + 1) {
+        rv += dp0[i];
+    }
+    cout << fixed << setprecision(6) << rv << '\n';
 
     return 0;
 }

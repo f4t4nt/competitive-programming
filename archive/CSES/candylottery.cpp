@@ -50,7 +50,13 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    
+    ll n, k;
+    cin >> n >> k;
+    ld num = 0, den = pow(k, n);
+    FOR (i, k) {
+        num += pow(i, n);
+    }
+    cout << fixed << setprecision(6) << k - num / den << '\n';
 
     return 0;
 }

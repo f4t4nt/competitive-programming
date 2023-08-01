@@ -4,4 +4,4 @@
 *.pdb
 bin/
 # for problems from active recruiting processes
-*_.cpp
+*_.*

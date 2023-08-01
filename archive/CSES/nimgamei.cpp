@@ -45,12 +45,30 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+bool nim(vector<ll> &x) {
+    ll rv = 0;
+    FORE (xi, x) {
+        rv ^= xi;
+    }
+    return rv;
+}
+
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
 
-    
+    ll t;
+    cin >> t;
+    while (t--) {
+        ll n;
+        cin >> n;
+        vector<ll> x(n);
+        FORE (xi, x) {
+            cin >> xi;
+        }
+        cout << (nim(x) ? "first" : "second") << '\n';
+    }
 
     return 0;
 }

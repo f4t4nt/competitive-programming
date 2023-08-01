@@ -45,12 +45,47 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+ll dfs(ll u, vector<vector<ll>> &adj, vector<ll> &par, vector<ll> &subtree_sz) {
+    subtree_sz[u] = 1;
+    FORE (v, adj[u]) {
+        if (v != par[u]) {
+            par[v] = u;
+            subtree_sz[u] += dfs(v, adj, par, subtree_sz);
+        }
+    }
+    return subtree_sz[u];
+}
+
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
 
-    
+    ll n;
+    cin >> n;
+    vector<vector<ll>> adj(n);
+    FOR (i, n - 1) {
+        ll u, v;
+        cin >> u >> v;
+        u--, v--;
+        adj[u].pb(v);
+        adj[v].pb(u);
+    }
+    vector<ll> par(n, -1), subtree_sz(n);
+    dfs(0, adj, par, subtree_sz);
+    FOR (i, n) {
+        bool ok = true;
+        ok &= (n - subtree_sz[i]) <= n / 2;
+        FORE (v, adj[i]) {
+            if (v != par[i]) {
+                ok &= subtree_sz[v] <= n / 2;
+            }
+        }
+        if (ok) {
+            cout << i + 1 << '\n';
+            return 0;
+        }
+    }
 
     return 0;
 }

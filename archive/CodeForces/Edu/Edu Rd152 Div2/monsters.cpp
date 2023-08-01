@@ -50,7 +50,28 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    
+    ll t;
+    cin >> t;
+    while (t--) {
+        ll n, k;
+        cin >> n >> k;
+        // {% k, idx}
+        vector<pair<ll, ll>> a(n);
+        FOR (i, n) {
+            ll x;
+            cin >> x;
+            if (x % k == 0) {
+                a[i] = {-k, i};
+            } else {
+                a[i] = {-(x % k), i};
+            }
+        }
+        ssort(a);
+        FOR (i, n) {
+            cout << a[i].second + 1 << ' ';
+        }
+        cout << '\n';
+    }
 
     return 0;
 }

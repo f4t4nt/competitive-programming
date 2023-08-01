@@ -50,7 +50,18 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    
+    ll t;
+    cin >> t;
+    while (t--) {
+        ll n;
+        cin >> n;
+        ll rv = 1;
+        while (n % rv == 0) {
+            rv++;
+        }
+        rv--;
+        cout << rv << '\n';
+    }
 
     return 0;
 }

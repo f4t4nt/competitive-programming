@@ -20,8 +20,6 @@ using indexed_set = tree<
     tree_order_statistics_node_update
 >;
 
-#pragma GCC target("popcnt,lzcnt")
-
 #define pb push_back
 #define elif else if
 #define sz(C) (ll) C.size()
@@ -50,7 +48,19 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    
+    ll n, k;
+    cin >> n >> k;
+    vector<bitset<30>> a(n);
+    FOR (i, n) {
+        cin >> a[i];
+    }
+    int rv = 30;
+    FOR (i, n) {
+        FOB (j, i + 1, n) {
+            rv = min(rv, (int) (a[i] ^ a[j]).count());
+        }
+    }
+    cout << rv << '\n';
 
     return 0;
 }

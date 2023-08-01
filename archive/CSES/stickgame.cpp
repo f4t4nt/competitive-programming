@@ -50,7 +50,27 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    
+    ll n, k;
+    cin >> n >> k;
+    vector<ll> p(k);
+    FORE (x, p) {
+        cin >> x;
+    }
+    ssort(p);
+    vector<bool> win(n + 1);
+    win[0] = false;
+    FOB (i, 1, n + 1) {
+        FORE (x, p) {
+            if (i - x >= 0 && !win[i - x]) {
+                win[i] = true;
+                break;
+            }
+        }
+    }
+    FOB (i, 1, n + 1) {
+        cout << (win[i] ? 'W' : 'L');
+    }
+    cout << '\n';
 
     return 0;
 }

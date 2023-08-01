@@ -20,8 +20,6 @@ using indexed_set = tree<
     tree_order_statistics_node_update
 >;
 
-#pragma GCC target("popcnt,lzcnt")
-
 #define pb push_back
 #define elif else if
 #define sz(C) (ll) C.size()
@@ -34,6 +32,8 @@ using indexed_set = tree<
 #define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
 #define FOB(x, b, e) for(auto x = b; x < e; x++)
 #define FORE(x, C) for(auto &x : C)
+
+#pragma GCC target("popcnt") // ??
 
 #ifdef LOCAL
 #include "tester.cpp"
@@ -50,7 +50,20 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    
+    ll n;
+    cin >> n;
+    vector<bitset<3000>> a(n);
+    FOR (i, n) {
+        cin >> a[i];
+    }
+    ll rv = 0;
+    FOR (i, n) {
+        FOB (j, i + 1, n) {
+            ll cnt = (a[i] & a[j]).count();
+            rv += cnt * (cnt - 1) / 2;
+        }
+    }
+    cout << rv << '\n';
 
     return 0;
 }

@@ -50,7 +50,21 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    
+    ll n;
+    cin >> n;
+    vector<ld> r(n);
+    FORE (x, r) {
+        cin >> x;
+    }
+    ld rv = 0;
+    FOR (i, n) {
+        FOB (j, i + 1, n) {
+            FOB (k, 1, r[i] + 1) {
+                rv += 1 / r[i] * min((k - 1) / r[j], (ld) 1);
+            }
+        }
+    }
+    cout << fixed << setprecision(6) << rv << '\n';
 
     return 0;
 }
