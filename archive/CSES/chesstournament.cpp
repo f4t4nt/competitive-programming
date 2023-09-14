@@ -44,46 +44,50 @@ string test_file_name = "tests";
 #define cin fin
 #define cout fout
 #endif
-
+ 
+constexpr ll MOD = 1e9 + 7;
+ 
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
-
-    ll n, m;
-    cin >> n >> m;
-    vector<vector<pair<ll, ll>>> adj(n + 1);
+ 
+    ll n, tot = 0;
+    cin >> n;
+    vector<pair<ll, ll>> deg(n), rv;
     FOR (i, n) {
-        adj[i + 1].pb({i, 1});
-        adj[i].pb({i + 1, 1});
+        cin >> deg[i].first;
+        tot += deg[i].first;
+        deg[i].second = i;
     }
-    FOR (i, m) {
-        ll t, l, r, v;
-        cin >> t >> l >> r >> v;
-        l--;
-        v = v / 2 * 2;
-        if (t) swap(l, r);
-        adj[l].pb({r, v});
+    if (tot % 2 == 1) {
+        cout << "IMPOSSIBLE\n";
+        return 0;
     }
-    vector<ll> d(n + 1, 1e18);
-    d[0] = 0;
-    std::priority_queue<pair<ll, ll>, vector<pair<ll, ll>>, greater<>> pq;
-    pq.push({0, 0});
-    while (!pq.empty()) {
-        auto [w, u] = pq.top();
-        pq.pop();
-        if (w > d[u]) continue;
-        FORE (e, adj[u]) {
-            auto [v, c] = e;
-            if (d[v] > d[u] + c) {
-                d[v] = d[u] + c;
-                pq.push({d[v], v});
+    rsort(deg);
+    ll last = 0;
+    FOR (i, n) {
+        sort(deg.begin() + i, deg.begin() + last, greater<>());
+        auto [d, v] = deg[i];
+        ll j = i + 1;
+        while (j < n && d > 0) {
+            if (deg[j].first > 0) {
+                deg[j].first--;
+                rv.pb({v, deg[j].second});
+                d--;
             }
+            j++;
         }
+        if (d > 0) {
+            cout << "IMPOSSIBLE\n";
+            return 0;
+        }
+        last = min(n, max(last, j + deg[i].first));
     }
-    str rv = str(n, '0');
-    FOR (i, n) if (d[i + 1] < d[i]) rv[i] = '1';
-    cout << rv << '\n';
-
+    cout << sz(rv) << '\n';
+    FORE (e, rv) {
+        cout << e.first + 1 << ' ' << e.second + 1 << '\n';
+    }
+ 
     return 0;
 }

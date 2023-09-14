@@ -1,17 +1,17 @@
 #include <bits/stdc++.h>
- 
+
 using namespace std;
- 
+
 using ll = long long;
 using ull = unsigned long long;
 using cd = complex<long double>;
 using ld = long double;
 using ch = char;
 using str = string;
- 
+
 #include <bits/extc++.h>
 using namespace __gnu_pbds;
- 
+
 using indexed_set = tree<
     pair<ll, ll>,
     null_type,
@@ -19,9 +19,9 @@ using indexed_set = tree<
     rb_tree_tag,
     tree_order_statistics_node_update
 >;
- 
+
 #pragma GCC target("popcnt,lzcnt")
- 
+
 #define pb push_back
 #define elif else if
 #define sz(C) (ll) C.size()
@@ -29,12 +29,12 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
- 
+
 #define FOR(x, e) for(ll x = 0; x < (ll) e; x++)
 #define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
 #define FOB(x, b, e) for(auto x = b; x < e; x++)
 #define FORE(x, C) for(auto &x : C)
- 
+
 #ifdef LOCAL
 #include "tester.cpp"
 #define main test_main
@@ -45,45 +45,44 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
+ll n;
+ld d, s, t, fmn, fmx, l;
 
-    ll n, m;
-    cin >> n >> m;
-    vector<vector<pair<ll, ll>>> adj(n + 1);
-    FOR (i, n) {
-        adj[i + 1].pb({i, 1});
-        adj[i].pb({i + 1, 1});
-    }
-    FOR (i, m) {
-        ll t, l, r, v;
-        cin >> t >> l >> r >> v;
-        l--;
-        v = v / 2 * 2;
-        if (t) swap(l, r);
-        adj[l].pb({r, v});
-    }
-    vector<ll> d(n + 1, 1e18);
-    d[0] = 0;
-    std::priority_queue<pair<ll, ll>, vector<pair<ll, ll>>, greater<>> pq;
-    pq.push({0, 0});
-    while (!pq.empty()) {
-        auto [w, u] = pq.top();
-        pq.pop();
-        if (w > d[u]) continue;
-        FORE (e, adj[u]) {
-            auto [v, c] = e;
-            if (d[v] > d[u] + c) {
-                d[v] = d[u] + c;
-                pq.push({d[v], v});
-            }
+ld seg(ll del) {
+    return sqrt(s * s + d * d * del * del);
+}
+
+ll solve(ll i, vector<bool> &vis, ld len) {
+    if (i == 0) {
+        if (l - len * 2 - s >= fmn * 2 && l - len * 2 - s <= fmx * 2) {
+            return 1;
+        } else {
+            return 0;
         }
     }
-    str rv = str(n, '0');
-    FOR (i, n) if (d[i + 1] < d[i]) rv[i] = '1';
-    cout << rv << '\n';
+    vis[i] = true;
+    ll rv = 0;
+    if (i != n - 1 && !vis[i + 1]) {
+        rv += solve(i + 1, vis, len + d + t);
+    }
+    if (!vis[i - 1]) {
+        rv += solve(i - 1, vis, len + d + t);
+    }
+    FOR (j, n) {
+        if (!vis[j]) {
+            rv += solve(j, vis, len + seg(i - j) + t);
+        }
+    }
+    vis[i] = false;
+    return rv;
+}
+
+int main() {
+    cin >> n >> d >> s >> t >> fmn >> fmx;
+    while (cin >> l) {
+        vector<bool> vis(n);
+        cout << solve(n - 1, vis, t) << '\n';
+    }
 
     return 0;
 }

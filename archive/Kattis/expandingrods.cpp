@@ -50,40 +50,27 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    ll n, m;
-    cin >> n >> m;
-    vector<vector<pair<ll, ll>>> adj(n + 1);
-    FOR (i, n) {
-        adj[i + 1].pb({i, 1});
-        adj[i].pb({i + 1, 1});
-    }
-    FOR (i, m) {
-        ll t, l, r, v;
-        cin >> t >> l >> r >> v;
-        l--;
-        v = v / 2 * 2;
-        if (t) swap(l, r);
-        adj[l].pb({r, v});
-    }
-    vector<ll> d(n + 1, 1e18);
-    d[0] = 0;
-    std::priority_queue<pair<ll, ll>, vector<pair<ll, ll>>, greater<>> pq;
-    pq.push({0, 0});
-    while (!pq.empty()) {
-        auto [w, u] = pq.top();
-        pq.pop();
-        if (w > d[u]) continue;
-        FORE (e, adj[u]) {
-            auto [v, c] = e;
-            if (d[v] > d[u] + c) {
-                d[v] = d[u] + c;
-                pq.push({d[v], v});
+    ld l0, n, c;
+    while (cin >> l0 >> n >> c) {
+        if (l0 == -1 && n == -1 && c == -1) {
+            break;
+        }
+        l0 /= 2;
+        ld x = 1 + n * c, lo = 0, hi = M_PI / 2;
+        if (x == 1) {
+            cout << 0 << '\n';
+            continue;
+        }
+        while (hi - lo > 1e-15) {
+            ld mid = (lo + hi) / 2;
+            if (mid / sin(mid) < x) {
+                lo = mid;
+            } else {
+                hi = mid;
             }
         }
+        cout << fixed << setprecision(6) << l0 / sin(lo) * (1 - cos(lo)) << '\n';
     }
-    str rv = str(n, '0');
-    FOR (i, n) if (d[i + 1] < d[i]) rv[i] = '1';
-    cout << rv << '\n';
 
     return 0;
 }

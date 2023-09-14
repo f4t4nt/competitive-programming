@@ -50,39 +50,35 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    ll n, m;
-    cin >> n >> m;
-    vector<vector<pair<ll, ll>>> adj(n + 1);
+    ll n, m, k;
+    cin >> n >> m >> k;
+    vector<ll> c(n);
     FOR (i, n) {
-        adj[i + 1].pb({i, 1});
-        adj[i].pb({i + 1, 1});
+        cin >> c[i];
+        c[i]--;
     }
-    FOR (i, m) {
-        ll t, l, r, v;
-        cin >> t >> l >> r >> v;
-        l--;
-        v = v / 2 * 2;
-        if (t) swap(l, r);
-        adj[l].pb({r, v});
+    vector<ll> last_seen(m, n), nxt(n);
+    FORR (i, n) {
+        nxt[i] = last_seen[c[i]];
+        last_seen[c[i]] = i;
     }
-    vector<ll> d(n + 1, 1e18);
-    d[0] = 0;
-    std::priority_queue<pair<ll, ll>, vector<pair<ll, ll>>, greater<>> pq;
-    pq.push({0, 0});
-    while (!pq.empty()) {
-        auto [w, u] = pq.top();
-        pq.pop();
-        if (w > d[u]) continue;
-        FORE (e, adj[u]) {
-            auto [v, c] = e;
-            if (d[v] > d[u] + c) {
-                d[v] = d[u] + c;
-                pq.push({d[v], v});
+    ll rv = 0;
+    set<pair<ll, ll>> active;
+    vector<bool> in_active(m);
+    FOR (i, n) {
+        if (in_active[c[i]]) {
+            active.erase({i, c[i]});
+        } else {
+            rv++;
+            if (sz(active) == k) {
+                auto [pos, col] = *active.rbegin();
+                active.erase({pos, col});
+                in_active[col] = false;
             }
         }
+        in_active[c[i]] = true;
+        active.insert({nxt[i], c[i]});
     }
-    str rv = str(n, '0');
-    FOR (i, n) if (d[i + 1] < d[i]) rv[i] = '1';
     cout << rv << '\n';
 
     return 0;

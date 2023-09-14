@@ -9,18 +9,18 @@ using ld = long double;
 using ch = char;
 using str = string;
 
-#include <ext/pb_ds/assoc_container.hpp>
+#include <bits/extc++.h>
 using namespace __gnu_pbds;
 
 using indexed_set = tree<
-    ll,
+    pair<ll, ll>,
     null_type,
-    less<ll>,
+    less<pair<ll, ll>>,
     rb_tree_tag,
     tree_order_statistics_node_update
 >;
 
-#pragma GCC target("popcnt,lzcnt") // __builtin_popcountll, __builtin_clzll
+#pragma GCC target("popcnt,lzcnt")
 
 #define pb push_back
 #define elif else if
@@ -50,6 +50,55 @@ ld angle(ld x1, ld y1, ld x0, ld y0, ld x2, ld y2) {
         rv += 2 * M_PI;
     }
     return rv;
+}
+
+//--------------------------------------------------
+
+void bellman_ford(ll v, vector<tuple<ll, ll, ll>> &edges, vector<ll> &dist) {
+    ll n = sz(dist);
+    FOR (i, n) {
+        dist[i] = INF;
+    }
+    dist[v] = 0;
+    FOR (i, n - 1) {
+        for (auto [a, b, w] : edges) {
+            if (dist[a] != INF && dist[a] + w < dist[b]) {
+                dist[b] = dist[a] + w;
+            }
+        }
+    }
+}
+
+void dijkstra(ll v0, vector<vector<pair<ll, ll>>> &adj, vector<ll> &dist) {
+    std::priority_queue<pair<ll, ll>, vector<pair<ll, ll>>, greater<>> pq;
+    pq.push({0, v0});
+    while (!pq.empty()) {
+        ll cur_d, u;
+        tie(cur_d, u) = pq.top();
+        pq.pop();
+        if (cur_d > dist[u]) {
+            continue;
+        }
+        FORE (elem, adj[u]) {
+            ll v, w;
+            tie(v, w) = elem;
+            if (dist[v] > dist[u] + w) {
+                dist[v] = dist[u] + w;
+                pq.push({dist[v], v});
+            }
+        }
+    }
+}
+
+void floyd_warshall(vector<vector<ll>> &dist) {
+    ll n = sz(dist);
+    FOR (k, n) {
+        FOR (i, n) {
+            FOR (j, n) {
+                dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
+            }
+        }
+    }
 }
 
 //--------------------------------------------------
@@ -107,6 +156,33 @@ struct BIT {
     }
 };
 
+struct BIT2d {
+    vector<BIT> tree;
+    ll n, m;
+    BIT2d(ll n, ll m) : n(n), m(m) {
+        tree.resize(n + 1, BIT(m));
+    }
+    void update(ll x, ll y, ll val) {
+        x++;
+        while (x <= n) {
+            tree[x].update(y, val);
+            x += x & (-x);
+        }
+    }
+    ll query(ll x, ll y) {
+        x++;
+        ll sum = 0;
+        while (x > 0) {
+            sum += tree[x].query(y);
+            x -= x & (-x);
+        }
+        return sum;
+    }
+    ll query(ll x1, ll y1, ll x2, ll y2) {
+        return query(x2, y2) - query(x1 - 1, y2) - query(x2, y1 - 1) + query(x1 - 1, y1 - 1);
+    }
+};
+
 //--------------------------------------------------
 
 pair<ld, ld> get_com(vector<pair<ld, ld>> &poly) {
@@ -124,6 +200,62 @@ pair<ld, ld> get_com(vector<pair<ld, ld>> &poly) {
     y /= 6 * area;
     return {x, y};
 }
+
+//--------------------------------------------------
+
+struct Point {
+    ld x, y;
+    Point operator+(Point o) {
+        return {x + o.x, y + o.y};
+    }
+    Point operator-(Point o) {
+        return {x - o.x, y - o.y};
+    }
+    Point operator*(ld k) {
+        return {x * k, y * k};
+    }
+    Point operator/(ld k) {
+        return {x / k, y / k};
+    }
+    ld abs2() {
+        return x * x + y * y;
+    }
+    ld abs_() {
+        return sqrt(abs2());
+    }
+    bool operator==(Point o) {
+        return abs(x - o.x) < EPS && abs(y - o.y) < EPS;
+    }
+    bool operator!=(Point o) {
+        return abs(x - o.x) > EPS || abs(y - o.y) > EPS;
+    }
+};
+
+struct Circle {
+    Point c;
+    ld r;
+    ll id;
+    Circle(Point c, ld r, ll id) : c(c), r(r), id(id) {}
+    Circle() {}
+    bool has(Point &p) {
+        return (p - c).abs_() <= r + EPS;
+    }
+    vector<Point> operator&(Circle &o) {
+        if ((c - o.c).abs_() > r + o.r + EPS || (c - o.c).abs_() < abs(r - o.r) - EPS) {
+            return {};
+        }
+        if ((c - o.c).abs_() < EPS && abs(r - o.r) < EPS) {
+            return {{c.x + r, c.y}};
+        }
+        Point sum = o.c + c, diff = o.c - c, perp = {diff.y, -diff.x};
+        ld csu = 0.5,
+            cdi = (r * r - o.r * o.r) / (2 * diff.abs2()),
+            cpe = 0.5 * sqrt(max((ld) 0, 2 * (r * r + o.r * o.r) / (diff.abs2())
+                - (r * r - o.r * o.r) * (r * r - o.r * o.r) / (diff.abs2() * diff.abs2()) - 1));
+        vector<Point> rv = {sum * csu + diff * cdi + perp * cpe, sum * csu + diff * cdi - perp * cpe};
+        return rv;
+    }
+};
 
 //--------------------------------------------------
 
@@ -174,130 +306,11 @@ void customsort() {
 
 //--------------------------------------------------
 
-vector<ll> dist(n, INF);
-dist[0] = 0;
-priority_queue<pair<ll, ll>, vector<pair<ll, ll>>, greater<>> pq;
-pq.push({0, 0});
-while (!pq.empty()) {
-    ll cur_d, u;
-    tie(cur_d, u) = pq.top();
-    pq.pop();
-    if (cur_d > dist[u]) {
-        continue;
-    }
-    FORE (elem, adj_s[u]) {
-        ll v, w;
-        tie(v, w) = elem;
-        if (dist[v] > dist[u] + w) {
-            dist[v] = dist[u] + w;
-            pq.push({dist[v], v});
-        }
-    }
-}
-
-//--------------------------------------------------
-
 struct Edge {
     ll s, t, cap = 0, cost = 0, flow = 0;
 };
 
-struct Dinic { // matrix
-    ll n;
-    vector<Edge> edges;
-    vector<vector<ll>> adj, caps, flows, costs;
-    vector<ll> lvl, ptr;
-    queue<ll> q;
-
-    Dinic(ll n, vector<Edge> &edges) :
-        n(n), adj(n), edges(edges),
-        caps(n, vector<ll>(n)),
-        flows(n, vector<ll>(n)),
-        costs(n, vector<ll>(n))
-    {
-        FORE (e, edges) {
-            adj[e.s].pb(e.t);
-            adj[e.t].pb(e.s);
-            caps[e.s][e.t] = e.cap;
-            costs[e.s][e.t] = e.cost;
-        }
-    }
-
-    bool bfs(ll s, ll t) {
-        lvl.assign(n, -1);
-        lvl[s] = 0;
-        q.push(s);
-        while (!q.empty()) {
-            ll v = q.front();
-            q.pop();
-            FORE (u, adj[v]) {
-                if (lvl[u] != -1 || caps[v][u] <= flows[v][u]) {
-                    continue;
-                }
-                lvl[u] = lvl[v] + 1;
-                q.push(u);
-            }
-        }
-        return lvl[t] != -1;
-    }
-
-    ll dfs(ll v, ll t, ll f) {
-        if (v == t || f == 0) {
-            return f;
-        }
-        for (ll &cid = ptr[v]; cid < sz(adj[v]); cid++) {
-            ll u = adj[v][cid];
-            if (lvl[v] + 1 != lvl[u] || caps[v][u] <= flows[v][u]) {
-                continue;
-            }
-            ll tr = dfs(u, t, min(f, caps[v][u] - flows[v][u]));
-            if (tr == 0) {
-                continue;
-            }
-            flows[v][u] += tr;
-            flows[u][v] -= tr;
-            return tr;
-        }
-        return 0;
-    }
-
-    ll max_flow(ll s, ll t) {
-        ll flow = 0;
-        while (true) {
-            if (!bfs(s, t)) {
-                break;
-            }
-            ptr.assign(n, 0);
-            while (ll pushed = dfs(s, t, LLONG_MAX)) {
-                flow += pushed;
-            }
-        }
-        return flow;
-    }
-
-    vector<pair<ll, ll>> min_cut(ll s) {
-        bfs(s, -1);
-        vector<pair<ll, ll>> cut;
-        FORE (e, edges) {
-            if (lvl[e.s] != -1 && lvl[e.t] == -1 && caps[e.s][e.t] > 0) {
-                cut.pb({e.s, e.t});
-            }
-        }
-        return cut;
-    }
-
-    void undo_flow(vector<ll> path, ll f) {
-        FOB (i, 1, sz(path)) {
-            flows[path[i - 1]][path[i]] -= f;
-            flows[path[i]][path[i - 1]] += f;
-            assert(flows[path[i - 1]][path[i]] >= 0);
-            assert(flows[path[i]][path[i - 1]] >= 0);
-            assert(flows[path[i - 1]][path[i]] <= caps[path[i - 1]][path[i]]);
-            assert(flows[path[i]][path[i - 1]] <= caps[path[i]][path[i - 1]]);
-        }
-    }
-};
-
-struct Dinic { // edge list
+struct Dinic {
     ll n;
     vector<Edge> edges;
     vector<vector<ll>> adj;
@@ -385,112 +398,7 @@ struct Dinic { // edge list
     }
 };
 
-struct MinCostMaxFlow { // matrix
-    ll n;
-    vector<Edge> edges;
-    vector<vector<ll>> adj, caps, flows, costs;
-    vector<ll> vis, dist, pi;
-    vector<pair<ll, ll>> par;
- 
-    MinCostMaxFlow(ll n, vector<Edge> &edges) :
-        n(n), adj(n), edges(edges),
-        caps(n, vector<ll>(n)),
-        flows(n, vector<ll>(n)),
-        costs(n, vector<ll>(n)),
-        vis(n), dist(n), pi(n), par(n)
-    {
-        FORE (e, edges) {
-            adj[e.s].pb(e.t);
-            adj[e.t].pb(e.s);
-            caps[e.s][e.t] = e.cap;
-            costs[e.s][e.t] = e.cost;
-        }
-    }
- 
-    void path(ll s) {
-        vis.assign(n, 0);
-        dist.assign(n, INF);
-        dist[s] = 0;
-        ll di;
- 
-        priority_queue<pair<ll, ll>, vector<pair<ll, ll>>, greater<pair<ll, ll>>> pq;
-        pq.push({0, s});
-        
-        auto relax = [&](ll i, ll cap, ll cost, ll dir) {
-            ll val = di - pi[i] + cost;
-            if (cap && val < dist[i]) {
-                dist[i] = val;
-                par[i] = {s, dir};
-                pq.push({dist[i], i});
-            }
-        };
- 
-        while (!pq.empty()) {
-            s = pq.top().second;
-            pq.pop();
-            vis[s] = 1;
-            di = dist[s] + pi[s];
-            FORE (i, adj[s]) {
-                if (!vis[i]) {
-                    relax(i, caps[s][i] - flows[s][i], costs[s][i], 1);
-                }
-            }
-            FORE (i, adj[s]) {
-                if (!vis[i]) {
-                    relax(i, flows[i][s], -costs[i][s], 0);
-                }
-            }
-        }
- 
-        FOR (i, n) {
-            pi[i] = min(pi[i] + dist[i], INF);
-        }
-    }
-    
-    pair<ll, ll> max_flow(ll s, ll t) {
-        ll flow = 0, cost = 0;
-        while (path(s), vis[t]) {
-            ll fl = INF;
-            for (ll p, r, x = t; tie(p, r) = par[x], x != s; x = p) {
-                fl = min(fl, r ? caps[p][x] - flows[p][x] : flows[x][p]);
-            }
-            flow += fl;
-            for (ll p, r, x = t; tie(p, r) = par[x], x != s; x = p) {
-                if (r) flows[p][x] += fl;
-                else flows[x][p] -= fl;
-            }
-        }
-        FOR (i, n) {
-            FOR (j, n) {
-                cost += costs[i][j] * flows[i][j];
-            }
-        }
-        return {flow, cost};
-    }
- 
-    void set_pi(ll s) { // for negative costs
-        pi.assign(n, INF);
-        pi[s] = 0;
-        ll it = n, ch = 1, v;
-        while (ch-- && it--) {
-            FOR (i, n) {
-                if (pi[i] != INF) {
-                    FORE (j, adj[i]) {
-                        if (caps[i][j]) {
-                            if ((v = pi[i] + costs[i][j]) < pi[j]) {
-                                pi[j] = v;
-                                ch = 1;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        assert(it >= 0);
-    }
-};
-
-struct MinCostMaxFlow { // edge list
+struct MinCostMaxFlow {
     ll n, m;
     vector<Edge> edges;
     vector<vector<ll>> adj;
@@ -515,7 +423,8 @@ struct MinCostMaxFlow { // edge list
         dist[s] = 0;
         ll di;
 
-        priority_queue<pair<ll, ll>, vector<pair<ll, ll>>, greater<>> pq;
+        __gnu_pbds::priority_queue<pair<ll, ll>, greater<>> pq;
+        vector<decltype(pq)::point_iterator> its(n);
         pq.push({0, s});
 
         auto relax = [&](ll t, ll e, ll cap, ll cost, ll dir) {
@@ -523,7 +432,11 @@ struct MinCostMaxFlow { // edge list
             if (cap && val < dist[t]) {
                 dist[t] = val;
                 par[t] = {e, dir};
-                pq.push({val, t});
+                if (its[t] == pq.end()) {
+                    its[t] = pq.push({val, t});
+                } else {
+                    pq.modify(its[t], {val, t});
+                }
             }
         };
 
@@ -544,6 +457,10 @@ struct MinCostMaxFlow { // edge list
                     relax(t, e, edges[e ^ 1].flow, -edges[e ^ 1].cost, 0);
                 }
             }
+        }
+
+        FOR (i, n) {
+            pi[i] = min(pi[i] + dist[i], INF);
         }
     }
 
@@ -595,7 +512,6 @@ struct DSU {
     ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
     bool same_set(ll a, ll b) { return get(a) == get(b); }
     ll size(ll x) { return -e[get(x)]; }
-    ll count() { return cnt; }
     bool unite(ll x, ll y) {
         x = get(x), y = get(y);
         if (x == y) return false;
@@ -609,7 +525,6 @@ struct DSU {
 //--------------------------------------------------
 
 constexpr ll MOD = 1e9 + 7;
-constexpr ll MAXN = 1e6 + 1;
 
 struct Binom {
     ll n;
@@ -627,15 +542,15 @@ struct Binom {
         }
     }
     ll pow(ll a, ll b) {
-        ll res = 1;
+        ll rv = 1;
         while (b) {
             if (b & 1) {
-                res = res * a % MOD;
+                rv = rv * a % MOD;
             }
             a = a * a % MOD;
             b >>= 1;
         }
-        return res;
+        return rv;
     }
     ll choose(ll n, ll k) {
         if (k < 0 || k > n) {
@@ -647,28 +562,42 @@ struct Binom {
 
 //--------------------------------------------------
 
-void floyd_warshall(vector<vector<ll>> &dist) {
-    ll n = sz(dist);
-    FOR (k, n) {
-        FOR (i, n) {
-            FOR (j, n) {
-                dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
+// ll n = sz(s), n2 = 2 << (ll) ceil(log2(n));
+// vector<cd> a(n2), b(n2);
+// ...init a, b...
+// fft(a, false);
+// fft(b, false);
+// FOR (i, n) a[i] *= b[i];
+// fft(a, true);
+
+void fft(vector<cd> &a, bool inv) {
+    ll n = sz(a);
+    for (ll i = 1, j = 0; i < n; i++) {
+        ll bit = n >> 1;
+        for (; j & bit; bit >>= 1) {
+            j ^= bit;
+        }
+        j ^= bit;
+        if (i < j) {
+            swap(a[i], a[j]);
+        }
+    }
+    for (ll len = 2; len <= n; len <<= 1) {
+        ld ang = 2 * M_PI / len * (inv ? -1 : 1);
+        cd wlen(cos(ang), sin(ang));
+        for (ll i = 0; i < n; i += len) {
+            cd w(1);
+            for (ll j = 0; j < len / 2; j++) {
+                cd u = a[i + j], v = a[i + j + len / 2] * w;
+                a[i + j] = u + v;
+                a[i + j + len / 2] = u - v;
+                w *= wlen;
             }
         }
     }
-}
-
-void bellman_ford(ll v, vector<tuple<ll, ll, ll>> &edges, vector<ll> &dist) {
-    ll n = sz(dist);
-    FOR (i, n) {
-        dist[i] = INF;
-    }
-    dist[v] = 0;
-    FOR (i, n - 1) {
-        for (auto [a, b, w] : edges) {
-            if (dist[a] != INF && dist[a] + w < dist[b]) {
-                dist[b] = dist[a] + w;
-            }
+    if (inv) {
+        FORE (x, a) {
+            x /= n;
         }
     }
 }
@@ -1083,45 +1012,37 @@ struct SCCs {
 struct SegTree {
     ll n;
     vector<ll> data, lazy;
-    SegTree (ll n) : n(n), data(4 * n, 0), lazy(4 * n, 0) {}
-    void update(ll lo, ll hi, ll val, ll i = 1, ll l = 0, ll r = -1) { // [lo, hi)
-        if (r == -1) r = n;
-        if (lazy[i] != 0) {
-            data[i] += (r - l) * lazy[i];
-            if (r - l > 1) {
-                lazy[2 * i] += lazy[i];
-                lazy[2 * i + 1] += lazy[i];
-            }
-            lazy[i] = 0;
+    SegTree (ll n) : n(n), data(4 * n), lazy(4 * n) {}
+    void push(ll i, ll l, ll r) {
+        if (lazy[i] == 0) return;
+        data[i] += (r - l) * lazy[i];
+        if (r - l > 1) {
+            lazy[2 * i] += lazy[i];
+            lazy[2 * i + 1] += lazy[i];
         }
-        if (lo <= l && r <= hi) {
-            data[i] += (r - l) * val;
-            if (r - l > 1) {
-                lazy[2 * i] += val;
-                lazy[2 * i + 1] += val;
-            }
+        lazy[i] = 0;
+    }
+    void update(ll ul, ll ur, ll val, ll i = 1, ll l = 0, ll r = -1) { // [ul, ur)
+        if (r == -1) r = n;
+        push(i, l, r);
+        if (ur <= l || r <= ul) return;
+        if (ul <= l && r <= ur) {
+            lazy[i] += val;
+            push(i, l, r);
             return;
         }
-        if (r <= lo || hi <= l) return;
         ll m = (l + r) / 2;
-        update(lo, hi, val, 2 * i, l, m);
-        update(lo, hi, val, 2 * i + 1, m, r);
+        update(ul, ur, val, 2 * i, l, m);
+        update(ul, ur, val, 2 * i + 1, m, r);
         data[i] = data[2 * i] + data[2 * i + 1];
     }
-    ll query(ll lo, ll hi, ll i = 1, ll l = 0, ll r = -1) {
+    ll query(ll ql, ll qr, ll i = 1, ll l = 0, ll r = -1) {
         if (r == -1) r = n;
-        if (lazy[i] != 0) {
-            data[i] += (r - l) * lazy[i];
-            if (r - l > 1) {
-                lazy[2 * i] += lazy[i];
-                lazy[2 * i + 1] += lazy[i];
-            }
-            lazy[i] = 0;
-        }
-        if (lo <= l && r <= hi) return data[i];
-        if (r <= lo || hi <= l) return 0;
+        push(i, l, r);
+        if (qr <= l || r <= ql) return 0;
+        if (ql <= l && r <= qr) return data[i];
         ll m = (l + r) / 2;
-        return query(lo, hi, 2 * i, l, m) + query(lo, hi, 2 * i + 1, m, r);
+        return query(ql, qr, 2 * i, l, m) + query(ql, qr, 2 * i + 1, m, r);
     }
 };
 
@@ -1130,7 +1051,6 @@ struct SegTree {
 struct Vertex { // persistent segtree, sum
     Vertex *l, *r;
     ll sum;
-
     Vertex(ll val) : l(nullptr), r(nullptr), sum(val) {}
     Vertex(Vertex *l, Vertex *r) : l(l), r(r), sum(0) {
         if (l) sum += l->sum;
@@ -1207,16 +1127,16 @@ struct SuffixTree {
         hi[1] = -1;
         tree[1] = vector<ll>(alpha, 0);
         // add the text to the tree, letter by letter
-        for (cur_char = 0; cur_char < sz(s); ++cur_char) {
+        for (cur_char = 0; cur_char < sz(s); cur_char++) {
             add_char(char_to_index(s[cur_char]));
         }
     }
 
     ll char_to_index(ch c) {
         if (c == '$') {
-            return 0;
+            return 26;
         } else {
-            return c - 'a' + 1;
+            return c - 'a';
         }
     }
 
@@ -1282,10 +1202,10 @@ struct SuffixTree {
             cout << i << ':' << lo[i] << ' ' << hi[i] << ' ' << par[i] << ' ' << link[i] << " " << '\n';
             FOR (j, alpha) {
                 if (tree[i][j] != -1) {
-                    if (j == 0) {
+                    if (j == 26) {
                         cout << "$ ";
                     } else {
-                        cout << (char)('a' + j - 1) << ' ';
+                        cout << (char)('a' + j) << ' ';
                     }
                     cout << tree[i][j] << '\n';
                 }
@@ -1341,6 +1261,27 @@ void gen_tree(SuffixTree &st, vector<ll> &leafs, vector<ll> &depth) {
             }
         }
     }
+}
+
+bool dfs(ll u, SuffixTree &st, str &s, str &rv, ll &n) {
+    ll lo = 0, hi = -1;
+    if (u) {
+        lo = st.lo[u];
+        hi = min(min(st.hi[u], sz(s) - 1), lo + n - 1);
+    }
+    n -= hi - lo + 1;
+    if (n == 0) {
+        rv = s.substr(lo, hi - lo + 1);
+        return true;
+    }
+    FOR (i, 26) {
+        ll &v = st.tree[u][i];
+        if (v != -1 && dfs(v, st, s, rv, n)) {
+            rv = s.substr(lo, hi - lo + 1) + rv;
+            return true;
+        }
+    }
+    return false;
 }
 
 int main() {

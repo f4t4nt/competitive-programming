@@ -1,17 +1,17 @@
 #include <bits/stdc++.h>
- 
+
 using namespace std;
- 
+
 using ll = long long;
 using ull = unsigned long long;
 using cd = complex<long double>;
 using ld = long double;
 using ch = char;
 using str = string;
- 
+
 #include <bits/extc++.h>
 using namespace __gnu_pbds;
- 
+
 using indexed_set = tree<
     pair<ll, ll>,
     null_type,
@@ -19,9 +19,9 @@ using indexed_set = tree<
     rb_tree_tag,
     tree_order_statistics_node_update
 >;
- 
+
 #pragma GCC target("popcnt,lzcnt")
- 
+
 #define pb push_back
 #define elif else if
 #define sz(C) (ll) C.size()
@@ -29,12 +29,12 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
- 
+
 #define FOR(x, e) for(ll x = 0; x < (ll) e; x++)
 #define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
-#define FOB(x, b, e) for(auto x = b; x < e; x++)
+#define FOB(x, b, e) for(auto x = b; x != e; x++)
 #define FORE(x, C) for(auto &x : C)
- 
+
 #ifdef LOCAL
 #include "tester.cpp"
 #define main test_main
@@ -50,40 +50,38 @@ int main() {
     cin.tie(0);
     cout.tie(0);
 
-    ll n, m;
-    cin >> n >> m;
-    vector<vector<pair<ll, ll>>> adj(n + 1);
-    FOR (i, n) {
-        adj[i + 1].pb({i, 1});
-        adj[i].pb({i + 1, 1});
-    }
-    FOR (i, m) {
-        ll t, l, r, v;
-        cin >> t >> l >> r >> v;
-        l--;
-        v = v / 2 * 2;
-        if (t) swap(l, r);
-        adj[l].pb({r, v});
-    }
-    vector<ll> d(n + 1, 1e18);
-    d[0] = 0;
-    std::priority_queue<pair<ll, ll>, vector<pair<ll, ll>>, greater<>> pq;
-    pq.push({0, 0});
-    while (!pq.empty()) {
-        auto [w, u] = pq.top();
-        pq.pop();
-        if (w > d[u]) continue;
-        FORE (e, adj[u]) {
-            auto [v, c] = e;
-            if (d[v] > d[u] + c) {
-                d[v] = d[u] + c;
-                pq.push({d[v], v});
+    ll t;
+    cin >> t;
+    while (t--) {
+        ll n;
+        cin >> n;
+        vector<ll> a(n);
+        FOR (i, n) {
+            cin >> a[i];
+        }
+        ssort(a);
+        if (a[0] == a.back()) {
+            cout << -1 << '\n';
+            continue;
+        }
+        vector<ll> rv0, rv1;
+        FOR (i, n) {
+            if (a[i] != a.back()) {
+                rv0.pb(a[i]);
+            } else {
+                rv1.pb(a[i]);
             }
         }
+        cout << sz(rv0) << ' ' << sz(rv1) << '\n';
+        FORE (x, rv0) {
+            cout << x << ' ';
+        }
+        cout << '\n';
+        FORE (x, rv1) {
+            cout << x << ' ';
+        }
+        cout << '\n';
     }
-    str rv = str(n, '0');
-    FOR (i, n) if (d[i + 1] < d[i]) rv[i] = '1';
-    cout << rv << '\n';
 
     return 0;
 }

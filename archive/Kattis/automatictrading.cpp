@@ -45,45 +45,56 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+constexpr ll MOD = 1e9 + 7;
+
+// hash of [l, r)
+ll get_substr(ll l, ll r, vector<ll> &hash, vector<ll> &pow52) {
+    return (hash[r] - hash[l] * pow52[r - l] % MOD + MOD) % MOD;
+}
+
+ll pow_(ll a, ll b) {
+    ll rv = 1;
+    while (b) {
+        if (b & 1) {
+            rv = rv * a % MOD;
+        }
+        a = a * a % MOD;
+        b >>= 1;
+    }
+    return rv;
+}
+
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
 
-    ll n, m;
-    cin >> n >> m;
-    vector<vector<pair<ll, ll>>> adj(n + 1);
+    str s;
+    cin >> s;
+    ll n = sz(s), q;
+    vector<ll> hash(n + 1), pow52(n + 1, 1);
+    // [a,z] -> [0,25], [A,Z] -> [26,51]
     FOR (i, n) {
-        adj[i + 1].pb({i, 1});
-        adj[i].pb({i + 1, 1});
+        pow52[i + 1] = pow52[i] * 52 % MOD;
+        ll c = (s[i] >= 'a' ? s[i] - 'a' : s[i] - 'A' + 26);
+        hash[i + 1] = (hash[i] * 52 + c) % MOD;
     }
-    FOR (i, m) {
-        ll t, l, r, v;
-        cin >> t >> l >> r >> v;
-        l--;
-        v = v / 2 * 2;
-        if (t) swap(l, r);
-        adj[l].pb({r, v});
-    }
-    vector<ll> d(n + 1, 1e18);
-    d[0] = 0;
-    std::priority_queue<pair<ll, ll>, vector<pair<ll, ll>>, greater<>> pq;
-    pq.push({0, 0});
-    while (!pq.empty()) {
-        auto [w, u] = pq.top();
-        pq.pop();
-        if (w > d[u]) continue;
-        FORE (e, adj[u]) {
-            auto [v, c] = e;
-            if (d[v] > d[u] + c) {
-                d[v] = d[u] + c;
-                pq.push({d[v], v});
+    cin >> q;
+    while (q--) {
+        ll i, j;
+        cin >> i >> j;
+        ll l = 0, r = n - j;
+        while (l < r) {
+            ll m = (l + r + 1) / 2;
+            if (get_substr(i, i + m, hash, pow52) ==
+                get_substr(j, j + m, hash, pow52)) {
+                l = m;
+            } else {
+                r = m - 1;
             }
         }
+        cout << l << '\n';
     }
-    str rv = str(n, '0');
-    FOR (i, n) if (d[i + 1] < d[i]) rv[i] = '1';
-    cout << rv << '\n';
 
     return 0;
 }

@@ -96,5 +96,6 @@
         "cwctype": "cpp",
         "memory_resource": "cpp",
         "optional": "cpp"
-    }
+    },
+    "C_Cpp.default.configurationProvider": "ms-vscode.makefile-tools"
 }

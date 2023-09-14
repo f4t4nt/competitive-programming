@@ -45,45 +45,54 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+constexpr ll MAX = 1e6 + 1;
+
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(0);
     cout.tie(0);
 
-    ll n, m;
-    cin >> n >> m;
-    vector<vector<pair<ll, ll>>> adj(n + 1);
+    ll n;
+    cin >> n;
+    vector<ll> seq(n), cnt(MAX), del(MAX), mn(MAX);
     FOR (i, n) {
-        adj[i + 1].pb({i, 1});
-        adj[i].pb({i + 1, 1});
+        str s;
+        cin >> s;
+        ll c = (s[0] == 's' ? 1 : -1);
+        seq[i] = c * stoll(s.substr(1));
+        ll idx = abs(seq[i]);
+        cnt[idx]++;
+        del[idx] += c;
+        mn[idx] = min(mn[idx], del[idx]);
     }
-    FOR (i, m) {
-        ll t, l, r, v;
-        cin >> t >> l >> r >> v;
-        l--;
-        v = v / 2 * 2;
-        if (t) swap(l, r);
-        adj[l].pb({r, v});
-    }
-    vector<ll> d(n + 1, 1e18);
-    d[0] = 0;
-    std::priority_queue<pair<ll, ll>, vector<pair<ll, ll>>, greater<>> pq;
-    pq.push({0, 0});
-    while (!pq.empty()) {
-        auto [w, u] = pq.top();
-        pq.pop();
-        if (w > d[u]) continue;
-        FORE (e, adj[u]) {
-            auto [v, c] = e;
-            if (d[v] > d[u] + c) {
-                d[v] = d[u] + c;
-                pq.push({d[v], v});
-            }
+    pair<ll, ll> rv = {0, -1};
+    FOR (idx, MAX) {
+        if (cnt[idx] > 0 && del[idx] == 0 && mn[idx] == 0) {
+            rv.first++;
         }
     }
-    str rv = str(n, '0');
-    FOR (i, n) if (d[i + 1] < d[i]) rv[i] = '1';
-    cout << rv << '\n';
+    ll cur = rv.first;
+    FOR (i, n) {
+        ll idx = abs(seq[i]);
+        if (del[idx] != 0) {
+            continue;
+        }
+        if (seq[i] > 0) {
+            if (mn[idx] == 0) {
+                cur--;
+            }
+            mn[idx]--;
+        } else {
+            if (mn[idx] == -1) {
+                cur++;
+            }
+            mn[idx]++;
+        }
+        if (cur > rv.first) {
+            rv = {cur, i};
+        }
+    }
+    cout << rv.second + 2 << ' ' << rv.first << '\n';
 
     return 0;
 }
