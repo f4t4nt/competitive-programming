@@ -45,45 +45,42 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+ll n;
+vector<ld> p;
+
+// [who's standing][who's turn] = probabilities of winning
+map<pair<ll, ll>, vector<ld>> mem;
+set<pair<ll, ll>> vis;
+
+vector<ld> dfs(ll state, ll cur) {
+    assert(state & (1 << cur));
+    if (vis.count({state, cur})) {
+        return mem[{state, cur}];
+    }
+}
+
 int main() {
     ios_base::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
 
-    ll n, m;
-    cin >> n >> m;
-    vector<vector<pair<ll, ll>>> adj(n + 1);
-    FOR (i, n) {
-        adj[i + 1].pb({i, 1});
-        adj[i].pb({i + 1, 1});
-    }
-    FOR (i, m) {
-        ll t, l, r, v;
-        cin >> t >> l >> r >> v;
-        l--;
-        v = v / 2 * 2;
-        if (t) swap(l, r);
-        adj[l].pb({r, v});
-    }
-    vector<ll> d(n + 1, 1e18);
-    d[0] = 0;
-    std::priority_queue<pair<ll, ll>, vector<pair<ll, ll>>, greater<>> pq;
-    pq.push({0, 0});
-    while (!pq.empty()) {
-        auto [w, u] = pq.top();
-        pq.pop();
-        if (w > d[u]) continue;
-        FORE (e, adj[u]) {
-            auto [v, c] = e;
-            if (d[v] > d[u] + c) {
-                d[v] = d[u] + c;
-                pq.push({d[v], v});
-            }
+    ll t;
+    cin >> t;
+    while (t--) {
+        cin >> n;
+        p.resize(n);
+        mem.clear();
+        vis.clear();
+        FOR (i, n) {
+            cin >> p[i];
+            p[i] /= 100;
         }
+        vector<ld> rv = dfs((1 << n) - 1, 0);
+        FORE (x, rv) {
+            cout << fixed << setprecision(10) << x << ' ';
+        }
+        cout << '\n';
     }
-    str rv = str(n, '0');
-    FOR (i, n) if (d[i + 1] < d[i]) rv[i] = '1';
-    cout << rv << '\n';
 
     return 0;
 }

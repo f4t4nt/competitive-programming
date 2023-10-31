@@ -259,39 +259,21 @@ struct Circle {
 
 //--------------------------------------------------
 
-vector<pair<ld, ld>> convex_hull(vector<pair<ld, ld>> pts) {
-    ssort(pts); // sort points by x-coordinate
-    vector<pair<ld, ld>> lo; // lower hull
-    for (auto &p : pts) {
-        while (sz(lo) >= 2) {
-            auto &p1 = lo[sz(lo) - 2];
-            auto &p2 = lo[sz(lo) - 1];
-            if ((p2.second - p1.second) * (p.first - p2.first) >= (p.second - p2.second) * (p2.first - p1.first)) {
-                lo.pop_back();
-            } else {
-                break;
-            }
+vector<pair<ll, ll>> convex_hull(vector<pair<ll, ll>> pts) {
+    if (sz(pts) <= 1) return pts;
+    sort(all(pts));
+    vector<pair<ll, ll>> h(sz(pts) + 1);
+    int s = 0, t = 0;
+    FOR (it, 2) {
+        FOR (i, sz(pts)) {
+            auto p = pts[i];
+            while (t >= s + 2 && (h[t - 2].first - h[t - 1].first) * (p.second - h[t - 1].second) - (h[t - 2].second - h[t - 1].second) * (p.first - h[t - 1].first) <= 0) t--;
+            h[t++] = p;
         }
-        lo.pb(p);
+        s = t--;
+        reverse(all(pts));
     }
-    vector<pair<ld, ld>> hi; // upper hull
-    for (auto it = pts.rbegin(); it != pts.rend(); it++) {
-        auto &p = *it;
-        while (sz(hi) >= 2) {
-            auto &p1 = hi[sz(hi) - 2];
-            auto &p2 = hi[sz(hi) - 1];
-            if ((p2.second - p1.second) * (p.first - p2.first) >= (p.second - p2.second) * (p2.first - p1.first)) {
-                hi.pop_back();
-            } else {
-                break;
-            }
-        }
-        hi.pb(p);
-    }
-    lo.pop_back(); // remove duplicates
-    hi.pop_back();
-    lo.insert(lo.end(), hi.begin(), hi.end()); // merge lower and upper hulls
-    return lo;
+    return {h.begin(), h.begin() + t - (t == 2 && h[0] == h[1])};
 }
 
 //--------------------------------------------------
@@ -872,7 +854,7 @@ pair<ll, ll> manacher(str &s) {
 
 //--------------------------------------------------
 
-struct Matrix {
+struct Matrix { // mat[i] is row i
     vector<vector<ll>> mat;
     ll n, m;
     Matrix(ll n, ll m) : n(n), m(m) {
@@ -902,6 +884,33 @@ struct Matrix {
             }
             a = a * a;
             p >>= 1;
+        }
+        return rv;
+    }
+    ld det() const {
+        Matrix a = *this;
+        ld rv = 1;
+        FOR(i, n) {
+            ll p = i;
+            FOB(j, i + 1, n) {
+                if (abs(a.mat[j][i]) > abs(a.mat[p][i])) {
+                    p = j;
+                }
+            }
+            if (p != i) {
+                swap(a.mat[i], a.mat[p]);
+                rv *= -1;
+            }
+            if (abs(a.mat[i][i]) < 1e-9) {
+                return 0;
+            }
+            rv *= a.mat[i][i];
+            FOB(j, i + 1, n) {
+                ld c = a.mat[j][i] / a.mat[i][i];
+                FOB(k, i, n) {
+                    a.mat[j][k] -= c * a.mat[i][k];
+                }
+            }
         }
         return rv;
     }
@@ -1089,6 +1098,70 @@ ld shoelace(vector<pair<ld, ld>> &v) {
     }
     return abs(area) / 2;
 }
+
+//--------------------------------------------------
+
+struct Simplex {
+    ll m, n;
+    vector<ll> N, B;
+    vector<vector<ld>> D;
+
+    // Ax <= b, max c.x with x >= 0
+    Simplex(vector<vector<ld>> &A, vector<ld> &b, vector<ld> &c) :
+        m(sz(b)), n(sz(c)), N(n + 1), B(m), D(m + 2, vector<ld>(n + 2)) {
+        FOR (i, m) FOR (j, n) D[i][j] = A[i][j];
+        FOR (i, m) { B[i] = n + i; D[i][n] = -1; D[i][n + 1] = b[i]; }
+        FOR (j, n) { N[j] = j; D[m][j] = -c[j]; }
+        N[n] = -1; D[m + 1][n] = 1;
+    }
+
+    void pivot(ll r, ll s) {
+        ld inv = 1 / D[r][s];
+        FOR (i, m + 2) if (i != r) FOR (j, n + 2) if (j != s)
+            D[i][j] -= D[r][j] * D[i][s] * inv;
+        FOR (j, n + 2) if (j != s) D[r][j] *= inv;
+        FOR (i, m + 2) if (i != r) D[i][s] *= -inv;
+        D[r][s] = inv;
+        swap(B[r], N[s]);
+    }
+
+    bool simplex(ll phase) {
+        ll x = m + phase - 1;
+        for (;;) {
+            ll s = -1;
+            FOR (j, n + 1) if (N[j] != -phase) {
+                if (s == -1 || make_pair(D[x][j], N[j]) <
+                    make_pair(D[x][s], N[s])) s = j;
+            }
+            if (D[x][s] >= -EPS) return true;
+            ll r = -1;
+            FOR (i, m) {
+                if (D[i][s] <= EPS) continue;
+                if (r == -1 || make_pair(D[i][n + 1] / D[i][s], B[i]) <
+                    make_pair(D[r][n + 1] / D[r][s], B[r])) r = i;
+            }
+            if (r == -1) return false;
+            pivot(r, s);
+        }
+    }
+
+    ll solve(vector<ld> &x) {
+        ll r = 0;
+        FOB (i, 1, m) if (D[i][n + 1] < D[r][n + 1]) r = i;
+        if (D[r][n + 1] < -EPS) {
+            pivot(r, n);
+            if (!simplex(2) || D[m + 1][n + 1] < -EPS) return -INF;
+            FOR (i, m) if (B[i] == -1) {
+                ll s = 0;
+                FOB (j, 1, n + 1) if (D[i][j] < D[i][s]) s = j;
+                pivot(i, s);
+            }
+        }
+        bool ok = simplex(1); x = vector<ld>(n);
+        FOR (i, m) if (B[i] < n) x[B[i]] = D[i][n + 1];
+        return ok ? D[m][n + 1] : INF;
+    }
+};
 
 //--------------------------------------------------
 
