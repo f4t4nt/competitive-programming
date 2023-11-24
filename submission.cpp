@@ -45,42 +45,12 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-ll n;
-vector<ld> p;
-
-// [who's standing][who's turn] = probabilities of winning
-map<pair<ll, ll>, vector<ld>> mem;
-set<pair<ll, ll>> vis;
-
-vector<ld> dfs(ll state, ll cur) {
-    assert(state & (1 << cur));
-    if (vis.count({state, cur})) {
-        return mem[{state, cur}];
-    }
-}
-
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    ll t;
-    cin >> t;
-    while (t--) {
-        cin >> n;
-        p.resize(n);
-        mem.clear();
-        vis.clear();
-        FOR (i, n) {
-            cin >> p[i];
-            p[i] /= 100;
-        }
-        vector<ld> rv = dfs((1 << n) - 1, 0);
-        FORE (x, rv) {
-            cout << fixed << setprecision(10) << x << ' ';
-        }
-        cout << '\n';
-    }
+    
 
     return 0;
 }
