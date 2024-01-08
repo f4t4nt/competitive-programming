@@ -52,7 +52,47 @@ int main(void) {
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    
+    while (true) {
+        ll nx, ny;
+        ld w;
+        cin >> nx >> ny >> w;
+        if (nx == 0 && ny == 0 && w == 0) break;
+        bool ok = true;
+        set<ld> xs, ys;
+        FOR (i, nx) {
+            ld x;
+            cin >> x;
+            xs.insert(x);
+        }
+        xs.insert(75 + w / 2);
+        FOR (i, ny) {
+            ld y;
+            cin >> y;
+            ys.insert(y);
+        }
+        ys.insert(100 + w / 2);
+        auto it = xs.begin();
+        ld prev = *it;
+        ok &= (prev <= w / 2);
+        it++;
+        while (ok && it != xs.end()) {
+            ld diff = *it - prev;
+            if (diff > w) ok = false;
+            prev = *it;
+            it++;
+        }
+        it = ys.begin();
+        prev = *it;
+        ok &= (prev <= w / 2);
+        it++;
+        while (ok && it != ys.end()) {
+            ld diff = *it - prev;
+            if (diff > w) ok = false;
+            prev = *it;
+            it++;
+        }
+        cout << (ok ? "YES" : "NO") << '\n';
+    }
 
     return 0;
 }

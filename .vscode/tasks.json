@@ -1,6 +1,29 @@
 {
     "version": "2.0.0",
     "tasks": [
+        // {
+        //     "type": "cppbuild",
+        //     "label": "C/C++: g++ build active file optimized",
+        //     "command": "/usr/bin/g++",
+        //     "args": [
+        //         "-fdiagnostics-color=always",
+        //         "-DLOCAL",
+        //         "-O3",
+        //         "${file}",
+        //         "-o",
+        //         "${fileDirname}/bin/${fileBasenameNoExtension}"
+        //     ],
+        //     "options": {
+        //         "cwd": "${fileDirname}"
+        //     },
+        //     "problemMatcher": [
+        //         "$gcc"
+        //     ],
+        //     "group": {
+        //         "kind": "build"
+        //     },
+        //     "detail": "Task generated for optimized build."
+        // },
         {
             "type": "cppbuild",
             "label": "C/C++: g++ build active file",

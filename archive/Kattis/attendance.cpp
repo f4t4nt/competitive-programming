@@ -52,7 +52,21 @@ int main(void) {
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    
+    ll n;
+    cin >> n;
+    vector<str> calls(n), absent;
+    FOR (i, n) cin >> calls[i];
+    ll i = 0;
+    while (i < n) {
+        if (calls[i] != "Present!" && (i + 1 == n || calls[i + 1] != "Present!")) {
+            absent.pb(calls[i]);
+            i++;
+        } else {
+            i += 2;
+        }
+    }
+    if (sz(absent)) FORE (name, absent) cout << name << '\n';
+    else cout << "No Absences\n";
 
-    return 0;
+	return 0;
 }

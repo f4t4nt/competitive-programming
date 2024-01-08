@@ -47,12 +47,45 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-int main(void) {
+const ll MOD = 1e6 + 3;
+
+int main(){
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    
+    ll n, m;
+    cin >> n >> m;
+    vector<str> ins(n), outs(n);
+    map<str, ll> in_cnt, out_cnt;
+    FOR (i, m) {
+        str in, out;
+        cin >> in >> out;
+        FOR (j, n) {
+            ins[j] += in[j];
+            outs[j] += out[j];
+        }
+    }
+    FOR (i, n) {
+        in_cnt[ins[i]]++;
+        out_cnt[outs[i]]++;
+    }
+    FORE (x, in_cnt) {
+        if (out_cnt[x.first] != x.second) {
+            cout << 0 << '\n';
+            return 0;
+        }
+    }
+
+    vector<ll> fact(n + 1, 1);
+    FOR (i, n) {
+        fact[i + 1] = (fact[i] * (i + 1)) % MOD;
+    }
+    ll rv = 1;
+    FORE (x, in_cnt) {
+        rv = (rv * fact[x.second]) % MOD;
+    }
+    cout << rv << '\n';
 
     return 0;
 }

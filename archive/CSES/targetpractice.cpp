@@ -47,12 +47,45 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-int main(void) {
+bool collinear(ll x1, ll y1, ll x2, ll y2, ll x3, ll y3){
+    return (y1 - y2) * (x1 - x3) == (y1 - y3) * (x1 - x2);
+}
+
+int main(){
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    
+    ll n;
+    cin >> n;
+    vector<ll> xs(n), ys(n);
+    FOR(i, n) cin >> xs[i] >> ys[i];
+    if (n <= 2) {
+        cout << "success\n";
+        return 0;
+    }
+    FOR (_, 1e3) {
+        ll a = rng() % n, b = rng() % n;
+        while (a == b) b = rng() % n;
+        vector<ll> others;
+        FOR(i, n) {
+            if (!collinear(xs[a], ys[a], xs[b], ys[b], xs[i], ys[i])) {
+                others.pb(i);
+            }
+        }
+        bool ok = true;
+        FOB (i, 2, sz(others)) {
+            if (!collinear(xs[others[0]], ys[others[0]], xs[others[1]], ys[others[1]], xs[others[i]], ys[others[i]])) {
+                ok = false;
+                break;
+            }
+        }
+        if (ok) {
+            cout << "success\n";
+            return 0;
+        }
+    }
+    cout << "failure\n";
 
     return 0;
 }

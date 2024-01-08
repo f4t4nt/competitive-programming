@@ -47,12 +47,33 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-int main(void) {
+int main(){
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    
+    str s, rv;
+    cin >> s;
+    flip(s);
+    ll n = sz(s);
+    vector<int> bits;
+    FORE (c, s) {
+        ll x = c - '0';
+        FOR (i, 3) {
+            bits.pb(x & 1);
+            x >>= 1;
+        }
+    }
+    n = sz(bits);
+    for (ll i = 0; i < n; i += 4) {
+        ll x = 0;
+        for (ll j = i; j < i + 4 && j < n; j++) x |= bits[j] << (j - i);
+        rv.pb(x < 10 ? x + '0' : x - 10 + 'A');
+    }
+    while (sz(rv) && rv.back() == '0') rv.pop_back();
+    flip(rv);
+    if (sz(rv) == 0) rv = "0";
+    cout << rv << '\n';
 
     return 0;
 }

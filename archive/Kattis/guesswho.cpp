@@ -52,7 +52,32 @@ int main(void) {
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    
+    ll n, m, q;
+    cin >> n >> m >> q;
+    multiset<str> strs;
+    map<str, ll> id;
+    FOR (i, n) {
+        str s;
+        cin >> s;
+        strs.insert(s);
+        id[s] = i;
+    }
+    while (q--) {
+        ll idx;
+        ch c;
+        cin >> idx >> c;
+        idx--;
+        multiset<str> new_strs;
+        FORE (s, strs) {
+            if (s[idx] == c) {
+                new_strs.insert(s);
+            }
+        }
+        strs = new_strs;
+    }
+    if (sz(strs) > 1) cout << "ambiguous\n" << sz(strs) << '\n';
+    elif (sz(strs) == 0) assert(false);
+    else cout << "unique\n" << id[*strs.begin()] + 1 << '\n';
 
-    return 0;
+	return 0;
 }

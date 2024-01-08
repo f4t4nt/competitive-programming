@@ -47,12 +47,55 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-int main(void) {
+const ll MOD = 1e6 + 3;
+
+int main(){
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    
+    ll n, m, s;
+    cin >> n >> m >> s;
+    // adj[v] incoming trains to v
+    // <from, t0, duration, period>
+    vector<vector<tuple<ll, ll, ll, ll>>> adj(n);
+    FOR (i, m) {
+        ll u, v, t0, p, d;
+        cin >> u >> v >> t0 >> p >> d;
+        adj[v].pb({u, t0, d, p});
+    }
+    // latest time to reach i
+    vector<ll> latest(n, -1e18);
+    latest[n - 1] = s;
+    // <time, node>, largest time first
+    std::priority_queue<pair<ll, ll>> pq;
+    pq.push({s, n - 1});
+    while (!pq.empty()) {
+        auto [t, v] = pq.top();
+        pq.pop();
+        if (t < latest[v]) {
+            continue;
+        }
+        FORE (e, adj[v]) {
+            auto [u, t0, d, p] = e;
+            // find closest t_in = t0 + k * p + d <= t
+            ll k = (t - t0 - d) / p;
+            if (k < 0) {
+                continue;
+            }
+            ll t_in = t0 + k * p + d,
+               t_out = t_in - d;
+            if (t_out > latest[u]) {
+                latest[u] = t_out;
+                pq.push({t_out, u});
+            }
+        }
+    }
+    if (latest[0] >= 0) {
+        cout << latest[0] << '\n';
+    } else {
+        cout << "impossible\n";
+    }
 
     return 0;
 }

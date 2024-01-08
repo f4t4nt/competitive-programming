@@ -52,7 +52,14 @@ int main(void) {
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    
+    ll w, n, area = 0;
+    cin >> w >> n;
+    FOR (i, n) {
+        ll x, y;
+        cin >> x >> y;
+        area += x * y;
+    }
+    cout << area / w << '\n';
 
     return 0;
 }

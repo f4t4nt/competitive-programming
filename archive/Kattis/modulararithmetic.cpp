@@ -47,12 +47,58 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-int main(void) {
+ll pow(ll a, ll b, ll m) {
+    ll res = 1;
+    while (b) {
+        if (b & 1) res = res * a % m;
+        a = a * a % m;
+        b >>= 1;
+    }
+    return res;
+}
+
+ll phi(ll n) {
+    ll res = n;
+    for (ll i = 2; i * i <= n; i++) {
+        if (n % i == 0) {
+            res -= res / i;
+            while (n % i == 0) n /= i;
+        }
+    }
+    if (n > 1) res -= res / n;
+    return res;
+}
+
+int main(){
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    
+    while (true) {
+        ll n, t;
+        cin >> n >> t;
+        if (n == 0 && t == 0) break;
+        while (t--) {
+            ll x, y;
+            ch op;
+            cin >> x >> op >> y;
+            if (op == '+') {
+                cout << (x + y) % n << '\n';
+            } elif (op == '-') {
+                cout << (x - y + n) % n << '\n';
+            } elif (op == '*') {
+                cout << (x * y) % n << '\n';
+            } elif (op == '/') {
+                if (y == 0) {
+                    cout << -1 << '\n';
+                } elif (__gcd(y, n) != 1) {
+                    cout << -1 << '\n';
+                } else {
+                    cout << x * pow(y, phi(n) - 1, n) % n << '\n';
+                }
+            }
+        }
+    }
 
     return 0;
 }

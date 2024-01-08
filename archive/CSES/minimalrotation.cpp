@@ -1,40 +1,28 @@
 #include <bits/stdc++.h>
-
+ 
 using namespace std;
-
-typedef long long ll;
-typedef unsigned long long ull;
-typedef complex<long double> cd;
-typedef long double ld;
-typedef char ch;
-typedef string str;
-
-mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
-
-#include <bits/extc++.h>
-using namespace __gnu_pbds;
-
-using indexed_set = tree<
-    pair<ll, ll>,
-    null_type,
-    less<pair<ll, ll>>,
-    rb_tree_tag,
-    tree_order_statistics_node_update
->;
-
-#pragma GCC target("popcnt,lzcnt")
-
+ 
+using ll = long long;
+using ull = unsigned long long;
+using ld = long double;
+using ch = char;
+using str = string;
+ 
 #define pb push_back
 #define elif else if
 #define sz(C) (ll) C.size()
+#define mp make_pair
+#define mt make_tuple
 #define all(C) C.begin(), C.end()
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-
+ 
 #define FOR(x, e) for(ll x = 0; x < (ll) e; x++)
 #define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
 #define FOB(x, b, e) for(auto x = b; x < e; x++)
+#define FOI(x, e, i) for(ll x = 0; x < (ll) e; x += (ll) i)
+#define FOBI(x, b, e, i) for(ll x = (ll) b; x < (ll) e; x += (ll) i)
 #define FORE(x, C) for(auto &x : C)
  
 #ifdef LOCAL
@@ -47,12 +35,26 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-int main(void) {
+int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    
-
+    str s;
+    cin >> s;
+    ll n = sz(s);
+    vector<ll> rv(n);
+    iota(all(rv), 0);
+    FOR (i, n) {
+        ch c = 'z';
+        FORE (j, rv) c = min(c, s[(i + j) % n]);
+        vector<ll> nv;
+        FORE (j, rv) if (s[(i + j) % n] == c) nv.pb(j);
+        rv = {nv[0]};
+        FORE (j, nv) if (j - rv.back() > i + 1) rv.pb(j);
+    }
+    s += s;
+    cout << s.substr(rv[0], n) << '\n';
+ 
     return 0;
 }

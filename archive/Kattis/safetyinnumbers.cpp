@@ -47,12 +47,37 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-int main(void) {
+int main(){
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    
+    ll T; cin >> T;
+    FOR (t, T) {
+        ll n; cin >> n;
+        vector<ld> js(n);
+        FOR (i, n) cin >> js[i];
+        ld sum = accumulate(all(js), 0.0);
+        vector<ld> rv(n);
+        FOR (i, n) {
+            ld lo = 0, hi = 1;
+            while (hi - lo > 1e-15) {
+                ld mid = (lo + hi) / 2,
+                    target = js[i] + sum * mid,
+                    rem = 0;
+                FOR (j, n) {
+                    if (i != j && js[j] < target) {
+                        rem += target - js[j];
+                    }
+                }
+                if (rem >= (1 - mid) * sum) hi = mid;
+                else lo = mid;
+            }
+            rv[i] = lo * 100;
+        }
+        cout << "Case #" << t + 1 << ": ";
+        FOR (i, n) cout << fixed << setprecision(6) << rv[i] << " \n"[i == n - 1];
+    }
 
     return 0;
 }

@@ -2,12 +2,14 @@
 
 using namespace std;
 
-using ll = long long;
-using ull = unsigned long long;
-using cd = complex<long double>;
-using ld = long double;
-using ch = char;
-using str = string;
+typedef long long ll;
+typedef unsigned long long ull;
+typedef complex<long double> cd;
+typedef long double ld;
+typedef char ch;
+typedef string str;
+
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 #include <bits/extc++.h>
 using namespace __gnu_pbds;
@@ -347,9 +349,7 @@ struct Dinic {
         ll flow = 0;
         while (bfs(s, t)) {
             ptr.assign(n, 0);
-            while (ll pushed = dfs(s, t, INF)) {
-                flow += pushed;
-            }
+            while (ll pushed = dfs(s, t, INF)) flow += pushed;
         }
         return flow;
     }
@@ -358,9 +358,7 @@ struct Dinic {
         bfs(s, n - 1);
         vector<pair<ll, ll>> cut;
         FORE (e,edges) {
-            if (lvl[e.s] != -1 && lvl[e.t] == -1 && e.cap > 0) {
-                cut.pb({e.s, e.t});
-            }
+            if (lvl[e.s] != -1 && lvl[e.t] == -1 && e.cap > 0) cut.pb({e.s, e.t});
         }
         return cut;
     }
@@ -511,40 +509,43 @@ constexpr ll MOD = 1e9 + 7;
 struct Binom {
     ll n;
     vector<ll> fac, ifac;
+    vector<vector<ll>> stirling;
     Binom(ll n) : n(n) {
         fac.resize(n + 1);
         ifac.resize(n + 1);
+        stirling.resize(n + 1, vector<ll>(n + 1));
         fac[0] = 1;
-        FOB (i, 1, n + 1) {
-            fac[i] = fac[i - 1] * i % MOD;
-        }
+        FOB (i, 1, n + 1) fac[i] = fac[i - 1] * i % MOD;
         ifac[n] = pow(fac[n], MOD - 2);
-        FORR (i, n) {
-            ifac[i] = ifac[i + 1] * (i + 1) % MOD;
+        FORR (i, n) ifac[i] = ifac[i + 1] * (i + 1) % MOD;
+        stirling[0][0] = 1;
+        FOB (i, 1, n + 1) {
+            FOB (j, 1, i + 1) {
+                stirling[i][j] = (stirling[i - 1][j - 1] + (i - 1) * stirling[i - 1][j]) % MOD;
+            }
         }
     }
     ll pow(ll a, ll b) {
         ll rv = 1;
         while (b) {
-            if (b & 1) {
-                rv = rv * a % MOD;
-            }
+            if (b & 1) rv = rv * a % MOD;
             a = a * a % MOD;
             b >>= 1;
         }
         return rv;
     }
     ll choose(ll n, ll k) {
-        if (k < 0 || k > n) {
-            return 0;
-        }
-        return fac[n] * ifac[k] % MOD * ifac[n - k] % MOD;
+        if (k < 0 || k > n) return 0;
+        else return fac[n] * ifac[k] % MOD * ifac[n - k] % MOD;
+    }
+    ll stirling1(ll n, ll k) {
+        return abs(stirling[n][k]);
     }
 };
 
 //--------------------------------------------------
 
-// ll n = sz(s), n2 = 2 << (ll) ceil(log2(n));
+// ll n = sz(s), n2 = 1LL << (64 - __builtin_clz(n));
 // vector<cd> a(n2), b(n2);
 // ...init a, b...
 // fft(a, false);
@@ -553,23 +554,19 @@ struct Binom {
 // fft(a, true);
 
 void fft(vector<cd> &a, bool inv) {
-    ll n = sz(a);
-    for (ll i = 1, j = 0; i < n; i++) {
-        ll bit = n >> 1;
-        for (; j & bit; bit >>= 1) {
-            j ^= bit;
-        }
+    int n = sz(a);
+    for (int i = 1, j = 0; i < n; i++) {
+        int bit = n >> 1;
+        for (; j & bit; bit >>= 1) j ^= bit;
         j ^= bit;
-        if (i < j) {
-            swap(a[i], a[j]);
-        }
+        if (i < j) swap(a[i], a[j]);
     }
-    for (ll len = 2; len <= n; len <<= 1) {
+    for (int len = 2; len <= n; len <<= 1) {
         ld ang = 2 * M_PI / len * (inv ? -1 : 1);
         cd wlen(cos(ang), sin(ang));
-        for (ll i = 0; i < n; i += len) {
+        for (int i = 0; i < n; i += len) {
             cd w(1);
-            for (ll j = 0; j < len / 2; j++) {
+            for (int j = 0; j < len / 2; j++) {
                 cd u = a[i + j], v = a[i + j + len / 2] * w;
                 a[i + j] = u + v;
                 a[i + j + len / 2] = u - v;
@@ -577,11 +574,7 @@ void fft(vector<cd> &a, bool inv) {
             }
         }
     }
-    if (inv) {
-        FORE (x, a) {
-            x /= n;
-        }
-    }
+    if (inv) FORE (x, a) x /= n;
 }
 
 //--------------------------------------------------
@@ -743,6 +736,43 @@ ll crt(ll m, ll n, ll a, ll b) {
     ll x = (a + m * k * u) % lcm;
     if (x < 0) x += lcm;
     return x;
+}
+
+//--------------------------------------------------
+
+vector<ll> hungarian(vector<vector<ll>> &costs) {
+    ll J = sz(costs), W = sz(costs[0]); // J <= W
+    vector<ll> job(W + 1, -1), ys(J), yt(W + 1), rv;
+    FOR (j_cur, J) {
+        ll w_cur = W;
+        job[w_cur] = j_cur;
+        vector<ll> min_to(W + 1, INF), prev(W + 1, -1);
+        vector<bool> in_Z(W + 1);
+        while (job[w_cur] != -1) {
+            in_Z[w_cur] = true;
+            ll j = job[w_cur], del = INF, w_nxt;
+            FOR (w, W) {
+                if (!in_Z[w]) {
+                    if (min_to[w] > costs[j][w] - ys[j] - yt[w]) {
+                        min_to[w] = costs[j][w] - ys[j] - yt[w];
+                        prev[w] = w_cur;
+                    }
+                    if (del > min_to[w]) {
+                        del = min_to[w];
+                        w_nxt = w;
+                    }
+                }
+            }
+            FOR (w, W + 1) {
+                if (in_Z[w]) ys[job[w]] += del, yt[w] -= del;
+                else min_to[w] -= del;
+            }
+            w_cur = w_nxt;
+        }
+        for (ll w; w_cur != W; w_cur = w) job[w_cur] = job[w = prev[w_cur]];
+        rv.pb(-yt[W]);
+    }
+    return rv;
 }
 
 //--------------------------------------------------
@@ -1053,6 +1083,15 @@ struct SegTree {
         ll m = (l + r) / 2;
         return query(ql, qr, 2 * i, l, m) + query(ql, qr, 2 * i + 1, m, r);
     }
+    void print(ll i = 1, ll l = 0, ll r = -1) {
+        if (r == -1) r = n;
+        cout << "[" << l << ", " << r << "): " << data[i] << " " << lazy[i] << '\n';
+        if (r - l > 1) {
+            ll m = (l + r) / 2;
+            print(2 * i, l, m);
+            print(2 * i + 1, m, r);
+        }
+    }
 };
 
 //--------------------------------------------------
@@ -1165,6 +1204,54 @@ struct Simplex {
 
 //--------------------------------------------------
 
+struct SuffixArray {
+    str s;
+    ll n, alpha = 256;
+    vector<ll> sorted_shifts;
+
+    SuffixArray(str s) : s(s), n(sz(s)) {
+        s += '$', n++; // $ is important
+        sorted_shifts = sort_cyclic_shifts();
+    }
+
+    vector<ll> sort_cyclic_shifts() {
+        vector<ll> p(n), c(n), cnt(max(n, alpha), 0);
+        FOR (i, n) cnt[s[i] - 'a']++;
+        FOB (i, 1, alpha) cnt[i] += cnt[i - 1];
+        FOR (i, n) p[--cnt[s[i] - 'a']] = i;
+        c[p[0]] = 0;
+        ll classes = 1;
+        FOB (i, 1, n) {
+            if (s[p[i]] != s[p[i - 1]]) classes++;
+            c[p[i]] = classes - 1;
+        }
+        vector<ll> pn(n), cn(n);
+        for (ll h = 0; (1 << h) < n; h++) {
+            FOR (i, n) {
+                pn[i] = p[i] - (1 << h);
+                if (pn[i] < 0) pn[i] += n;
+            }
+            fill(cnt.begin(), cnt.begin() + classes, 0);
+            FOR (i, n) cnt[c[pn[i]]]++;
+            FOB (i, 1, classes) cnt[i] += cnt[i - 1];
+            FORR (i, n) p[--cnt[c[pn[i]]]] = pn[i];
+            cn[p[0]] = 0;
+            classes = 1;
+            FOB (i, 1, n) {
+                pair<ll, ll> cur = {c[p[i]], c[(p[i] + (1 << h)) % n]};
+                pair<ll, ll> prev = {c[p[i - 1]], c[(p[i - 1] + (1 << h)) % n]};
+                if (cur != prev) classes++;
+                cn[p[i]] = classes - 1;
+            }
+            c.swap(cn);
+        }
+        p.erase(p.begin()); // remove $
+        return p;
+    }
+};
+
+//--------------------------------------------------
+
 struct SuffixTree {
     str s; // input string for which the suffix tree is being built
     vector<vector<ll>> tree; // array of transitions (state, letter)
@@ -1179,40 +1266,26 @@ struct SuffixTree {
     // position in the string which corresponds to the position on the edge (between lo[cur_node] and hi[cur_node], inclusive)
     // the number of nodes
     // the current character in the string
-    ll cur_node, cur_pos, cur_size, cur_char;
-
+    ll cur_node, cur_pos, cur_sz, cur_ch;
+ 
     SuffixTree(str &s_in, ll alpha = 27) : s(s_in), alpha(alpha) {
         s += '$';
         n = sz(s) * 2 + 2;
-        tree = vector<vector<ll>>(n, vector<ll>(alpha, -1));
-        lo = vector<ll>(n);
-        hi = vector<ll>(n, sz(s) - 1);
-        par = vector<ll>(n);
-        link = vector<ll>(n);
-        cur_size = 2;
-        cur_node = 0;
-        cur_pos = 0;
+        tree.resize(n, vector<ll>(alpha, -1));
+        lo.resize(n), hi.resize(n, sz(s) - 1), par.resize(n), link.resize(n);
+        cur_sz = 2, cur_node = 0, cur_pos = 0;
         // initialize data for the root of the tree
-        link[0] = 1;
-        lo[0] = -1;
-        hi[0] = -1;
-        lo[1] = -1;
-        hi[1] = -1;
+        link[0] = 1; lo[0] = hi[0] = lo[1] = hi[1] = -1;
         tree[1] = vector<ll>(alpha, 0);
         // add the text to the tree, letter by letter
-        for (cur_char = 0; cur_char < sz(s); cur_char++) {
-            add_char(char_to_index(s[cur_char]));
-        }
+        for (cur_ch = 0; cur_ch < sz(s); cur_ch++) add_char(ch_to_idx(s[cur_ch]));
     }
-
-    ll char_to_index(ch c) {
-        if (c == '$') {
-            return 26;
-        } else {
-            return c - 'a';
-        }
+ 
+    ll ch_to_idx(ch c) {
+        if (c == '$') return 26;
+        else return c - 'a';
     }
-
+ 
     // add character c to the tree
     void add_char(ll c) {
         // we'll return here after each transition to the suffix (and will add character again)
@@ -1221,9 +1294,9 @@ struct SuffixTree {
         if (hi[cur_node] < cur_pos) {
             // if we're not, find the next edge. If it doesn't exist, create a leaf and add it to the tree
             if (tree[cur_node][c] == -1) {
-                tree[cur_node][c] = cur_size;
-                lo[cur_size] = cur_char;
-                par[cur_size++] = cur_node;
+                tree[cur_node][c] = cur_sz;
+                lo[cur_sz] = cur_ch;
+                par[cur_sz++] = cur_node;
                 cur_node = link[cur_node];
                 cur_pos = hi[cur_node] + 1;
                 goto suff;
@@ -1231,55 +1304,49 @@ struct SuffixTree {
             cur_node = tree[cur_node][c];
             cur_pos = lo[cur_node];
         } // otherwise just proceed to the next edge
-        if (cur_pos == -1 || c == char_to_index(s[cur_pos])) {
-            cur_pos++; // if the letter on the edge equal c, go down that edge
-        } else { 
-            // otherwise split the edge in two with middle in node cur_size
-            lo[cur_size] = lo[cur_node];
-            hi[cur_size] = cur_pos - 1;
-            par[cur_size] = par[cur_node];
-            tree[cur_size][char_to_index(s[cur_pos])] = cur_node;
-            // add leaf cur_size+1. It corresponds to transition through c.
-            tree[cur_size][c] = cur_size + 1;
-            lo[cur_size + 1] = cur_char;
-            par[cur_size + 1] = cur_size;
-            // update info for the current node - remember to mark cur_size as parent of cur_node
+        // if the letter on the edge equal c, go down that edge
+        if (cur_pos == -1 || c == ch_to_idx(s[cur_pos])) cur_pos++;
+        else { 
+            // otherwise split the edge in two with middle in node cur_sz
+            lo[cur_sz] = lo[cur_node];
+            hi[cur_sz] = cur_pos - 1;
+            par[cur_sz] = par[cur_node];
+            tree[cur_sz][ch_to_idx(s[cur_pos])] = cur_node;
+            // add leaf cur_sz+1. It corresponds to transition through c.
+            tree[cur_sz][c] = cur_sz + 1;
+            lo[cur_sz + 1] = cur_ch;
+            par[cur_sz + 1] = cur_sz;
+            // update info for the current node - remember to mark cur_sz as parent of cur_node
             lo[cur_node] = cur_pos;
-            par[cur_node] = cur_size;
-            tree[par[cur_size]][char_to_index(s[lo[cur_size]])] = cur_size;
-            cur_size += 2;
+            par[cur_node] = cur_sz;
+            tree[par[cur_sz]][ch_to_idx(s[lo[cur_sz]])] = cur_sz;
+            cur_sz += 2;
             // prepare for descent
             // cur_pos will mark where are we in the current suffix
-            cur_node = link[par[cur_size - 2]];
-            cur_pos = lo[cur_size - 2];
+            cur_node = link[par[cur_sz - 2]];
+            cur_pos = lo[cur_sz - 2];
             // while the current suffix is not over, descend
-            while (cur_pos <= hi[cur_size - 2]) {
-                cur_node = tree[cur_node][char_to_index(s[cur_pos])];
+            while (cur_pos <= hi[cur_sz - 2]) {
+                cur_node = tree[cur_node][ch_to_idx(s[cur_pos])];
                 cur_pos += hi[cur_node] - lo[cur_node] + 1;
             }
-            // if we're in a node, add a suffix link to it, otherwise add the link to cur_size
-            // (we'll create cur_size on next iteration).
-            if (cur_pos == hi[cur_size - 2] + 1) {
-                link[cur_size - 2] = cur_node;
-            } else {
-                link[cur_size - 2] = cur_size;
-            } 
+            // if we're in a node, add a suffix link to it, otherwise add the link to cur_sz
+            // (we'll create cur_sz on next iteration).
+            if (cur_pos == hi[cur_sz - 2] + 1) link[cur_sz - 2] = cur_node;
+            else link[cur_sz - 2] = cur_sz;
             // add cur_pos to the new edge and return to add letter to suffix
-            cur_pos = hi[cur_node] - (cur_pos - hi[cur_size - 2]) + 2;
+            cur_pos = hi[cur_node] - (cur_pos - hi[cur_sz - 2]) + 2;
             goto suff;
         }
     }
 
     void print() {
-        FOR (i, cur_size) {
-            cout << i << ':' << lo[i] << ' ' << hi[i] << ' ' << par[i] << ' ' << link[i] << " " << '\n';
+        FOR (i, cur_sz) {
+            cout << i << ": [" << lo[i] << ", " << hi[i] << "] par: " << par[i] << " link: " << link[i] << '\n';
             FOR (j, alpha) {
                 if (tree[i][j] != -1) {
-                    if (j == 26) {
-                        cout << "$ ";
-                    } else {
-                        cout << (char)('a' + j) << ' ';
-                    }
+                    if (j == 0) cout << "$ ";
+                    else cout << (ch) ('a' + j - 1) << ' ';
                     cout << tree[i][j] << '\n';
                 }
             }
@@ -1409,6 +1476,103 @@ int main() {
 
     return 0;
 }
+
+//--------------------------------------------------
+
+vector<bool> vis(n); // Tarjan's Bridge Finding
+vector<ll> tin(n), low(n);
+ll timer = 0;
+bool ok = true; // ok = false if bridge found
+auto dfs = [&](auto &&self, ll u, ll p) -> void {
+    vis[u] = true;
+    tin[u] = low[u] = timer++;
+    ll children = 1;
+    FORE (v, adj[u]) {
+        if (v == p) continue;
+        if (vis[v]) low[u] = min(low[u], tin[v]);
+        else {
+            self(self, v, u);
+            low[u] = min(low[u], low[v]);
+            if (low[v] > tin[u]) {
+            // *low[v] >= tin[u] && p != -1 means u is an articulation point
+                ok = false;
+            }
+            children++;
+        }
+        if (!ok) return;
+    }
+    // *p == -1 && children > 1 ALSO means u is an articulation point
+};
+
+//--------------------------------------------------
+
+struct Node {
+    ll label, priority, size = 1, sum;
+    bool rev = false;
+    Node *child[2];
+    Node(ll label) : label(label), priority(rng()), sum(label) {
+        child[0] = child[1] = nullptr;
+    }
+};
+
+struct Treap {
+    Node *root = nullptr;
+
+    ll cnt(Node *node) { return node ? node->size : 0; }
+
+    void upd_cnt(Node *node)
+    { if (node) node->size = cnt(node->child[0]) + cnt(node->child[1]) + 1; }
+
+    ll sum(Node *node) { return node ? node->sum : 0; }
+
+    void upd_sum(Node *node)
+    { if (node) node->sum = sum(node->child[0]) + sum(node->child[1]) + node->label; }
+
+    void push(Node *node) { // lazy propagation
+        if (node && node->rev) {
+            node->rev = false;
+            swap(node->child[0], node->child[1]);
+            if (node->child[0]) node->child[0]->rev ^= true;
+            if (node->child[1]) node->child[1]->rev ^= true;
+        }
+    }
+
+    void merge(Node *&node, Node *l, Node *r) { // merges l and r into node
+        push(l), push(r);
+        if (!l || !r) node = l ? l : r;
+        elif (l->priority > r->priority) merge(l->child[1], l->child[1], r), node = l;
+        else merge(r->child[0], l, r->child[0]), node = r;
+        upd_cnt(node);
+        upd_sum(node);
+    }
+
+    void split(Node *node, Node *&l, Node *&r, ll key, ll add = 0) { // splits node into l and r
+        if (!node) return void(l = r = nullptr);
+        push(node);
+        ll cur_key = add + cnt(node->child[0]);
+        if (key <= cur_key) split(node->child[0], l, node->child[0], key, add), r = node;
+        else split(node->child[1], node->child[1], r, key, add + 1 + cnt(node->child[0])), l = node;
+        upd_cnt(node);
+        upd_sum(node);
+    }
+
+    void reverse(Node *node, ll l, ll r) { // reverses [l, r]
+        Node *t1, *t2, *t3;
+        split(node, t1, t2, l);
+        split(t2, t2, t3, r - l + 1);
+        t2->rev ^= true;
+        merge(node, t1, t2);
+        merge(node, node, t3);
+    }
+
+    void output(Node *node) { // inorder traversal
+        if (!node) return;
+        push(node);
+        output(node->child[0]);
+        cout << node->label;
+        output(node->child[1]);
+    }
+};
 
 //--------------------------------------------------
 

@@ -52,7 +52,30 @@ int main(void) {
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    
+    ll n, k, xr = 0;
+    cin >> n >> k;
+    vector<vector<ll>> a(n), nim(n);
+    FOR (i, n) {
+        ll m;
+        cin >> m;
+        a[i].resize(m), nim[i].resize(m);
+        FOR (j, m) cin >> a[i][j];
+    }
+    FOR (i, n) {
+        FOR (j, sz(a[i])) {
+            bitset<1001> ok;
+            FOR (x, min(j, k + 1)) {
+                ll y = j - x;
+                if (y >= a[i][y]) {
+                    y -= a[i][y];
+                    ok[nim[i][y]] = 1;
+                } elif (y + 1 == a[i][y]) ok[0] = 1;
+            }
+            while (ok[nim[i][j]]) nim[i][j]++;
+        }
+        xr ^= nim[i].back();
+    }
+    cout << (xr ? "Alice can win." : "Bob will win.") << '\n';
 
     return 0;
 }

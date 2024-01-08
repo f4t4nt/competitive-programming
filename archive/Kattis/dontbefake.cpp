@@ -52,7 +52,31 @@ int main(void) {
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    
+    ll n;
+    cin >> n;
+    ll times[86401] = {0};
+    FOR (i, n) {
+        ll m;
+        cin >> m;
+        FOR (j, m) {
+            ll a, b;
+            cin >> a >> b;
+            times[a]++;
+            times[b + 1]--;
+        }
+    }
+    pair<ll, ll> mx = {0, 0};
+    ll cur = 0;
+    FOR (i, 86401) {
+        cur += times[i];
+        if (cur > mx.first) {
+            mx.first = cur;
+            mx.second = 1;
+        } elif (cur == mx.first) {
+            mx.second++;
+        }
+    }
+    cout << mx.first << '\n' << mx.second << '\n';
 
-    return 0;
+	return 0;
 }
