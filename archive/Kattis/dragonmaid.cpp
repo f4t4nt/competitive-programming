@@ -4,7 +4,6 @@ using namespace std;
 
 typedef long long ll;
 typedef unsigned long long ull;
-typedef pair<ll, ll> pll;
 typedef complex<long double> cd;
 typedef long double ld;
 typedef char ch;
@@ -47,48 +46,47 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-#define f first
-#define s second
-
-ll sum(ll n) { return n * (n + 1) / 2; }
-
-struct SegTree {
-    ll n; vector<ll> data, sum, pre, suf;
-    SegTree (ll n) : n(n), data(4 * n), sum(4 * n), pre(4 * n), suf(4 * n) {}
-    void upd(ll ui, ll val, ll i = 1, ll l = 0, ll r = -1) {
-        if (r == -1) r = n;
-        if (ui == l && ui == r - 1) {
-            data[i] = max(val, 0LL);
-            sum[i] = val;
-            pre[i] = val;
-            suf[i] = val;
-            return;
-        }
-        ll m = (l + r) / 2;
-        if (ui < m) upd(ui, val, 2 * i, l, m);
-        else upd(ui, val, 2 * i + 1, m, r);
-        sum[i] = sum[2 * i] + sum[2 * i + 1];
-        pre[i] = max(pre[2 * i], sum[2 * i] + pre[2 * i + 1]);
-        suf[i] = max(suf[2 * i + 1], suf[2 * i] + sum[2 * i + 1]);
-        data[i] = max({data[2 * i], data[2 * i + 1], suf[2 * i] + pre[2 * i + 1], 0LL});
-    }
-    ll qry() { return data[1]; }
-};
-
-int main() {
+int main(void) {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    ll n, q; cin >> n >> q;
-    vector<ll> raw(n);
-    FOR (i, n) cin >> raw[i];
-    SegTree st(n);
-    FOR (i, n) st.upd(i, raw[i]);
-    while (q--) {
-        ll i, v; cin >> i >> v;
-        st.upd(--i, v);
-        cout << st.qry() << '\n';
+    ll n, q; cin >> n;
+    vector<tuple<ll, ll, ll>> items(n);
+    FOR (i, n) {
+        ll p, v; cin >> p >> v;
+        items[i] = {v, -p, i};
+    }
+    cin >> q;
+    vector<tuple<ll, ll, ll>> queries(q);
+    FOR (i, q) {
+        ll x, k; cin >> x >> k;
+        queries[i] = {x, k, i};
+    }
+    ssort(items);
+    ssort(queries);
+    vector<vector<ll>> rv(q);
+    ll cur = 0;
+    set<pair<ll, ll>> active;
+    for (auto [x, k, i] : queries) {
+        while (cur < n && get<0>(items[cur]) <= x) {
+            active.insert({get<1>(items[cur]), get<2>(items[cur])});
+            cur++;
+        }
+        while (sz(active) > 10) {
+            active.erase(prev(active.end()));
+        }
+        if (sz(active)) {
+            FORE (p, active) {
+                rv[i].pb(p.second + 1);
+            }
+        } else {
+            rv[i].pb(-1);
+        }
+    }
+    FORE (v, rv) {
+        FORE (p, v) cout << p << ' ';
+        cout << '\n';
     }
 
     return 0;

@@ -4,7 +4,6 @@ using namespace std;
 
 typedef long long ll;
 typedef unsigned long long ull;
-typedef pair<ll, ll> pll;
 typedef complex<long double> cd;
 typedef long double ld;
 typedef char ch;
@@ -47,52 +46,23 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-#define x first
-#define y second
-
-vector<pair<ll, ll>> convex_hull(vector<pair<ll, ll>> pts) {
-    if (sz(pts) <= 1) return pts;
-    ssort(pts);
-    vector<pair<ll, ll>> lo, hi;
-    FORE (p, pts) {
-        while (sz(lo) >= 2) {
-            auto &p1 = lo[sz(lo) - 2], &p2 = lo[sz(lo) - 1];
-            if ((p2.y - p1.y) * (p.x - p2.x) >= (p.y - p2.y) * (p2.x - p1.x)) {
-                lo.pop_back();
-            } else break;
-        }
-        lo.pb(p);
-    }
-    for (auto it = pts.rbegin(); it != pts.rend(); it++) {
-        auto &p = *it;
-        while (sz(hi) >= 2) {
-            auto &p1 = hi[sz(hi) - 2], &p2 = hi[sz(hi) - 1];
-            if ((p2.y - p1.y) * (p.x - p2.x) >= (p.y - p2.y) * (p2.x - p1.x)) {
-                hi.pop_back();
-            } else break;
-        }
-        hi.pb(p);
-    }
-    lo.pop_back(), hi.pop_back();
-    lo.insert(lo.end(), hi.begin(), hi.end());
-    return lo;
-}
-
 int main(void) {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    while (true) {
+    ll t; cin >> t;
+    while (t--) {
         ll n; cin >> n;
-        if (n == 0) break;
-        vector<pll> pts(n);
-        FORE (p, pts) cin >> p.x >> p.y;
-        set<pll> s(all(pts));
-        pts.assign(all(s));
-        auto hull = convex_hull(pts);
-        cout << sz(hull) << '\n';
-        FORE (p, hull) cout << p.x << ' ' << p.y << '\n';
+        str a, b, c; cin >> a >> b >> c;
+        bool ok = false;
+        FOR (i, n) {
+            if (a[i] != c[i] && b[i] != c[i]) {
+                ok = true;
+                break;
+            }
+        }
+        cout << (ok ? "YES" : "NO") << '\n';
     }
 
     return 0;

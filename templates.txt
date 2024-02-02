@@ -3,11 +3,12 @@
 using namespace std;
 
 typedef long long ll;
-typedef unsigned long long ull;
-typedef complex<long double> cd;
 typedef long double ld;
 typedef char ch;
 typedef string str;
+typedef pair<ll, ll> pll;
+typedef pair<ld, ld> pld;
+typedef complex<long double> cd;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
@@ -15,12 +16,11 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 using namespace __gnu_pbds;
 
 using indexed_set = tree<
-    pair<ll, ll>,
+    pll,
     null_type,
-    less<pair<ll, ll>>,
+    less<pll>,
     rb_tree_tag,
-    tree_order_statistics_node_update
->;
+    tree_order_statistics_node_update>;
 
 #pragma GCC target("popcnt,lzcnt")
 
@@ -32,10 +32,18 @@ using indexed_set = tree<
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
 
-#define FOR(x, e) for(ll x = 0; x < (ll) e; x++)
-#define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
-#define FOB(x, b, e) for(auto x = b; x < e; x++)
-#define FORE(x, C) for(auto &x : C)
+#define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
+#define FORR(x, e) for (ll x = (ll)e - 1; x >= 0; x--)
+#define FOB(x, b, e) for (auto x = b; x < e; x++)
+#define FORE(x, C) for (auto &x : C)
+
+int main() {
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
+    auto start = chrono::steady_clock::now(); auto end = chrono::steady_clock::now();
+    double diff = chrono::duration<double, milli>(end - start).count();
+}
 
 // Run -> Add configuration... -> in launch.json:
 // "program": "${fileDirname}/${fileBasenameNoExtension}",
@@ -43,159 +51,96 @@ using indexed_set = tree<
 
 //--------------------------------------------------
 
-// clockwise angle from (x1, y1) to (x0, y0) to (x2, y2)
-ld angle(ld x1, ld y1, ld x0, ld y0, ld x2, ld y2) {
-    ld dot = (x1 - x0) * (x2 - x0) + (y1 - y0) * (y2 - y0),
-        det = (x1 - x0) * (y2 - y0) - (y1 - y0) * (x2 - x0),
-        rv = atan2(det, dot);
-    if (rv < 0) {
-        rv += 2 * M_PI;
-    }
-    return rv;
-}
-
-//--------------------------------------------------
-
-void bellman_ford(ll v, vector<tuple<ll, ll, ll>> &edges, vector<ll> &dist) {
-    ll n = sz(dist);
-    FOR (i, n) {
-        dist[i] = INF;
-    }
+// bellman_ford
     dist[v] = 0;
-    FOR (i, n - 1) {
-        for (auto [a, b, w] : edges) {
-            if (dist[a] != INF && dist[a] + w < dist[b]) {
+    FOR (i, n - 1)
+        for (auto [a, b, w] : edges)
+            if (dist[a] != INF && dist[a] + w < dist[b])
                 dist[b] = dist[a] + w;
-            }
-        }
-    }
-}
 
-void dijkstra(ll v0, vector<vector<pair<ll, ll>>> &adj, vector<ll> &dist) {
-    std::priority_queue<pair<ll, ll>, vector<pair<ll, ll>>, greater<>> pq;
+// dijkstra
+    std::priority_queue<pll, vector<pll>, greater<>> pq;
     pq.push({0, v0});
     while (!pq.empty()) {
-        ll cur_d, u;
-        tie(cur_d, u) = pq.top();
-        pq.pop();
-        if (cur_d > dist[u]) {
-            continue;
-        }
+        auto [d, v] = pq.top(); pq.pop();
+        if (d > dist[u]) continue;
         FORE (elem, adj[u]) {
-            ll v, w;
-            tie(v, w) = elem;
+            auto [v, w] = elem;
             if (dist[v] > dist[u] + w) {
                 dist[v] = dist[u] + w;
                 pq.push({dist[v], v});
             }
         }
     }
-}
 
-void floyd_warshall(vector<vector<ll>> &dist) {
-    ll n = sz(dist);
-    FOR (k, n) {
-        FOR (i, n) {
-            FOR (j, n) {
-                dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
-            }
-        }
-    }
-}
+// floyd warshall
+    FOR (k, n) FOR (i, n) FOR (j, n)
+        dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
 
 //--------------------------------------------------
 
-ll bin_search_find_last(vector<ll> &a) {
-        ll lo = 0, hi = sz(a) - 1;
-        while (lo < hi) {
-            ll mid = (lo + hi + 1) / 2;
-            if (valid(mid)) {
-                lo = mid;
-            } else {
-                hi = mid - 1;
-            }
-        }
+// find last
+while (lo < hi) {
+    ll mid = (lo + hi + 1) / 2;
+    if (valid(mid)) lo = mid;
+    else hi = mid - 1;
 }
 
-ll bin_search_find_first(vector<ll> &a) {
-    ll lo = 0, hi = sz(a) - 1;
-    while (lo < hi) {
-        ll mid = (lo + hi) / 2;
-        if (valid(mid)) {
-            hi = mid;
-        } else {
-            lo = mid + 1;
-        }
-    }
+// find first
+while (lo < hi) {
+    ll mid = (lo + hi) / 2;
+    if (valid(mid)) hi = mid;
+    else lo = mid + 1;
 }
 
 //--------------------------------------------------
 
 struct BIT {
-    vector<ll> tree;
-    ll n;
-    BIT(ll n) : n(n) {
-        tree.resize(n + 1);
-    }
+    vector<ll> tree; ll n;
+    BIT(ll n) : n(n) { tree.resize(n + 1); }
     void update(ll idx, ll val) {
         idx++;
-        while (idx <= n) {
-            tree[idx] += val;
-            idx += idx & (-idx);
-        }
+        while (idx <= n)
+        { tree[idx] += val; idx += idx & (-idx); }
     }
     ll query(ll idx) {
-        idx++;
-        ll sum = 0;
-        while (idx > 0) {
-            sum += tree[idx];
-            idx -= idx & (-idx);
-        }
+        idx++; ll sum = 0;
+        while (idx > 0)
+        { sum += tree[idx]; idx -= idx & (-idx); }
         return sum;
     }
-    ll query(ll l, ll r) {
-        return query(r) - query(l - 1);
-    }
+    ll query(ll l, ll r) { return query(r) - query(l - 1); }
 };
 
 struct BIT2d {
     vector<BIT> tree;
     ll n, m;
-    BIT2d(ll n, ll m) : n(n), m(m) {
-        tree.resize(n + 1, BIT(m));
-    }
+    BIT2d(ll n, ll m) : n(n), m(m) { tree.resize(n + 1, BIT(m)); }
     void update(ll x, ll y, ll val) {
         x++;
-        while (x <= n) {
-            tree[x].update(y, val);
-            x += x & (-x);
-        }
+        while (x <= n)
+        { tree[x].update(y, val); x += x & (-x); }
     }
     ll query(ll x, ll y) {
-        x++;
-        ll sum = 0;
-        while (x > 0) {
-            sum += tree[x].query(y);
-            x -= x & (-x);
-        }
+        x++; ll sum = 0;
+        while (x > 0) { sum += tree[x].query(y); x -= x & (-x); }
         return sum;
     }
-    ll query(ll x1, ll y1, ll x2, ll y2) {
-        return query(x2, y2) - query(x1 - 1, y2) - query(x2, y1 - 1) + query(x1 - 1, y1 - 1);
-    }
+    ll query(ll x1, ll y1, ll x2, ll y2)
+    { return query(x2, y2) - query(x1 - 1, y2) - query(x2, y1 - 1) + query(x1 - 1, y1 - 1); }
 };
 
 //--------------------------------------------------
 
-pair<ld, ld> get_com(vector<pair<ld, ld>> &poly) {
+pld get_com(vector<pld> &poly) {
     ld x = 0, y = 0;
     ld area = 0;
     FOR (i, sz(poly)) {
         ll j = (i + 1) % sz(poly);
-        ld a = poly[i].first * poly[j].second - poly[j].first * poly[i].second;
+        ld a = poly[i].x * poly[j].y - poly[j].x * poly[i].y;
         area += a;
-        x += (poly[i].first + poly[j].first) * a;
-        y += (poly[i].second + poly[j].second) * a;
+        x += (poly[i].x + poly[j].x) * a;
+        y += (poly[i].y + poly[j].y) * a;
     }
     area /= 2;
     x /= 6 * area;
@@ -207,48 +152,28 @@ pair<ld, ld> get_com(vector<pair<ld, ld>> &poly) {
 
 struct Point {
     ld x, y;
-    Point operator+(Point o) {
-        return {x + o.x, y + o.y};
-    }
-    Point operator-(Point o) {
-        return {x - o.x, y - o.y};
-    }
-    Point operator*(ld k) {
-        return {x * k, y * k};
-    }
-    Point operator/(ld k) {
-        return {x / k, y / k};
-    }
-    ld abs2() {
-        return x * x + y * y;
-    }
-    ld abs_() {
-        return sqrt(abs2());
-    }
-    bool operator==(Point o) {
-        return abs(x - o.x) < EPS && abs(y - o.y) < EPS;
-    }
-    bool operator!=(Point o) {
-        return abs(x - o.x) > EPS || abs(y - o.y) > EPS;
-    }
+    Point operator+(Point o) { return {x + o.x, y + o.y}; }
+    Point operator-(Point o) { return {x - o.x, y - o.y}; }
+    Point operator*(ld k)    { return {x * k, y * k}; }
+    Point operator/(ld k)    { return {x / k, y / k}; }
+    ld abs2()                { return x * x + y * y; }
+    ld abs_()                { return sqrt(abs2()); }
+    bool operator==(Point o)
+    { return abs(x - o.x) < EPS && abs(y - o.y) < EPS; }
+    bool operator!=(Point o)
+    { return abs(x - o.x) > EPS || abs(y - o.y) > EPS; }
 };
 
 struct Circle {
-    Point c;
-    ld r;
-    ll id;
+    Point c; ld r; ll id;
     Circle(Point c, ld r, ll id) : c(c), r(r), id(id) {}
     Circle() {}
-    bool has(Point &p) {
-        return (p - c).abs_() <= r + EPS;
-    }
+    bool has(Point &p)       { return (p - c).abs_() <= r + EPS; }
     vector<Point> operator&(Circle &o) {
-        if ((c - o.c).abs_() > r + o.r + EPS || (c - o.c).abs_() < abs(r - o.r) - EPS) {
+        if ((c - o.c).abs_() > r + o.r + EPS || (c - o.c).abs_() < abs(r - o.r) - EPS)
             return {};
-        }
-        if ((c - o.c).abs_() < EPS && abs(r - o.r) < EPS) {
+        if ((c - o.c).abs_() < EPS && abs(r - o.r) < EPS)
             return {{c.x + r, c.y}};
-        }
         Point sum = o.c + c, diff = o.c - c, perp = {diff.y, -diff.x};
         ld csu = 0.5,
             cdi = (r * r - o.r * o.r) / (2 * diff.abs2()),
@@ -261,64 +186,64 @@ struct Circle {
 
 //--------------------------------------------------
 
-vector<pair<ll, ll>> convex_hull(vector<pair<ll, ll>> pts) {
+vector<pll> convex_hull(vector<pll> pts) {
     if (sz(pts) <= 1) return pts;
-    sort(all(pts));
-    vector<pair<ll, ll>> h(sz(pts) + 1);
-    int s = 0, t = 0;
-    FOR (it, 2) {
-        FOR (i, sz(pts)) {
-            auto p = pts[i];
-            while (t >= s + 2 && (h[t - 2].first - h[t - 1].first) * (p.second - h[t - 1].second) - (h[t - 2].second - h[t - 1].second) * (p.first - h[t - 1].first) <= 0) t--;
-            h[t++] = p;
+    ssort(pts);
+    vector<pll> lo, hi;
+    FORE (p, pts) {
+        while (sz(lo) >= 2) {
+            auto &p1 = lo[sz(lo) - 2], &p2 = lo[sz(lo) - 1];
+            if ((p2.y - p1.y) * (p.x - p2.x) >= (p.y - p2.y) * (p2.x - p1.x)) {
+                lo.pop_back();
+            } else break;
         }
-        s = t--;
-        reverse(all(pts));
+        lo.pb(p);
     }
-    return {h.begin(), h.begin() + t - (t == 2 && h[0] == h[1])};
+    for (auto it = pts.rbegin(); it != pts.rend(); it++) {
+        auto &p = *it;
+        while (sz(hi) >= 2) {
+            auto &p1 = hi[sz(hi) - 2], &p2 = hi[sz(hi) - 1];
+            if ((p2.y - p1.y) * (p.x - p2.x) >= (p.y - p2.y) * (p2.x - p1.x)) {
+                hi.pop_back();
+            } else break;
+        }
+        hi.pb(p);
+    }
+    lo.pop_back(), hi.pop_back();
+    lo.insert(lo.end(), hi.begin(), hi.end());
+    return lo;
 }
 
 //--------------------------------------------------
 
-void customsort() {
-    vector<ll> x;
-    sort(x.begin(), x.end(),
-        &[] (const ll &a, const ll &b) -> bool
-        { return a < b; });
-    // equivalent to regular sort
-}
+sort(x.begin(), x.end(),
+    &[] (const ll &a, const ll &b) -> bool
+    { return a < b; }); // equivalent to regular sort
 
 //--------------------------------------------------
 
-struct Edge {
-    ll s, t, cap = 0, cost = 0, flow = 0;
-};
+struct Edge { ll s, t, cap = 0, cost = 0, flow = 0; };
 
 struct Dinic {
-    ll n;
-    vector<Edge> edges;
+    ll n; vector<Edge> edges;
     vector<vector<ll>> adj;
     vector<ll> lvl, ptr;
     queue<ll> q;
 
     Dinic(ll n, vector<Edge> &edges0) :
         n(n), adj(n), lvl(n), ptr(n) {
-        ll i = 0;
         FORE (e, edges0) {
+            adj[e.s].pb(sz(edges));
             edges.pb(e);
+            adj[e.t].pb(sz(edges));
             edges.pb({e.t, e.s});
-            adj[e.s].pb(i++);
-            adj[e.t].pb(i++);
         }
     }
 
     bool bfs(ll s, ll t) {
-        lvl.assign(n, -1);
-        lvl[s] = 0;
-        q.push(s);
+        lvl.assign(n, -1); lvl[s] = 0; q.push(s);
         while (!q.empty()) {
-            ll v = q.front();
-            q.pop();
+            ll v = q.front(); q.pop();
             FORE (e, adj[v]) {
                 ll u = edges[e].t;
                 if (lvl[u] != -1 || edges[e].cap <= edges[e].flow) continue;
@@ -332,8 +257,7 @@ struct Dinic {
     ll dfs(ll v, ll t, ll f) {
         if (v == t || f == 0) return f;
         for (ll &cid = ptr[v]; cid < sz(adj[v]); cid++) {
-            ll e = adj[v][cid];
-            ll u = edges[e].t;
+            ll e = adj[v][cid], u = edges[e].t;
             if (lvl[v] + 1 != lvl[u]) continue;
             ll pushed = dfs(u, t, min(f, edges[e].cap - edges[e].flow));
             if (pushed) {
@@ -354,12 +278,11 @@ struct Dinic {
         return flow;
     }
 
-    vector<pair<ll, ll>> min_cut(ll s) {
+    vector<pll> min_cut(ll s) {
         bfs(s, n - 1);
-        vector<pair<ll, ll>> cut;
-        FORE (e,edges) {
-            if (lvl[e.s] != -1 && lvl[e.t] == -1 && e.cap > 0) cut.pb({e.s, e.t});
-        }
+        vector<pll> cut;
+        FORE (e,edges) if (lvl[e.s] != -1 && lvl[e.t] == -1 && e.cap > 0)
+            cut.pb({e.s, e.t});
         return cut;
     }
 
@@ -379,31 +302,28 @@ struct Dinic {
 };
 
 struct MinCostMaxFlow {
-    ll n, m;
-    vector<Edge> edges;
+    ll n, m; vector<Edge> edges;
     vector<vector<ll>> adj;
     vector<ll> dist, pi, vis;
-    vector<pair<ll, ll>> par;
+    vector<pll> par;
 
     MinCostMaxFlow(ll n, vector<Edge> &edges0) :
         n(n), m(sz(edges0)), adj(n),
         vis(n), dist(n), pi(n), par(n) {
-        ll i = 0;
         FORE (e, edges0) {
+            adj[e.s].pb(sz(edges));
             edges.pb(e);
+            adj[e.t].pb(sz(edges));
             edges.pb({e.t, e.s});
-            adj[e.s].pb(i++);
-            adj[e.t].pb(i++);
         }
     }
 
     void path(ll s) {
         vis.assign(n, false);
         dist.assign(n, INF);
-        dist[s] = 0;
-        ll di;
+        dist[s] = 0; ll di;
 
-        __gnu_pbds::priority_queue<pair<ll, ll>, greater<>> pq;
+        __gnu_pbds::priority_queue<pll, greater<>> pq;
         vector<decltype(pq)::point_iterator> its(n);
         pq.push({0, s});
 
@@ -412,39 +332,28 @@ struct MinCostMaxFlow {
             if (cap && val < dist[t]) {
                 dist[t] = val;
                 par[t] = {e, dir};
-                if (its[t] == pq.end()) {
-                    its[t] = pq.push({val, t});
-                } else {
-                    pq.modify(its[t], {val, t});
-                }
+                if (its[t] == pq.end()) its[t] = pq.push({val, t});
+                else pq.modify(its[t], {val, t});
             }
         };
 
         while (!pq.empty()) {
-            s = pq.top().second;
-            pq.pop();
-            vis[s] = 1;
-            di = dist[s] + pi[s];
+            s = pq.top().s; pq.pop();
+            vis[s] = 1; di = dist[s] + pi[s];
             FORE (e, adj[s]) {
                 ll t = edges[e].t;
-                if (!vis[t]) {
-                    relax(t, e, edges[e].cap - edges[e].flow, edges[e].cost, 1);
-                }
+                if (!vis[t]) relax(t, e, edges[e].cap - edges[e].flow, edges[e].cost, 1);
             }
             FORE (e, adj[s]) {
                 ll t = edges[e].t;
-                if (!vis[t]) {
-                    relax(t, e, edges[e ^ 1].flow, -edges[e ^ 1].cost, 0);
-                }
+                if (!vis[t]) relax(t, e, edges[e ^ 1].flow, -edges[e ^ 1].cost, 0);
             }
         }
 
-        FOR (i, n) {
-            pi[i] = min(pi[i] + dist[i], INF);
-        }
+        FOR (i, n) pi[i] = min(pi[i] + dist[i], INF);
     }
 
-    pair<ll, ll> max_flow(ll s, ll t) {
+    pll max_flow(ll s, ll t) {
         ll flow = 0, cost = 0;
         while (path(s), vis[t]) {
             ll f = INF;
@@ -457,15 +366,12 @@ struct MinCostMaxFlow {
                 else edges[p ^ 1].flow -= f;
             }
         }
-        FORE (e, edges) {
-            cost += e.flow * e.cost;
-        }
+        FORE (e, edges) cost += e.flow * e.cost;
         return {flow, cost};
     }
 
     void set_pi(ll s) { // for negative costs
-        pi.assign(n, INF);
-        pi[s] = 0;
+        pi.assign(n, INF); pi[s] = 0;
         ll it = n, ch = 1, v;
         while (ch-- && it--) {
             FOR (i, n) {
@@ -485,9 +391,8 @@ struct MinCostMaxFlow {
 //--------------------------------------------------
 
 struct DSU {
-    ll cnt;
-    vector<ll> e;
-    DSU(ll n) { e = vector<ll>(n, -1); cnt = n; }
+    ll cnt; vector<ll> e;
+    DSU(ll n) : cnt(n), e(n, -1) {}
     void reset() { e = vector<ll>(sz(e), -1); cnt = sz(e); }
     ll get(int x) { return e[x] < 0 ? x : e[x] = get(e[x]); }
     bool same_set(ll a, ll b) { return get(a) == get(b); }
@@ -519,11 +424,8 @@ struct Binom {
         ifac[n] = pow(fac[n], MOD - 2);
         FORR (i, n) ifac[i] = ifac[i + 1] * (i + 1) % MOD;
         stirling[0][0] = 1;
-        FOB (i, 1, n + 1) {
-            FOB (j, 1, i + 1) {
-                stirling[i][j] = (stirling[i - 1][j - 1] + (i - 1) * stirling[i - 1][j]) % MOD;
-            }
-        }
+        FOB (i, 1, n + 1) FOB (j, 1, i + 1)
+            stirling[i][j] = (stirling[i - 1][j - 1] + (i - 1) * stirling[i - 1][j]) % MOD;
     }
     ll pow(ll a, ll b) {
         ll rv = 1;
@@ -545,7 +447,7 @@ struct Binom {
 
 //--------------------------------------------------
 
-// ll n = sz(s), n2 = 1LL << (64 - __builtin_clz(n));
+// ll n = sz(s), n2 = 1LL << (64 - __builtin_clzll(n));
 // vector<cd> a(n2), b(n2);
 // ...init a, b...
 // fft(a, false);
@@ -580,19 +482,16 @@ void fft(vector<cd> &a, bool inv) {
 //--------------------------------------------------
 
 bool game(auto state, bool alice) {
-    if (mem.find(state) != mem.end()) {
+    if (mem.find(state) != mem.end())
         return mem[state];
-    }
-    FORE (move, all_moves) {
-        if (valid(move)) {
-            change_state();
-            if (!game(state, !alice)) {
-                restore_state();
-                mem[state] = true;
-                return true;
-            }
+    FORE (move, valid_moves) {
+        change_state();
+        if (!game(state, !alice)) {
             restore_state();
+            mem[state] = true;
+            return true;
         }
+        restore_state();
     }
     mem[state] = false;
     return false;
@@ -601,59 +500,37 @@ bool game(auto state, bool alice) {
 //--------------------------------------------------
 
 ll gauss_jordan(vector<vector<ld>> &A, vector<ld> &b, vector<ld> &x) {
-    ll n = A.size(), m = A[0].size();
+    ll n = sz(A), m = sz(A[0]);
     vector<vector<ld>> a(n, vector<ld>(m + 1));
     FOR(i, n) {
-        FOR(j, m) {
-            a[i][j] = A[i][j];
-        }
+        FOR(j, m) a[i][j] = A[i][j];
         a[i][m] = b[i];
     }
     vector<ll> where(m, -1);
     for (ll col = 0, row = 0; col < m && row < n; col++) {
         ll sel = row;
-        FOB (i, row, n) {
-            if (abs(a[i][col]) > abs(a[sel][col])) {
-                sel = i;
-            }
-        }
-        if (abs(a[sel][col]) < EPS) {
-            continue;
-        }
-        FOB (i, col, m + 1) {
-            swap(a[sel][i], a[row][i]);
-        }
+        FOB (i, row, n) if (abs(a[i][col]) > abs(a[sel][col])) sel = i;
+        if (abs(a[sel][col]) < EPS) continue;
+        FOB (i, col, m + 1) swap(a[sel][i], a[row][i]);
         where[col] = row;
         FOR (i, n) {
             if (i != row) {
                 ld c = a[i][col] / a[row][col];
-                FOB (j, col, m + 1) {
-                    a[i][j] -= a[row][j] * c;
-                }
+                FOB (j, col, m + 1) a[i][j] -= a[row][j] * c;
             }
         }
         row++;
     }
     x.assign(m, 0);
-    FOR (i, m) {
-        if (where[i] != -1) {
-            x[i] = a[where[i]][m] / a[where[i]][i];
-        }
-    }
+    FOR (i, m) if (where[i] != -1) x[i] = a[where[i]][m] / a[where[i]][i];
     FOR (i, n) {
         ld sum = 0;
-        FOR (j, m) {
-            sum += a[i][j] * x[j];
-        }
+        FOR (j, m) sum += a[i][j] * x[j];
         if (abs(sum - a[i][m]) > EPS) { // may need to change for modulo
             return 0;
         }
     }
-    FOR (i, m) {
-        if (where[i] == -1) {
-            return INF;
-        }
-    }
+    FOR (i, m) if (where[i] == -1) return INF;
     return 1;
 }
 
@@ -664,48 +541,26 @@ int gauss_jordan_binary(
     int n,
     int m
 ) {
-    FOR (i, n) {
-        A[i][m] = b[i];
-    }
+    FOR (i, n) A[i][m] = b[i];
     vector<int> where(m, -1);
     for (int col = 0, row = 0; col < m && row < n; col++) {
         FOB (i, row, n) {
-            if (A[i][col] != 0) {
-                swap(A[i], A[row]);
-                break;
-            }
+            if (A[i][col] != 0)
+            { swap(A[i], A[row]); break; }
         }
-        if (A[row][col] == 0) {
-            continue;
-        }
+        if (A[row][col] == 0) continue;
         where[col] = row;
-        FOR (i, n) {
-            if (i != row && A[i][col] != 0) {
-                A[i] ^= A[row];
-            }
-        }
+        FOR (i, n) if (i != row && A[i][col] != 0) A[i] ^= A[row];
         row++;
     }
     x = bitset<MAXN>(0);
-    FOR (i, m) {
-        if (where[i] != -1) {
-            x[i] = A[where[i]][m] / A[where[i]][i];
-        }
-    }
+    FOR (i, m) if (where[i] != -1) x[i] = A[where[i]][m] / A[where[i]][i];
     FOR (i, n) {
         int sum = 0;
-        FOR (j, m) {
-            sum += A[i][j] * x[j];
-        }
-        if (sum != A[i][m]) {
-            return 0;
-        }
+        FOR (j, m) sum += A[i][j] * x[j];
+        if (sum != A[i][m]) return 0;
     }
-    FOR (i, m) {
-        if (where[i] == -1) {
-            return INF;
-        }
-    }
+    FOR (i, m) if (where[i] == -1) return INF;
     return 1;
 }
 
@@ -717,8 +572,7 @@ ll gcd(ll a, ll b) {
 }
 
 // a * x + b * y = gcd(a, b)
-
-pair<ll, ll> bezout(ll a, ll b) {
+pll bezout(ll a, ll b) {
     if (a == 0) return {0, 1};
     auto [x, y] = bezout(b % a, a);
     return {y - (b / a) * x, x};
@@ -726,22 +580,21 @@ pair<ll, ll> bezout(ll a, ll b) {
 
 // x % m == a, x % n == b
 // x % lcm(m, n) = -(a * v * n + b * u * m) / gcd(m, n)
-
 ll crt(ll m, ll n, ll a, ll b) {
     ll g = gcd(m, n);
     if (a % g != b % g) return -1;
     ll lcm = m * n / g;
     auto [u, v] = bezout(m / g, n / g);
-    ll k = (b - a) / g;
-    ll x = (a + m * k * u) % lcm;
+    ll k = (b - a) / g, x = (a + m * k * u) % lcm;
     if (x < 0) x += lcm;
     return x;
 }
 
 //--------------------------------------------------
 
+// costs[i][j] = j-th worker's cost to do i-th job
 vector<ll> hungarian(vector<vector<ll>> &costs) {
-    ll J = sz(costs), W = sz(costs[0]); // J <= W
+    ll J = sz(costs), W = sz(costs[0]); // |jobs| <= |workers|
     vector<ll> job(W + 1, -1), ys(J), yt(W + 1), rv;
     FOR (j_cur, J) {
         ll w_cur = W;
@@ -777,55 +630,38 @@ vector<ll> hungarian(vector<vector<ll>> &costs) {
 
 //--------------------------------------------------
 
-struct LCA_Tree {
+struct LCA {
     vector<vector<ll>> parent, adj;
     vector<ll> pre, post, depth;
     ll n, timer;
-    LCA_Tree(ll &n0, vector<vector<ll>> &adj0) {
+    LCA(ll &n0, vector<vector<ll>> &adj0) {
         n = n0;
         timer = 0;
         pre = vector<ll>(n), post = pre, depth = pre;
         parent = vector<vector<ll>>(n, vector<ll>(30));
-        adj = adj0;
-        dfs(0, 0, 0);
-        gen();
+        adj = adj0; dfs(0, 0, 0); gen();
     }
     void dfs(ll node, ll par, ll d) {
         pre[node] = timer++;
         depth[node] = d;
         parent[node][0] = par;
-        FORE (child, adj[node]) {
-            if (child != par) {
-                dfs(child, node, d + 1);
-            }
-        }
+        FORE (child, adj[node]) if (child != par) dfs(child, node, d + 1);
         post[node] = timer++;
     }
-    void gen() {
-        FOR (i, 29) {
-            FOR (j, n) {
-                parent[j][i + 1] = parent[parent[j][i]][i];
-            }
-        }
-    }
-    bool is_anc(ll u, ll v) {
-        return pre[u] <= pre[v] && post[u] >= post[v];
-    }
+    void gen()
+    { FOR (i, 29) FOR (j, n) parent[j][i + 1] = parent[parent[j][i]][i]; }
+    bool is_anc(ll u, ll v) // is u an ancestor of v?
+    { return pre[u] <= pre[v] && post[u] >= post[v]; }
     ll lca(ll u, ll v) {
         if (is_anc(u, v)) return u;
         if (is_anc(v, u)) return v;
-        FORR (i, 30) {
-            if (!is_anc(parent[u][i], v)) {
-                u = parent[u][i];
-            }
-        }
+        FORR (i, 30) if (!is_anc(parent[u][i], v)) u = parent[u][i];
         return parent[u][0];
     }
-    ll dist(ll u, ll v) {
-        return depth[u] + depth[v] - 2 * depth[lca(u, v)];
-    }
-    bool disjoint(vector<pair<ll, ll>> paths) {
-        vector<pair<ll, ll>> p;
+    ll dist(ll u, ll v)
+    { return depth[u] + depth[v] - 2 * depth[lca(u, v)]; }
+    bool disjoint(vector<pll> paths) {
+        vector<pll> p;
         FORE (path, paths) {
             ll u, v;
             tie(u, v) = path;
@@ -833,39 +669,25 @@ struct LCA_Tree {
             p.pb({w, u});
             p.pb({w, v});
         }
-        FOR (i, sz(p)) {
-            FOR (j, i - i % 2) {
-                if (!(lca(p[i].second, p[j].first) != p[j].first ||
-                    lca(p[j].second, p[i].first) != p[i].first))
-                {
-                    return false;
-                }
-            }
-        }
+        FOR (i, sz(p)) FOR (j, i - i % 2) 
+            if (!(lca(p[i].s, p[j].f) != p[j].f ||
+                lca(p[j].s, p[i].f) != p[i].f)) return false;
         return true;
     }
 };
 
 //--------------------------------------------------
 
-pair<ll, ll> manacher(str &s) {
+pll manacher(str &s) {
     str t = "$#";
-    FORE (c, s) {
-        t += c;
-        t += '#';
-    }
+    FORE (c, s) { t += c; t += '#'; }
     ll n = sz(t);
     ll center = 0, max_rad = -1, rad;
     vector<ll> p(n);
     FOR (i, n) {
-        if (i <= max_rad) {
-            rad = min(p[2 * center - i], max_rad - i);
-        } else {
-            rad = 0;
-        }
-        while (i - rad - 1 >= 0 && i + rad + 1 < n && t[i - rad - 1] == t[i + rad + 1]) {
-            rad++;
-        }
+        if (i <= max_rad) rad = min(p[2 * center - i], max_rad - i);
+        else rad = 0;
+        while (i - rad - 1 >= 0 && i + rad + 1 < n && t[i - rad - 1] == t[i + rad + 1]) rad++;
         p[i] = rad;
         if (i + rad > max_rad) {
             center = i;
@@ -873,11 +695,9 @@ pair<ll, ll> manacher(str &s) {
         }
     }
     ll len = 0, idx = 0;
-    FOR (i, n) {
-        if (p[i] > len) {
-            len = p[i];
-            idx = i;
-        }
+    FOR (i, n) if (p[i] > len) {
+        len = p[i];
+        idx = i;
     }
     return {len, (idx - len) / 2};
 }
@@ -887,31 +707,19 @@ pair<ll, ll> manacher(str &s) {
 struct Matrix { // mat[i] is row i
     vector<vector<ll>> mat;
     ll n, m;
-    Matrix(ll n, ll m) : n(n), m(m) {
-        mat.resize(n, vector<ll>(m));
-    }
+    Matrix(ll n, ll m) : n(n), m(m) { mat.resize(n, vector<ll>(m)); }
     Matrix operator*(const Matrix &other) const {
         Matrix rv(n, other.m);
-        FOR(i, n) {
-            FOR(j, other.m) {
-                FOR(k, m) {
-                    rv.mat[i][j] += mat[i][k] * other.mat[k][j];
-                    rv.mat[i][j] %= MOD;
-                }
-            }
-        }
+        FOR(i, n) FOR(j, other.m) FOR(k, m)
+            rv.mat[i][j] += mat[i][k] * other.mat[k][j];
         return rv;
     }
     Matrix operator^(ll p) const {
         Matrix rv(n, n);
-        FOR(i, n) {
-            rv.mat[i][i] = 1;
-        }
+        FOR(i, n) rv.mat[i][i] = 1;
         Matrix a = *this;
         while (p) {
-            if (p & 1) {
-                rv = rv * a;
-            }
+            if (p & 1) rv = rv * a;
             a = a * a;
             p >>= 1;
         }
@@ -922,24 +730,16 @@ struct Matrix { // mat[i] is row i
         ld rv = 1;
         FOR(i, n) {
             ll p = i;
-            FOB(j, i + 1, n) {
-                if (abs(a.mat[j][i]) > abs(a.mat[p][i])) {
-                    p = j;
-                }
-            }
+            FOB(j, i + 1, n) if (abs(a.mat[j][i]) > abs(a.mat[p][i])) p = j;
             if (p != i) {
                 swap(a.mat[i], a.mat[p]);
                 rv *= -1;
             }
-            if (abs(a.mat[i][i]) < 1e-9) {
-                return 0;
-            }
+            if (abs(a.mat[i][i]) < 1e-9) return 0;
             rv *= a.mat[i][i];
             FOB(j, i + 1, n) {
                 ld c = a.mat[j][i] / a.mat[i][i];
-                FOB(k, i, n) {
-                    a.mat[j][k] -= c * a.mat[i][k];
-                }
+                FOB(k, i, n) a.mat[j][k] -= c * a.mat[i][k];
             }
         }
         return rv;
@@ -948,27 +748,17 @@ struct Matrix { // mat[i] is row i
     Matrix operator*(const Matrix &other) const {
         Matrix rv(n, other.m);
         rv.mat.assign(n, vector<ll>(other.m, INF));
-        FOR(i, n) {
-            FOR(j, other.m) {
-                FOR(k, m) {
-                    rv.mat[i][j] = min(rv.mat[i][j], mat[i][k] + other.mat[k][j]);
-                }
-            }
-        }
+        FOR(i, n) FOR(j, other.m) FOR(k, m)
+            rv.mat[i][j] = min(rv.mat[i][j], mat[i][k] + other.mat[k][j]);
         return rv;
     }
-
     Matrix operator^(ll p) const {
         Matrix rv(n, n);
         rv.mat.assign(n, vector<ll>(n, INF));
-        FOR (i, n) {
-            rv.mat[i][i] = 0;
-        }
+        FOR (i, n) rv.mat[i][i] = 0;
         Matrix a = *this;
         while (p) {
-            if (p & 1) {
-                rv = rv * a;
-            }
+            if (p & 1) rv = rv * a;
             a = a * a;
             p >>= 1;
         }
@@ -980,10 +770,9 @@ struct Matrix { // mat[i] is row i
 
 ll pow(ll x, ll p) {
     ll rv = 1;
-    while(p) {
+    while (p) {
         if(p & 1) rv *= x;
-        x *= x;
-        p >>= 1;
+        x *= x; p >>= 1;
     }
     return rv;
 }
@@ -992,10 +781,11 @@ ll pow(ll x, ll p) {
 
 struct SCCs {
     ll n, idx, scc_cnt;
-    vector<vector<ll>> adj, adj_scc;
+    vector<vector<ll>> adj,
+        adj_scc; // [0]: snk, [-1]: src
     vector<ll> ord, low, ids;
     vector<bool> on_stack;
-    stack<ll> st;
+    stack<ll> stk;
 
     SCCs(ll n0, vector<vector<ll>> &adj0) {
         n = n0, idx = 0, scc_cnt = 0;
@@ -1004,42 +794,28 @@ struct SCCs {
         low = vector<ll>(n, -1);
         ids = vector<ll>(n, -1);
         on_stack = vector<bool>(n, false);
-        FOR (u, n) {
-            if (ord[u] == -1) {
-                dfs(u);
-            }
-        }
+        FOR (u, n) if (ord[u] == -1) dfs(u);
         adj_scc = vector<vector<ll>>(scc_cnt);
-        FOR (u, n) {
-            FORE (v, adj[u]) {
-                if (ids[u] != ids[v]) {
-                    adj_scc[ids[u]].pb(ids[v]);
-                }
-            }
+        FOR (u, n) FORE (v, adj[u]) if (ids[u] != ids[v]) {
+            adj_scc[ids[u]].pb(ids[v]);
         }
     }
 
     void dfs(ll u) {
         ord[u] = low[u] = idx++;
-        st.push(u);
+        stk.push(u);
         on_stack[u] = true;
         FORE (v, adj[u]) {
-            if (ord[v] == -1) {
-                dfs(v);
-                low[u] = min(low[u], low[v]);
-            } elif (on_stack[v]) {
-                low[u] = min(low[u], ord[v]);
-            }
+            if (ord[v] == -1) dfs(v), low[u] = min(low[u], low[v]);
+            elif (on_stack[v]) low[u] = min(low[u], ord[v]);
         }
         if (low[u] == ord[u]) {
             while (true) {
-                ll v = st.top();
-                st.pop();
+                ll v = stk.top();
+                stk.pop();
                 ids[v] = scc_cnt;
                 on_stack[v] = false;
-                if (u == v) {
-                    break;
-                }
+                if (u == v) break;
             }
             scc_cnt++;
         }
@@ -1049,11 +825,16 @@ struct SCCs {
 //--------------------------------------------------
 
 struct SegTree {
-    ll n;
-    vector<ll> data, lazy;
-    SegTree (ll n) : n(n), data(4 * n), lazy(4 * n) {}
+    ll n; vector<ll> data, lazy;
+    SegTree (ll n, vector<ll> &raw) : n(n), data(4 * n), lazy(4 * n)
+        { build(raw); }
+    ll build(vector<ll> &raw, ll i = 1, ll l = 0, ll r = -1) {
+        if (r == -1) r = n;
+        if (r - l == 1) return data[i] = raw[l];
+        ll m = (l + r) / 2;
+        return data[i] = build(raw, 2 * i, l, m) + build(raw, 2 * i + 1, m, r);
+    }
     void push(ll i, ll l, ll r) {
-        if (lazy[i] == 0) return;
         data[i] += (r - l) * lazy[i];
         if (r - l > 1) {
             lazy[2 * i] += lazy[i];
@@ -1061,9 +842,8 @@ struct SegTree {
         }
         lazy[i] = 0;
     }
-    void update(ll ul, ll ur, ll val, ll i = 1, ll l = 0, ll r = -1) { // [ul, ur)
-        if (r == -1) r = n;
-        push(i, l, r);
+    void upd(ll ul, ll ur, ll val, ll i = 1, ll l = 0, ll r = -1) { // [ul, ur)
+        if (r == -1) r = n; push(i, l, r);
         if (ur <= l || r <= ul) return;
         if (ul <= l && r <= ur) {
             lazy[i] += val;
@@ -1071,26 +851,16 @@ struct SegTree {
             return;
         }
         ll m = (l + r) / 2;
-        update(ul, ur, val, 2 * i, l, m);
-        update(ul, ur, val, 2 * i + 1, m, r);
+        upd(ul, ur, val, 2 * i, l, m);
+        upd(ul, ur, val, 2 * i + 1, m, r);
         data[i] = data[2 * i] + data[2 * i + 1];
     }
-    ll query(ll ql, ll qr, ll i = 1, ll l = 0, ll r = -1) {
-        if (r == -1) r = n;
-        push(i, l, r);
+    ll qry(ll ql, ll qr, ll i = 1, ll l = 0, ll r = -1) {
+        if (r == -1) r = n; push(i, l, r);
         if (qr <= l || r <= ql) return 0;
         if (ql <= l && r <= qr) return data[i];
         ll m = (l + r) / 2;
-        return query(ql, qr, 2 * i, l, m) + query(ql, qr, 2 * i + 1, m, r);
-    }
-    void print(ll i = 1, ll l = 0, ll r = -1) {
-        if (r == -1) r = n;
-        cout << "[" << l << ", " << r << "): " << data[i] << " " << lazy[i] << '\n';
-        if (r - l > 1) {
-            ll m = (l + r) / 2;
-            print(2 * i, l, m);
-            print(2 * i + 1, m, r);
-        }
+        return qry(ql, qr, 2 * i, l, m) + qry(ql, qr, 2 * i + 1, m, r);
     }
 };
 
@@ -1129,13 +899,12 @@ Vertex* update(Vertex* v, ll tl, ll tr, ll pos, ll new_val) { // [tl, tr] = [0, 
 
 //--------------------------------------------------
 
-ld shoelace(vector<pair<ld, ld>> &v) {
-    ld area = 0;
-    FOR (i, sz(v)) {
-        area += (v[i].first * v[(i + 1) % sz(v)].second) -
-            (v[i].second * v[(i + 1) % sz(v)].first);
-    }
-    return abs(area) / 2;
+ld shoelace(vector<pld> &v) {
+    ld rv = 0;
+    FOR (i, sz(v))
+    { rv += (v[i].x * v[(i + 1) % sz(v)].y) -
+            (v[i].y * v[(i + 1) % sz(v)].x); }
+    return abs(rv) / 2;
 }
 
 //--------------------------------------------------
@@ -1184,7 +953,7 @@ struct Simplex {
         }
     }
 
-    ll solve(vector<ld> &x) {
+    ld solve(vector<ld> &x) {
         ll r = 0;
         FOB (i, 1, m) if (D[i][n + 1] < D[r][n + 1]) r = i;
         if (D[r][n + 1] < -EPS) {
@@ -1238,8 +1007,8 @@ struct SuffixArray {
             cn[p[0]] = 0;
             classes = 1;
             FOB (i, 1, n) {
-                pair<ll, ll> cur = {c[p[i]], c[(p[i] + (1 << h)) % n]};
-                pair<ll, ll> prev = {c[p[i - 1]], c[(p[i - 1] + (1 << h)) % n]};
+                pll cur = {c[p[i]], c[(p[i] + (1 << h)) % n]};
+                pll prev = {c[p[i - 1]], c[(p[i - 1] + (1 << h)) % n]};
                 if (cur != prev) classes++;
                 cn[p[i]] = classes - 1;
             }
@@ -1362,9 +1131,7 @@ ll gen_tree(SuffixTree &st, vector<ll> &leafs, vector<ll> &depth, ll v = 0, ll d
             rv += gen_tree(st, leafs, depth, st.tree[v][i], d + st.hi[st.tree[v][i]] - st.lo[st.tree[v][i]] + 1);
         }
     }
-    if (rv == 0) {
-        rv = 1;
-    }
+    if (rv == 0) rv = 1;
     leafs[v] = rv;
     return rv;
 }
@@ -1444,9 +1211,7 @@ int main() {
         if (st.tree[0][st.char_to_index(t[0])] == -1) {
             cout << 0 << '\n';
             continue;
-        } else {
-            v = st.tree[0][st.char_to_index(t[0])];
-        }
+        } else v = st.tree[0][st.char_to_index(t[0])];
 
         bool ok = true;
         int idx = 0;
@@ -1464,9 +1229,7 @@ int main() {
                 if (st.tree[v][st.char_to_index(t[i])] == -1) {
                     ok = false;
                     break;
-                } else {
-                    v = st.tree[v][st.char_to_index(t[i])];
-                }
+                } else v = st.tree[v][st.char_to_index(t[i])];
             } else {
                 ok = false;
                 break;
@@ -1576,27 +1339,27 @@ struct Treap {
 
 //--------------------------------------------------
 
-void make_clockwise(vector<pair<ld, ld>> &points) {
-    pair<ld, ld> center = mp(0, 0);
+void make_clockwise(vector<pld> &points) {
+    pld center = mp(0, 0);
     FORE (p, points) {
-        center.first += p.first;
-        center.second += p.second;
+        center.x += p.x;
+        center.y += p.y;
     }
-    center.first /= sz(points);
-    center.second /= sz(points);
-    sort(all(points), [center](pair<ld, ld> &p1, pair<ld, ld> &p2) {
-        return atan2(p1.second - center.second, p1.first - center.first) <
-               atan2(p2.second - center.second, p2.first - center.first);
+    center.x /= sz(points);
+    center.y /= sz(points);
+    sort(all(points), [center](pld &p1, pld &p2) {
+        return atan2(p1.y - center.y, p1.x - center.x) <
+               atan2(p2.y - center.y, p2.x - center.x);
     });
 }
 
-bool in_triangle(pair<ld, ld> &point, vector<pair<ld, ld>> &triangle) {
+bool in_triangle(pld &point, vector<pld> &triangle) {
     vector<ld> d(3);
     FOR (i, 3) {
         auto &p1 = triangle[i];
         auto &p2 = triangle[(i + 1) % 3];
-        d[i] = (p2.first - p1.first) * (point.second - p1.second) -
-            (p2.second - p1.second) * (point.first - p1.first);
+        d[i] = (p2.x - p1.x) * (point.y - p1.y) -
+            (p2.y - p1.y) * (point.x - p1.x);
     }
     return (d[0] >= 0 && d[1] >= 0 && d[2] >= 0) || (d[0] <= 0 && d[1] <= 0 && d[2] <= 0);
 }
@@ -1624,3 +1387,29 @@ struct Trie {
         children[si]->insert(i + 1, s);
     }
 };
+
+//--------------------------------------------------
+
+pld extend(pld p0, pld p1, ld r) { // extend p1 from p0 by r
+    ld dx = p1.x - p0.x, dy = p1.y - p0.y;
+    ld d = sqrt(dx * dx + dy * dy);
+    dx /= d, dy /= d;
+    return {p1.x + dx * r, p1.y + dy * r};
+}
+
+ld angle(pld p0, pld p1, pld p2) { // angle between vec p0p1 and p0p2
+    pld w = {p1.x - p0.x, p1.y - p0.y},
+        v = {p2.x - p0.x, p2.y - p0.y};
+    return atan2(
+        w.y * v.x - w.x * v.y,
+        w.x * v.x + w.y * v.y
+    );
+}
+
+pld proj(pld p0, pld p1, pld p2) { // proj p2 onto p0p1
+    pld w = {p1.x - p0.x, p1.y - p0.y},
+        v = {p2.x - p0.x, p2.y - p0.y};
+    ld d = sqrt(w.x * w.x + w.y * w.y);
+    w.x /= d, w.y /= d;
+    return {p0.x + w.x * (w.x * v.x + w.y * v.y), p0.y + w.y * (w.x * v.x + w.y * v.y)};
+}

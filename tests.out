@@ -1,1 +1,18 @@
-test 1 passed; 0.110386ms
+test 1 passed; 0.085712ms
+TEST 2 FAILED; 0.002380ms
+input:
+2 1
+2 1
+expected:
+1
+1 2
+received:
+2
+1 2
+2 1
+test 3 passed; 0.050021ms
+test 4 passed; 0.033482ms
+test 5 passed; 0.029274ms
+test 6 passed; 0.007092ms
+test 7 passed; 0.008346ms
+test 8 passed; 0.010972ms

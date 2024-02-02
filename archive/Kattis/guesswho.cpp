@@ -54,30 +54,25 @@ int main(void) {
 
     ll n, m, q;
     cin >> n >> m >> q;
-    multiset<str> strs;
-    map<str, ll> id;
+    set<pair<ll, str>> rv;
+    vector<str> ppl(n);
     FOR (i, n) {
-        str s;
-        cin >> s;
-        strs.insert(s);
-        id[s] = i;
+        cin >> ppl[i];
+        rv.insert({i + 1, ppl[i]});
     }
     while (q--) {
-        ll idx;
-        ch c;
+        ll idx; ch c;
         cin >> idx >> c;
         idx--;
-        multiset<str> new_strs;
-        FORE (s, strs) {
-            if (s[idx] == c) {
-                new_strs.insert(s);
-            }
-        }
-        strs = new_strs;
+        set<pair<ll, str>> nv;
+        for (auto [i, s] : rv) if (s[idx] == c) nv.insert({i, s});
+        rv = nv;
     }
-    if (sz(strs) > 1) cout << "ambiguous\n" << sz(strs) << '\n';
-    elif (sz(strs) == 0) assert(false);
-    else cout << "unique\n" << id[*strs.begin()] + 1 << '\n';
+    if (sz(rv) == 1) {
+        cout << "unique\n" << rv.begin()->first << '\n';
+    } else {
+        cout << "ambiguous\n" << sz(rv) << '\n';
+    }
 
-	return 0;
+    return 0;
 }

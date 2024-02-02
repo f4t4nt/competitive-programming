@@ -52,25 +52,18 @@ int main(void) {
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    ll n; cin >> n;
-    vector<ll> times(86401);
-    FOR (i, n) {
-        ll m; cin >> m;
-        FOR (j, m) {
-            ll lo, hi; cin >> lo >> hi;
-            times[lo]++; times[hi + 1]--;
+    ll t; cin >> t;
+    while (t--) {
+        ll mxx = -1e9, mnx = 1e9, mxy = -1e9, mny = 1e9;
+        FOR (i, 4) {
+            ll x, y; cin >> x >> y;
+            mxx = max(mxx, x);
+            mnx = min(mnx, x);
+            mxy = max(mxy, y);
+            mny = min(mny, y);
         }
+        cout << (mxx - mnx) * (mxy - mny) << '\n';
     }
-    ll mx = 0, cnt = 0, cur = 0;
-    FOR (i, 86401) {
-        cur += times[i];
-        if (cur > mx) {
-            mx = cur; cnt = 1;
-        } elif (cur == mx) {
-            cnt++;
-        }
-    }
-    cout << mx << '\n' << cnt << '\n';
 
     return 0;
 }

@@ -52,25 +52,24 @@ int main(void) {
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    ll n; cin >> n;
-    vector<ll> times(86401);
-    FOR (i, n) {
-        ll m; cin >> m;
-        FOR (j, m) {
-            ll lo, hi; cin >> lo >> hi;
-            times[lo]++; times[hi + 1]--;
+    ll t; cin >> t;
+    while (t--) {
+        ll n, m, rv = 0; cin >> n >> m;
+        vector<ll> a(n), b(m), c(n);
+        FOR (i, n) cin >> a[i];
+        FOR (i, m) cin >> b[i];
+        ssort(a);
+        rsort(b);
+        FOR (i, n) c[i] = b[i];
+        FOR (i, n) {
+            ll j = m - (n - i);
+            if (abs(a[i] - b[j]) > abs(a[i] - c[i])) {
+                c[i] = b[j];
+            }
         }
+        FOR (i, n) rv += abs(a[i] - c[i]);
+        cout << rv << '\n';
     }
-    ll mx = 0, cnt = 0, cur = 0;
-    FOR (i, 86401) {
-        cur += times[i];
-        if (cur > mx) {
-            mx = cur; cnt = 1;
-        } elif (cur == mx) {
-            cnt++;
-        }
-    }
-    cout << mx << '\n' << cnt << '\n';
 
     return 0;
 }

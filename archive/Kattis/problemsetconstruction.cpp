@@ -4,7 +4,6 @@ using namespace std;
 
 typedef long long ll;
 typedef unsigned long long ull;
-typedef pair<ll, ll> pll;
 typedef complex<long double> cd;
 typedef long double ld;
 typedef char ch;
@@ -47,48 +46,38 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-#define f first
-#define s second
-
-ll sum(ll n) { return n * (n + 1) / 2; }
-
-struct SegTree {
-    ll n; vector<ll> data, sum, pre, suf;
-    SegTree (ll n) : n(n), data(4 * n), sum(4 * n), pre(4 * n), suf(4 * n) {}
-    void upd(ll ui, ll val, ll i = 1, ll l = 0, ll r = -1) {
-        if (r == -1) r = n;
-        if (ui == l && ui == r - 1) {
-            data[i] = max(val, 0LL);
-            sum[i] = val;
-            pre[i] = val;
-            suf[i] = val;
-            return;
-        }
-        ll m = (l + r) / 2;
-        if (ui < m) upd(ui, val, 2 * i, l, m);
-        else upd(ui, val, 2 * i + 1, m, r);
-        sum[i] = sum[2 * i] + sum[2 * i + 1];
-        pre[i] = max(pre[2 * i], sum[2 * i] + pre[2 * i + 1]);
-        suf[i] = max(suf[2 * i + 1], suf[2 * i] + sum[2 * i + 1]);
-        data[i] = max({data[2 * i], data[2 * i + 1], suf[2 * i] + pre[2 * i + 1], 0LL});
-    }
-    ll qry() { return data[1]; }
-};
-
-int main() {
+int main(void) {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    ll n, q; cin >> n >> q;
-    vector<ll> raw(n);
-    FOR (i, n) cin >> raw[i];
-    SegTree st(n);
-    FOR (i, n) st.upd(i, raw[i]);
-    while (q--) {
-        ll i, v; cin >> i >> v;
-        st.upd(--i, v);
-        cout << st.qry() << '\n';
+    ll n, k, tt; cin >> n >> k >> tt;
+    vector<tuple<ll, ld, ll>> qs(n);
+    FOR (i, n) {
+        ld p; ll s; cin >> p >> s;
+        qs[i] = {s, p, i};
+    }
+    vector<ld> rv(n);
+    ssort(qs);
+    vector<vector<ld>> dp(k + 1, vector<ld>(tt + 1));
+    dp[0][0] = 1;
+    FOR (i, n) {
+        auto [s0, p0, idx] = qs[i];
+        FORR (t, tt) {
+            for (ll j = min(i, k - 1); j >= 0 && j + (n - i) >= k; j--) {
+                if (dp[j][t] == 0) continue;
+                ld p = dp[j][t], c = (ld) (k - j) / (n - i);
+                dp[j][t] = p * (1 - c);
+                dp[j + 1][t] += p * c * (1 - p0);
+                if (t + s0 <= tt) {
+                    dp[j + 1][t + s0] += p * c * p0;
+                    rv[idx] += p * c * p0;
+                }
+            }
+        }
+    }
+    FOR (i, n) {
+        cout << fixed << setprecision(10) << rv[i] * n / k << '\n';
     }
 
     return 0;

@@ -4,7 +4,6 @@ using namespace std;
 
 typedef long long ll;
 typedef unsigned long long ull;
-typedef pair<ll, ll> pll;
 typedef complex<long double> cd;
 typedef long double ld;
 typedef char ch;
@@ -47,35 +46,35 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-#define x first
-#define y second
+ll eval(vector<ll> &a) {
+    ll rv = 1;
+    vector<ll> m(1e3, 0);
+    FORE (x, a) {
+        ll cnt = 1;
+        FOR (i, x) cnt += m[i];
+        m[x] += cnt;
+        rv += cnt;
+    }
+    return rv;
+}
 
-vector<pair<ll, ll>> convex_hull(vector<pair<ll, ll>> pts) {
-    if (sz(pts) <= 1) return pts;
-    ssort(pts);
-    vector<pair<ll, ll>> lo, hi;
-    FORE (p, pts) {
-        while (sz(lo) >= 2) {
-            auto &p1 = lo[sz(lo) - 2], &p2 = lo[sz(lo) - 1];
-            if ((p2.y - p1.y) * (p.x - p2.x) >= (p.y - p2.y) * (p2.x - p1.x)) {
-                lo.pop_back();
-            } else break;
+void solve(ll n) {
+    ll cur = 0;
+    vector<ll> rv;
+    while (true) {
+        rv.pb(cur++);
+        while (eval(rv) > n) {
+            rv.pop_back();
+            cur--;
+            assert(cur >= 0);
+            rv.pb(cur);
         }
-        lo.pb(p);
+        assert(sz(rv) <= 200);
+        if (eval(rv) == n) break;
     }
-    for (auto it = pts.rbegin(); it != pts.rend(); it++) {
-        auto &p = *it;
-        while (sz(hi) >= 2) {
-            auto &p1 = hi[sz(hi) - 2], &p2 = hi[sz(hi) - 1];
-            if ((p2.y - p1.y) * (p.x - p2.x) >= (p.y - p2.y) * (p2.x - p1.x)) {
-                hi.pop_back();
-            } else break;
-        }
-        hi.pb(p);
-    }
-    lo.pop_back(), hi.pop_back();
-    lo.insert(lo.end(), hi.begin(), hi.end());
-    return lo;
+    cout << sz(rv) << '\n';
+    FORE (x, rv) cout << x << ' ';
+    cout << '\n';
 }
 
 int main(void) {
@@ -83,16 +82,10 @@ int main(void) {
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    while (true) {
+    ll t; cin >> t;
+    while (t--) {
         ll n; cin >> n;
-        if (n == 0) break;
-        vector<pll> pts(n);
-        FORE (p, pts) cin >> p.x >> p.y;
-        set<pll> s(all(pts));
-        pts.assign(all(s));
-        auto hull = convex_hull(pts);
-        cout << sz(hull) << '\n';
-        FORE (p, hull) cout << p.x << ' ' << p.y << '\n';
+        solve(n);
     }
 
     return 0;

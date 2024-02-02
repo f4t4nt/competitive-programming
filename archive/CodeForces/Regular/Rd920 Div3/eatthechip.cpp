@@ -52,25 +52,27 @@ int main(void) {
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    ll n; cin >> n;
-    vector<ll> times(86401);
-    FOR (i, n) {
-        ll m; cin >> m;
-        FOR (j, m) {
-            ll lo, hi; cin >> lo >> hi;
-            times[lo]++; times[hi + 1]--;
+    ll t; cin >> t;
+    while (t--) {
+        ll h, w, xa, ya, xb, yb; cin >> h >> w >> xa >> ya >> xb >> yb;
+        ll del = xb - xa;
+        if (del <= 0) {
+            cout << "Draw\n";
+            continue;
         }
+        bool alice = (xb - xa) & 1;
+        ll mid = (xa + xb + 1) / 2,
+            mna = max(ya - (mid - xa), 1LL),
+            mxa = min(ya + (mid - xa), w),
+            mnb = max(yb - (xb - mid), 1LL),
+            mxb = min(yb + (xb - mid), w);
+        if (alice && mna <= mnb && mxb <= mxa)
+            cout << "Alice\n";
+        elif (!alice && mnb <= mna && mxa <= mxb)
+            cout << "Bob\n";
+        else
+            cout << "Draw\n";
     }
-    ll mx = 0, cnt = 0, cur = 0;
-    FOR (i, 86401) {
-        cur += times[i];
-        if (cur > mx) {
-            mx = cur; cnt = 1;
-        } elif (cur == mx) {
-            cnt++;
-        }
-    }
-    cout << mx << '\n' << cnt << '\n';
 
     return 0;
 }

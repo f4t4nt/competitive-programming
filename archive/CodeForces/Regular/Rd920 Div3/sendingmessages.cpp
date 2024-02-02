@@ -1,17 +1,19 @@
 #include <bits/stdc++.h>
- 
+
 using namespace std;
- 
-using ll = long long;
-using ull = unsigned long long;
-using cd = complex<long double>;
-using ld = long double;
-using ch = char;
-using str = string;
- 
+
+typedef long long ll;
+typedef unsigned long long ull;
+typedef complex<long double> cd;
+typedef long double ld;
+typedef char ch;
+typedef string str;
+
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+
 #include <bits/extc++.h>
 using namespace __gnu_pbds;
- 
+
 using indexed_set = tree<
     pair<ll, ll>,
     null_type,
@@ -19,9 +21,9 @@ using indexed_set = tree<
     rb_tree_tag,
     tree_order_statistics_node_update
 >;
- 
+
 #pragma GCC target("popcnt,lzcnt")
- 
+
 #define pb push_back
 #define elif else if
 #define sz(C) (ll) C.size()
@@ -29,7 +31,7 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
- 
+
 #define FOR(x, e) for(ll x = 0; x < (ll) e; x++)
 #define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
 #define FOB(x, b, e) for(auto x = b; x < e; x++)
@@ -45,35 +47,20 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-str p_str;
-map<tuple<ll, ll, ll, ll, ll>, pair<ll, set<ll>>> mem;
-
-pair<ll, set<ll>> dp(ll k,ll lza, ll cy, ll fa, ll fb) {
-    if (mem.count({k, lza, cy, fa, fb})) return mem[{k, lza, cy, fa, fb}];
-    return {0, {}};
-}
-
-int main() {
+int main(void) {
     ios_base::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
 
-    cin >> p_str;
-    ll fa, fb;
-    FORE (c, p_str) {
-        fa |= (c - '0');
-        fb |= (c - '0');
-    }
-    auto rv0 = dp(sz(p_str), 0, 0, fa, fb);
-    auto rv1 = dp(sz(p_str), 1, 0, fa, fb);
-    rv0.first += rv1.first;
-    rv0.second.insert(all(rv1.second));
-    cout << rv0.first << '\n';
-    rv0.second = {1,2};
-    ll cnt = 0;
-    FORE (x, rv0.second) {
-        if (cnt++ == 1) break;
-        cout << x << '\n';
+    ll t; cin >> t;
+    while (t--) {
+        ll n, f, a, b; cin >> n >> f >> a >> b;
+        vector<ll> m(n + 1), dp(n + 1);
+        FOR (i, n) cin >> m[i + 1];
+        FOR (i, n) {
+            dp[i + 1] = dp[i] + min(a * (m[i + 1] - m[i]), b);
+        }
+        cout << (dp.back() < f ? "YES" : "NO") << '\n';
     }
 
     return 0;

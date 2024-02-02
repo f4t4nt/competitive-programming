@@ -4,7 +4,6 @@ using namespace std;
 
 typedef long long ll;
 typedef unsigned long long ull;
-typedef pair<ll, ll> pll;
 typedef complex<long double> cd;
 typedef long double ld;
 typedef char ch;
@@ -47,49 +46,51 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-#define f first
-#define s second
+#define a first
+#define b second
 
-ll sum(ll n) { return n * (n + 1) / 2; }
-
-struct SegTree {
-    ll n; vector<ll> data, sum, pre, suf;
-    SegTree (ll n) : n(n), data(4 * n), sum(4 * n), pre(4 * n), suf(4 * n) {}
-    void upd(ll ui, ll val, ll i = 1, ll l = 0, ll r = -1) {
-        if (r == -1) r = n;
-        if (ui == l && ui == r - 1) {
-            data[i] = max(val, 0LL);
-            sum[i] = val;
-            pre[i] = val;
-            suf[i] = val;
-            return;
-        }
-        ll m = (l + r) / 2;
-        if (ui < m) upd(ui, val, 2 * i, l, m);
-        else upd(ui, val, 2 * i + 1, m, r);
-        sum[i] = sum[2 * i] + sum[2 * i + 1];
-        pre[i] = max(pre[2 * i], sum[2 * i] + pre[2 * i + 1]);
-        suf[i] = max(suf[2 * i + 1], suf[2 * i] + sum[2 * i + 1]);
-        data[i] = max({data[2 * i], data[2 * i + 1], suf[2 * i] + pre[2 * i + 1], 0LL});
-    }
-    ll qry() { return data[1]; }
-};
-
-int main() {
+int main(void) {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    ll n, q; cin >> n >> q;
-    vector<ll> raw(n);
-    FOR (i, n) cin >> raw[i];
-    SegTree st(n);
-    FOR (i, n) st.upd(i, raw[i]);
-    while (q--) {
-        ll i, v; cin >> i >> v;
-        st.upd(--i, v);
-        cout << st.qry() << '\n';
+    ll n; cin >> n;
+    vector<pair<ll, ll>> scores(n);
+    FOR (i, n) {
+        str s; cin >> s;
+        scores[i].a = stoll(s.substr(0, s.find('-')));
+        scores[i].b = stoll(s.substr(s.find('-') + 1));
     }
+    FOR (i, n) {
+        ll sum = scores[i].a + scores[i].b + 1;
+        sum /= 2;
+        if (sum & 1) {
+            swap(scores[i].a, scores[i].b);
+        }
+    }
+    bool fixed = false;
+    FOR (i, n - 1) {
+        if (scores[i].a > scores[i + 1].a || scores[i].b > scores[i + 1].b) {
+            cout << "error " << i + 2 << '\n';
+            return 0;
+        }
+        if (scores[i].a == 11 || scores[i].b == 11) {
+            fixed = true;
+        }
+        if (fixed && scores[i] != scores[i + 1]) {
+            cout << "error " << i + 2 << '\n';
+            return 0;
+        }
+        if (scores[i].a == 11 && scores[i].b == 11) {
+            cout << "error " << i + 1 << '\n';
+            return 0;
+        }
+    }
+    if (scores[n - 1].a == 11 && scores[n - 1].b == 11) {
+        cout << "error " << n << '\n';
+        return 0;
+    }
+    cout << "ok\n";
 
     return 0;
 }

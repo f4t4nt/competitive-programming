@@ -47,49 +47,43 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-#define f first
-#define s second
-
-ll sum(ll n) { return n * (n + 1) / 2; }
-
-struct SegTree {
-    ll n; vector<ll> data, sum, pre, suf;
-    SegTree (ll n) : n(n), data(4 * n), sum(4 * n), pre(4 * n), suf(4 * n) {}
-    void upd(ll ui, ll val, ll i = 1, ll l = 0, ll r = -1) {
-        if (r == -1) r = n;
-        if (ui == l && ui == r - 1) {
-            data[i] = max(val, 0LL);
-            sum[i] = val;
-            pre[i] = val;
-            suf[i] = val;
-            return;
-        }
-        ll m = (l + r) / 2;
-        if (ui < m) upd(ui, val, 2 * i, l, m);
-        else upd(ui, val, 2 * i + 1, m, r);
-        sum[i] = sum[2 * i] + sum[2 * i + 1];
-        pre[i] = max(pre[2 * i], sum[2 * i] + pre[2 * i + 1]);
-        suf[i] = max(suf[2 * i + 1], suf[2 * i] + sum[2 * i + 1]);
-        data[i] = max({data[2 * i], data[2 * i + 1], suf[2 * i] + pre[2 * i + 1], 0LL});
-    }
-    ll qry() { return data[1]; }
-};
-
 int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    ll n, q; cin >> n >> q;
-    vector<ll> raw(n);
-    FOR (i, n) cin >> raw[i];
-    SegTree st(n);
-    FOR (i, n) st.upd(i, raw[i]);
-    while (q--) {
-        ll i, v; cin >> i >> v;
-        st.upd(--i, v);
-        cout << st.qry() << '\n';
+    ll n, mx = 0; cin >> n;
+    vector<vector<ll>> adj(n);
+    FOR (i, n - 1) {
+        ll u, v; cin >> u >> v;
+        u--; v--;
+        adj[u].pb(v);
+        adj[v].pb(u);
+        mx = max(mx, max(sz(adj[u]), sz(adj[v])));
     }
+    if (mx == n - 1) {
+        cout << "NO\n";
+        return 0;
+    }
+    cout << "YES\n";
+    ll u = -1;
+    FOR (i, n) if (sz(adj[i]) == 1) {
+        u = i;
+        break;
+    }
+    ll v = adj[u][0];
+    cout << v + 1 << ' ' << u + 1;
+    vector<bool> vis(n);
+    vis[u] = vis[v] = true;
+    auto dfs = [&](auto &&f, ll u) -> void {
+        FORE (v, adj[u]) if (!vis[v]) {
+            vis[v] = true;
+            cout << ' ' << v + 1;
+            f(f, v);
+        }
+    };
+    dfs(dfs, v);
+    cout << '\n';
 
     return 0;
 }

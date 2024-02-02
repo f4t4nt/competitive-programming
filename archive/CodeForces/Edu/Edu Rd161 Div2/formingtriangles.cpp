@@ -19,8 +19,7 @@ using indexed_set = tree<
     null_type,
     less<pair<ll, ll>>,
     rb_tree_tag,
-    tree_order_statistics_node_update
->;
+    tree_order_statistics_node_update>;
 
 #pragma GCC target("popcnt,lzcnt")
 
@@ -32,11 +31,11 @@ using indexed_set = tree<
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
 
-#define FOR(x, e) for(ll x = 0; x < (ll) e; x++)
-#define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
-#define FOB(x, b, e) for(auto x = b; x < e; x++)
-#define FORE(x, C) for(auto &x : C)
- 
+#define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
+#define FORR(x, e) for (ll x = (ll)e - 1; x >= 0; x--)
+#define FOB(x, b, e) for (auto x = b; x < e; x++)
+#define FORE(x, C) for (auto &x : C)
+
 #ifdef LOCAL
 #include "tester.cpp"
 #define main test_main
@@ -52,25 +51,34 @@ int main(void) {
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    ll n; cin >> n;
-    vector<ll> times(86401);
-    FOR (i, n) {
-        ll m; cin >> m;
-        FOR (j, m) {
-            ll lo, hi; cin >> lo >> hi;
-            times[lo]++; times[hi + 1]--;
+    ll t; cin >> t;
+    while (t--) {
+        ll n, rv = 0; cin >> n;
+        vector<ll> a(n), cnt(n);
+        map<ll, ll> m;
+        FOR (i, n) {
+            cin >> a[i];
+            m[a[i]]++;
         }
-    }
-    ll mx = 0, cnt = 0, cur = 0;
-    FOR (i, 86401) {
-        cur += times[i];
-        if (cur > mx) {
-            mx = cur; cnt = 1;
-        } elif (cur == mx) {
-            cnt++;
+        ll cur = 0;
+        cnt[0] = 0;
+        for (auto [k, v] : m) {
+            rv += v * (v - 1) * (v - 2) / 6;
+            cur += v;
+            cnt[k] = cur;
         }
+        auto it = m.begin();
+        cur = 0;
+        for (auto [k, v] : m) {
+            while (it != m.end() && it->first < k + 1) {
+                cur += it->second;
+                it++;
+            }
+            ll tru = cur - v;
+            rv += v * (v - 1) * tru / 2;
+        }
+        cout << rv << '\n';
     }
-    cout << mx << '\n' << cnt << '\n';
 
     return 0;
 }

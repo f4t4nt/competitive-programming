@@ -7,6 +7,7 @@ typedef unsigned long long ull;
 typedef pair<ll, ll> pll;
 typedef complex<long double> cd;
 typedef long double ld;
+typedef pair<ld, ld> pld;
 typedef char ch;
 typedef string str;
 
@@ -47,53 +48,54 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-#define x first
-#define y second
+// vector<cd> a(n2), b(n2);
+// ...init a, b...
+// fft(a, false);
+// fft(b, false);
+// FOR (i, n) a[i] *= b[i];
+// fft(a, true);
 
-vector<pair<ll, ll>> convex_hull(vector<pair<ll, ll>> pts) {
-    if (sz(pts) <= 1) return pts;
-    ssort(pts);
-    vector<pair<ll, ll>> lo, hi;
-    FORE (p, pts) {
-        while (sz(lo) >= 2) {
-            auto &p1 = lo[sz(lo) - 2], &p2 = lo[sz(lo) - 1];
-            if ((p2.y - p1.y) * (p.x - p2.x) >= (p.y - p2.y) * (p2.x - p1.x)) {
-                lo.pop_back();
-            } else break;
-        }
-        lo.pb(p);
+void fft(vector<cd> &a, bool inv) {
+    int n = sz(a);
+    for (int i = 1, j = 0; i < n; i++) {
+        int bit = n >> 1;
+        for (; j & bit; bit >>= 1) j ^= bit;
+        j ^= bit;
+        if (i < j) swap(a[i], a[j]);
     }
-    for (auto it = pts.rbegin(); it != pts.rend(); it++) {
-        auto &p = *it;
-        while (sz(hi) >= 2) {
-            auto &p1 = hi[sz(hi) - 2], &p2 = hi[sz(hi) - 1];
-            if ((p2.y - p1.y) * (p.x - p2.x) >= (p.y - p2.y) * (p2.x - p1.x)) {
-                hi.pop_back();
-            } else break;
+    for (int len = 2; len <= n; len <<= 1) {
+        ld ang = 2 * M_PI / len * (inv ? -1 : 1);
+        cd wlen(cos(ang), sin(ang));
+        for (int i = 0; i < n; i += len) {
+            cd w(1);
+            for (int j = 0; j < len / 2; j++) {
+                cd u = a[i + j], v = a[i + j + len / 2] * w;
+                a[i + j] = u + v;
+                a[i + j + len / 2] = u - v;
+                w *= wlen;
+            }
         }
-        hi.pb(p);
     }
-    lo.pop_back(), hi.pop_back();
-    lo.insert(lo.end(), hi.begin(), hi.end());
-    return lo;
+    if (inv) FORE (x, a) x /= n;
 }
 
-int main(void) {
+int main() {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    while (true) {
-        ll n; cin >> n;
-        if (n == 0) break;
-        vector<pll> pts(n);
-        FORE (p, pts) cin >> p.x >> p.y;
-        set<pll> s(all(pts));
-        pts.assign(all(s));
-        auto hull = convex_hull(pts);
-        cout << sz(hull) << '\n';
-        FORE (p, hull) cout << p.x << ' ' << p.y << '\n';
+    str s; cin >> s;
+    ll n = sz(s), n2 = 1LL << (65 - __builtin_clzll(n));
+    vector<cd> a(n2), b(n2);
+    FOR (i, n) {
+        if (s[i] == 'A') a[i] = 1;
+        else b[n - i - 1] = 1;
     }
+    fft(a, false);
+    fft(b, false);
+    FOR (i, n2) a[i] *= b[i];
+    fft(a, true);
+    FOB (i, n, 2 * n - 1) cout << (ll) round(a[i].real()) << '\n';
 
     return 0;
 }

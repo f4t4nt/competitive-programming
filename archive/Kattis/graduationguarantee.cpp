@@ -19,8 +19,7 @@ using indexed_set = tree<
     null_type,
     less<pair<ll, ll>>,
     rb_tree_tag,
-    tree_order_statistics_node_update
->;
+    tree_order_statistics_node_update>;
 
 #pragma GCC target("popcnt,lzcnt")
 
@@ -32,11 +31,11 @@ using indexed_set = tree<
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
 
-#define FOR(x, e) for(ll x = 0; x < (ll) e; x++)
-#define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
-#define FOB(x, b, e) for(auto x = b; x < e; x++)
-#define FORE(x, C) for(auto &x : C)
- 
+#define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
+#define FORR(x, e) for (ll x = (ll)e - 1; x >= 0; x--)
+#define FOB(x, b, e) for (auto x = b; x < e; x++)
+#define FORE(x, C) for (auto &x : C)
+
 #ifdef LOCAL
 #include "tester.cpp"
 #define main test_main
@@ -52,25 +51,25 @@ int main(void) {
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    ll n; cin >> n;
-    vector<ll> times(86401);
+    ll n, k; cin >> n >> k;
+    vector<ld> p(n);
+    FOR (i, n) cin >> p[i];
+    rsort(p);
+    ld rv = 0;
+    vector<ld> cur(2 * n + 1);
+    cur[n] = 1;
     FOR (i, n) {
-        ll m; cin >> m;
-        FOR (j, m) {
-            ll lo, hi; cin >> lo >> hi;
-            times[lo]++; times[hi + 1]--;
+        vector<ld> nxt(2 * n + 1);
+        FOB (j, 1, 2 * n) {
+            nxt[j - 1] += cur[j] * (1 - p[i]);
+            nxt[j + 1] += cur[j] * p[i];
         }
+        ld tmp = 0;
+        FOB (j, n + k, 2 * n + 1) tmp += nxt[j];
+        rv = max(rv, tmp);
+        cur = nxt;
     }
-    ll mx = 0, cnt = 0, cur = 0;
-    FOR (i, 86401) {
-        cur += times[i];
-        if (cur > mx) {
-            mx = cur; cnt = 1;
-        } elif (cur == mx) {
-            cnt++;
-        }
-    }
-    cout << mx << '\n' << cnt << '\n';
+    cout << fixed << setprecision(10) << rv << '\n';
 
     return 0;
 }

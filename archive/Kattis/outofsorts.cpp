@@ -47,30 +47,31 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+void binsearch(ll lo, ll hi, ll y, vector<ll> &x, vector<bool> &ok) {
+    if (lo > hi) return;
+    ll mid = (lo + hi) / 2;
+    if (x[mid] == y) {
+        ok[mid] = true;
+        return;
+    }
+    if (x[mid] < y) binsearch(mid + 1, hi, y, x, ok);
+    else binsearch(lo, mid - 1, y, x, ok);
+}
+
 int main(void) {
     ios_base::sync_with_stdio(false);
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    ll n; cin >> n;
-    vector<ll> times(86401);
-    FOR (i, n) {
-        ll m; cin >> m;
-        FOR (j, m) {
-            ll lo, hi; cin >> lo >> hi;
-            times[lo]++; times[hi + 1]--;
-        }
-    }
-    ll mx = 0, cnt = 0, cur = 0;
-    FOR (i, 86401) {
-        cur += times[i];
-        if (cur > mx) {
-            mx = cur; cnt = 1;
-        } elif (cur == mx) {
-            cnt++;
-        }
-    }
-    cout << mx << '\n' << cnt << '\n';
+    ll n, m, a, c;
+    cin >> n >> m >> a >> c;
+    n++;
+    vector<ll> x(n); cin >> x[0];
+    FOB (i, 1, n) x[i] = (a * x[i - 1] + c) % m;
+    vector<bool> ok(n);
+    FOB (i, 1, n) binsearch(1, n - 1, x[i], x, ok);
+    ll rv = accumulate(all(ok), 0LL);
+    cout << rv << '\n';
 
     return 0;
 }
