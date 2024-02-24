@@ -32,8 +32,8 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-#define f first
-#define s second
+#define x first
+#define y second
 
 #define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
 #define FORR(x, e) for (ll x = (ll)e - 1; x >= 0; x--)
@@ -50,11 +50,31 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+bool valid(str &s, ll i) {
+    ll delta = 0, idx = 0;
+    while (idx < sz(s)) {
+        ll a = 0, b = 0;
+        while (idx < sz(s) && a < i && b < i) {
+            if (s[idx] == 'A') a++;
+            else b++;
+            idx++;
+        }
+        if (a == i) delta++;
+        elif (b == i) delta--;
+    }
+    return delta > 0;
+}
+
 int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
 
-    
+    str s; cin >> s;
+    vector<ll> rv;
+    FOR (i, 2e3) if (valid(s, i + 1)) rv.pb(i + 1);
+    cout << sz(rv) << '\n';
+    FORE (x, rv) cout << x << ' ';
+    cout << '\n';
 
     return 0;
 }

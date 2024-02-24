@@ -80,17 +80,12 @@ struct SuffixTree {
         hi[1] = -1;
         tree[1] = vector<ll>(alpha, 0);
         // add the text to the tree, letter by letter
-        for (cur_char = 0; cur_char < sz(s); cur_char++) {
-            add_char(char_to_index(s[cur_char]));
-        }
+        for (cur_char = 0; cur_char < sz(s); cur_char++) add_char(char_to_index(s[cur_char]));
     }
 
     ll char_to_index(ch c) {
-        if (c == '$') {
-            return 26;
-        } else {
-            return c - 'a';
-        }
+        if (c == '$') return 26;
+        else return c - 'a';
     }
 
     // add character c to the tree
@@ -111,9 +106,9 @@ struct SuffixTree {
             cur_node = tree[cur_node][c];
             cur_pos = lo[cur_node];
         } // otherwise just proceed to the next edge
-        if (cur_pos == -1 || c == char_to_index(s[cur_pos])) {
-            cur_pos++; // if the letter on the edge equal c, go down that edge
-        } else { 
+        if (cur_pos == -1 || c == char_to_index(s[cur_pos])) cur_pos++;
+        // ^ if the letter on the edge equal c, go down that edge
+        else { 
             // otherwise split the edge in two with middle in node cur_size
             lo[cur_size] = lo[cur_node];
             hi[cur_size] = cur_pos - 1;
@@ -139,11 +134,8 @@ struct SuffixTree {
             }
             // if we're in a node, add a suffix link to it, otherwise add the link to cur_size
             // (we'll create cur_size on next iteration).
-            if (cur_pos == hi[cur_size - 2] + 1) {
-                link[cur_size - 2] = cur_node;
-            } else {
-                link[cur_size - 2] = cur_size;
-            } 
+            if (cur_pos == hi[cur_size - 2] + 1) link[cur_size - 2] = cur_node;
+            else link[cur_size - 2] = cur_size;
             // add cur_pos to the new edge and return to add letter to suffix
             cur_pos = hi[cur_node] - (cur_pos - hi[cur_size - 2]) + 2;
             goto suff;

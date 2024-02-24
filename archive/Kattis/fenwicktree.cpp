@@ -50,11 +50,39 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+struct BIT {
+    vector<ll> tree; ll n;
+    BIT(ll n) : n(n) { tree.resize(n + 1); }
+    void update(ll idx, ll val) {
+        idx++;
+        while (idx <= n)
+        { tree[idx] += val; idx += idx & (-idx); }
+    }
+    ll query(ll idx) {
+        idx++; ll sum = 0;
+        while (idx > 0)
+        { sum += tree[idx]; idx -= idx & (-idx); }
+        return sum;
+    }
+    ll query(ll l, ll r) { return query(r) - query(l - 1); }
+};
+
 int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
 
-    
+    ll n, q; cin >> n >> q;
+    BIT bit(n);
+    while (q--) {
+        ch t; cin >> t;
+        if (t == '+') {
+            ll k, x; cin >> k >> x;
+            bit.update(k, x);
+        } else {
+            ll r; cin >> r;
+            cout << bit.query(0, r - 1) << '\n';
+        }
+    }
 
     return 0;
 }

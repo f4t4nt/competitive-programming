@@ -32,8 +32,8 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-#define f first
-#define s second
+#define x first
+#define y second
 
 #define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
 #define FORR(x, e) for (ll x = (ll)e - 1; x >= 0; x--)
@@ -54,7 +54,12 @@ int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
 
-    
+    ll h1, b1, h2, b2; cin >> h1 >> b1 >> h2 >> b2;
+    h1 = h1 * 3 + b1;
+    h2 = h2 * 3 + b2;
+    if (h1 > h2) cout << 1 << ' ' << h1 - h2 << '\n';
+    elif (h1 < h2) cout << 2 << ' ' << h2 - h1 << '\n';
+    else cout << "NO SCORE\n";
 
     return 0;
 }

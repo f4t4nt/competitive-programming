@@ -32,8 +32,8 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-#define f first
-#define s second
+#define x first
+#define y second
 
 #define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
 #define FORR(x, e) for (ll x = (ll)e - 1; x >= 0; x--)
@@ -54,7 +54,18 @@ int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
 
-    
+    vector<ll> primes;
+    bitset<1000000> is_prime;
+    is_prime.set();
+    for (ll i = 2; i < 1000000; i++) {
+        if (is_prime[i]) {
+            primes.pb(i);
+            for (ll j = i * i; j < 1000000; j += i) {
+                is_prime[j] = 0;
+            }
+        }
+    }
+    cout << primes[2023] << '\n';
 
     return 0;
 }

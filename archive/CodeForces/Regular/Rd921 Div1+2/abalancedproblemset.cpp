@@ -7,7 +7,6 @@ typedef unsigned long long ull;
 typedef pair<ll, ll> pll;
 typedef complex<long double> cd;
 typedef long double ld;
-typedef pair<ld, ld> pld;
 typedef char ch;
 typedef string str;
 
@@ -17,9 +16,9 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 using namespace __gnu_pbds;
 
 using indexed_set = tree<
-    pld,
+    pair<ll, ll>,
     null_type,
-    less<pld>,
+    less<pair<ll, ll>>,
     rb_tree_tag,
     tree_order_statistics_node_update>;
 
@@ -32,8 +31,6 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-#define f first
-#define s second
 
 #define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
 #define FORR(x, e) for (ll x = (ll)e - 1; x >= 0; x--)
@@ -51,10 +48,28 @@ string test_file_name = "tests";
 #endif
 
 int main() {
-    ios_base::sync_with_stdio(0);
-    cin.tie(0), cout.tie(0);
+    ios_base::sync_with_stdio(false);
+    cin.tie(nullptr);
+    cout.tie(nullptr);
 
-    
+    ll t; cin >> t;
+    while (t--) {
+        ll n, x; cin >> n >> x;
+        ll rv = n / x;
+        set<ll> divs;
+        for (ll i = 1; i * i <= n; i++) {
+            if (n % i == 0) {
+                divs.insert(i);
+                divs.insert(n / i);
+            }
+        }
+        auto it = divs.upper_bound(rv);
+        if (it != divs.begin()) {
+            it--;
+            rv = *it;
+        }
+        cout << rv << '\n';
+    }
 
     return 0;
 }

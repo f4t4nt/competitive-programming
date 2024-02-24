@@ -35,45 +35,30 @@ int main() {
     cin.tie(nullptr);
     cout.tie(nullptr);
 
-    str s;
-    cin >> s;
+    str s; cin >> s;
     ll n = sz(s);
     vector<ll> match(n + 1);
     vector<vector<ll>> pre(n + 1, vector<ll>(n + 1));
-    FORR (i, n) {
-        FOB (j, i + 1, n) {
-            if (s[i] == s[j]) {
-                pre[i][j] = pre[i + 1][j + 1] + 1;
-            }
-            pre[j][i] = pre[i][j];
-        }
+    FORR (i, n) FOB (j, i + 1, n) {
+        if (s[i] == s[j]) pre[i][j] = pre[i + 1][j + 1] + 1;
+        pre[j][i] = pre[i][j];
     }
 
     ll rv0 = 0, rv1 = 0;
-    FOR (i, n) {
-        FOB (j, i, n) {
-            ll len = j - i + 1, tmp = 0;
-            FOR (k, n) {
-                match[k] = (pre[k][i] >= len);
-                tmp += match[k];
-            }
-            ll lo = max(0LL, i - len + 1), hi = j;
-            FOB (k, lo, (hi + 1)) {
-                tmp -= match[k];
-            }
-            rv1 += tmp;
-            FORR (k, i) {
-                lo--, hi++;
-                if (lo >= 0) {
-                    tmp -= match[lo];
-                }
-                if (hi < n) {
-                    tmp -= match[hi];
-                }
-                if (pre[k][j + 1] >= i - k) {
-                    rv0 += tmp;
-                }
-            }
+    FOR (i, n) FOB (j, i, n) {
+        ll len = j - i + 1, tmp = 0;
+        FOR (k, n) {
+            match[k] = (pre[k][i] >= len);
+            tmp += match[k];
+        }
+        ll lo = max(0LL, i - len + 1), hi = j;
+        FOB (k, lo, (hi + 1)) tmp -= match[k];
+        rv1 += tmp;
+        FORR (k, i) {
+            lo--, hi++;
+            if (lo >= 0) tmp -= match[lo];
+            if (hi < n) tmp -= match[hi];
+            if (pre[k][j + 1] >= i - k) rv0 += tmp;
         }
     }
     cout << rv0 + rv1 / 2 << '\n';

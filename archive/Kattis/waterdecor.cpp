@@ -31,7 +31,7 @@ string test_file_name = "tests";
 #endif
 
 constexpr ll MAXD = 1 << 20;
-ll cnter = 0;
+ll idx = 0;
 vector<ll> all_lo(MAXD), all_hi(MAXD), cnt(MAXD);
 
 struct SegTree {
@@ -95,7 +95,7 @@ struct SegTree {
             all_lo[l] = *data[i].begin();
             all_hi[l] = *data[i].rbegin();
             FORE (x, data[i]) {
-                if (cnt[x] == 0) cnt[x] = cnter++;
+                if (cnt[x] == 0) cnt[x] = idx++;
             }
             return;
         }

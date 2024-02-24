@@ -18,7 +18,7 @@ typedef long double ld;
 
 const ll MOD = 1e9 + 7;
 
-ll cnter = 0;
+ll idx = 0;
 ll dx[4] = {1, 0, -1, 0};
 ll dy[4] = {0, 1, 0, -1};
 
@@ -27,7 +27,7 @@ vector<vector<ll>> &grid,
 vector<vector<vector<ll>>> &dp,
 vector<vector<bool>> &vis) {
     if (vis[i][j]) return;
-    assert(cnter++ < 1e6);
+    assert(idx++ < 1e6);
     vis[i][j] = 1;
     FOR (k, 4) {
         ll nx = i + dx[k], ny = j + dy[k];

@@ -17,9 +17,9 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 using namespace __gnu_pbds;
 
 using indexed_set = tree<
-    pld,
+    pair<ll, ll>,
     null_type,
-    less<pld>,
+    less<pair<ll, ll>>,
     rb_tree_tag,
     tree_order_statistics_node_update>;
 
@@ -32,8 +32,6 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-#define f first
-#define s second
 
 #define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
 #define FORR(x, e) for (ll x = (ll)e - 1; x >= 0; x--)
@@ -54,7 +52,29 @@ int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
 
-    
+    ll n, m; cin >> n >> m;
+    vector<vector<ll>> adj(n);
+    FOR (i, m) {
+        ll u, v; cin >> u >> v;
+        u--, v--;
+        adj[u].pb(v);
+        adj[v].pb(u);
+    }
+    queue<ll> q;
+    vector<ll> dist(n, 1e18);
+    q.push(0);
+    dist[0] = 0;
+    while (sz(q)) {
+        ll u = q.front();
+        q.pop();
+        FORE (v, adj[u]) {
+            if (dist[v] > dist[u] + 1) {
+                dist[v] = dist[u] + 1;
+                q.push(v);
+            }
+        }
+    }
+    cout << dist[n - 1] - 1 << '\n';
 
     return 0;
 }
