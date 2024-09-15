@@ -1,0 +1,91 @@
+Room: 1
+Desc: You are standing in front of the gate to a large mysterious mansion. The thick nightime fog obsures the building but you can make out a few lights coming from the building. Someone is awake. The gate’s rusted lock seems ready to fall off. Maybe if you bashed the gate hard enough, you could get through, or you could try to climb over the gate. Would you like to CLIMB or BASH the gate?
+
+Option: climb
+Stat: dex
+Pass: You carefully climb over the old rusted gate. You land safely on your feet inside the grounds of the mysterious mansion.
+Pexit: 2
+Fail: As you make your way over the rusted gate, the finial you are using for support snaps and you land hard on the ground below. You take DMG damage and are a little shaken. Nevertheless, you have made it inside the grounds of the mysterious mansion.
+Fexit: 2
+Damage: 1d4
+
+Option: bash
+Stat: str
+Pass: You put all your weight into a massive assault on the gate. As you suspected, the lock was not up to the challenge and gave way easily. You hear a large thud as the gate crashes open. You have made it inside the grounds of the mysterious mansion.
+Pexit: 3
+Fail: You put all your weight into a massive assault on the gate. At first, the lock resists your attack, and the collision with the gate bites into your shoulder. You take DMG damage. After a moment's hesitation, the lock gives, and the gate swings open with a thud. You have made it inside the grounds of the mysterious mansion.
+Fexit: 3
+Damage: 1d4
+
+Room: 2
+Desc: You have made it onto the grounds of the mysterious mansion. A long driveway stretches before you. It leads to the an ornate main entry portico old barely visible in the distance. To your left you hear the sounds of flowing water coming from behind a hedge. To your right you think you see a swing rocking back and forth suspended from a large oak tree. Would you like to go FORWARD, LEFT, or RIGHT?
+
+Option: forward
+Stat: none
+Pass: With you heart ponding you boldly start to make your way towards the front entrance of the mansion.
+Pexit: 4
+
+Option: left
+Stat: none
+Pass: Curious as to what that sound could be you make your way to the left around the hedge.
+Pexit: 5
+Option: right
+Stat: none
+Pass: As you begin to approach the old oak tree, the thought occurs to you that there isn't enough breeze in the air to push the heavy tire swing.
+Pexit: 6
+Room: 3
+Desc: You have made it onto the grounds of the mysterious mansion. A long driveway stretches before you. It leads to the an ornate main entry portico old barely visible in the distance. To your left you hear the sounds of flowing water coming from behind a hedge. To your right the loud crash of the gate seems to have drawn some attention. A shadow, moving in the distance, seems to be getting larger. Would you like to STAND your ground, RUN up the driveway, or HIDE behind the hedge.
+Option: stand
+Stat: none
+Pass: You hold your ground and wait as the figure aproaches. A sleepy eyed dog emerges from the darkness and stares at you. Find out what happens next whaen the full game launches. Thank you for playing the demo.
+Pexit: 9999
+Option: run
+Stat: dex
+Pass: As the gate disapears rapidly into the fog you catch a glimpse of a large dog. It does not seem to have noticed you.
+Pexit: 4
+Fail: It's too late, the figure emerges from the darkness and blocks your path. A sleepy eyed dog stares at you apearantly waiting for something. Find out what happens next whaen the full game launches. Thank you for playing the demo.
+Fexit: 9999
+Option: hide
+Stat: dex
+Pass: That was close! You swiftly dodge behind the hedge before a large dog emerges from the dark onto the path you just left.
+Pexit: 5
+Fail: It's too late, the figure emerges from the darkness and blocks your path. A sleepy eyed dog stares at you apearantly waiting for something. Find out what happens next whaen the full game launches. Thank you for playing the demo.
+Fexit: 9999
+Room: 4
+Desc: Inside the portico you can see the ornate front door of the mansion looming before you. A large brass knocker dares you to alert the occupants to your presance. To the left you can see a cavernous garage which has been left open. Do you want to attempt to OPEN the door, KNOCK on the door, or enter the GARAGE?
+Option: open
+Stat: none
+Pass: That's all for now. Thank you for playing the demo.
+Pexit: 9999
+Option: knock
+Stat: none
+Pass: That's all for now. Thank you for playing the demo.
+Pexit: 9999
+Option: garage
+Stat: none
+Pass: That's all for now. Thank you for playing the demo.
+Pexit: 9999
+Room: 5
+Desc: You are in a small garden walled on all sides by a neatly trimmed hedge. In the center is a beautiful fairy tending a stone garden at her feet. A constant flow of water pours from her pitcher onto the meticulously carved stone flowers and into a pool surrounding the statue. Across the way you can make out a gap in the hedge. Would you like to INVESTIGATE the statue or go through the GAP in the hedge?
+Option: investigate
+Stat: none
+Pass: That's all for now. Thank you for playing the demo.
+Pexit: 9999
+Option: gap
+Stat: none
+Pass: That's all for now. Thank you for playing the demo.
+Pexit: 9999
+Room: 6
+Desc: The tree seems to have stood sentinal on this spot since before time began. You feel a strong presence from its ancient root. As stand transfixed by the oscillating tire swing, you begin to hear a faint whisper. Beyond it you can see the dim light of a fire in the distance. Go PAST the swing toward the fire, go BACK to the path, STAND and listing to the whisper.
+Option: past
+Stat: none
+Pass: That's all for now. Thank you for playing the demo.
+Pexit: 9999
+Option: back
+Stat: none
+Pass: You decide not to meddel with such ancient forces. You turn around and head back to the path.
+Pexit: 2
+Option: stand
+Stat: none
+Pass: That's all for now. Thank you for playing the demo.
+Pexit: 9999

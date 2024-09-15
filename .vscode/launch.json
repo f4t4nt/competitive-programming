@@ -1,21 +1,28 @@
 {
     "version": "0.2.0",
     "configurations": [
-        // {
-        //     "name": "(gdb) Launch optimized",
-        //     "type": "cppdbg",
-        //     "request": "launch",
-        //     "program": "${fileDirname}/bin/${fileBasenameNoExtension}",
-        //     "args": [],
-        //     "stopAtEntry": false,
-        //     "cwd": "${fileDirname}",
-        //     "environment": [],
-        //     "externalConsole": false,
-        //     "MIMode": "",
-        //     "preLaunchTask": "C/C++: g++ build active file optimized",
-        //     "miDebuggerPath": "",
-        //     "setupCommands": []
-        // },
+        {
+            "name": "Python Debugger: Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "(gdb) Launch optimized",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${fileDirname}/bin/${fileBasenameNoExtension}",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "",
+            "preLaunchTask": "C/C++: g++ build active file optimized",
+            "miDebuggerPath": "",
+            "setupCommands": []
+        },
         {
             "name": "(gdb) Launch",
             "type": "cppdbg",
@@ -32,12 +39,12 @@
                 {
                     "description": "Enable pretty-printing for gdb",
                     "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
+                    // "ignoreFailures": true
                 },
                 {
                     "description": "Set Disassembly Flavor to Intel",
                     "text": "-gdb-set disassembly-flavor intel",
-                    "ignoreFailures": true
+                    // "ignoreFailures": true
                 }
             ]
         },

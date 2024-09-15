@@ -492,7 +492,7 @@ const int ROOT = 5;
 const int ROOT_1 = 4404020; // 5*4404020 = 1 (mod MOD)
 const int ROOT_PW = 1 << 20; // 5^(2^20) = 1 (mod MOD)
 
-void fft(vector<int> & a, bool invert) {
+void fft(vector<int> &a, bool invert) {
     int n = sz(a);
     for (int i = 1, j = 0; i < n; i++) {
         int bit = n >> 1;
@@ -1577,3 +1577,32 @@ pld proj(pld p0, pld p1, pld p2) { // proj p2 onto p0p1
 // we can use graph cut optimization
 
 // https://en.wikipedia.org/wiki/Quadratic_pseudo-Boolean_optimization
+
+//--------------------------------------------------
+
+// if moving +1 with probability p, probability to reach N before 0 from k is:
+// if p=0.5:    P(k) = k / N
+// else:        q := 1 - p, P(k) = (1 - (q / p)^k) / (1 - (q / p)^N)
+
+#include <iostream>
+#include <set>
+
+// Custom comparator function
+bool customCompare(int a, int b) {
+    // Example: Sort in descending order
+    return a > b;
+}
+
+int main() {
+    // Create a set with custom comparator function
+    std::set<int, decltype(&customCompare)> mySet(customCompare);
+
+    mySet.insert({3, 1, 4, 1, 5, 9, 2, 6});
+
+    // Print elements of the set
+    for (const int& elem : mySet) {
+        std::cout << elem << " ";  // Output: 9 6 5 4 3 2 1
+    }
+
+    return 0;
+}

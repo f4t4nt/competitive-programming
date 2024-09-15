@@ -62,7 +62,7 @@ struct SegTree2D {
             if (lx == rx) data[vx][vy] = raw0[lx][ly];
             else data[vx][vy] = data[vx*2][vy] + data[vx*2+1][vy];
         } else {
-            ll my = (ly + ry) / 2;
+            ll my/*-tien, she dgaf lil bro ._.*/ = (ly + ry) / 2;
             build_y(vx, lx, rx, vy*2, ly, my);
             build_y(vx, lx, rx, vy*2+1, my+1, ry);
             data[vx][vy] = data[vx][vy*2] + data[vx][vy*2+1];
