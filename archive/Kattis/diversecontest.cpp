@@ -32,8 +32,8 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-#define f first
-#define s second
+// #define f first
+// #define s second
 
 #define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
 #define FOR1(x, e) for (ll x = 1; x < (ll)e; x++)
@@ -53,12 +53,40 @@ int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
 
-    ll t; cin >> t;
-    while (t--) {
-        ll n; cin >> n;
-        vector<ll> a(n);
-        FOR (i, n) cin >> a[i];
+    ll n, k; cin >> n >> k;
+    map<str, ll> topic_id;
+    vector<vector<ll>> problems(n);
+    FOR (i, n) {
+        ll m; cin >> m;
+        FOR (j, m) {
+            str topic; cin >> topic;
+            if (!topic_id.count(topic)) {
+                ll id = sz(topic_id);
+                topic_id[topic] = id;
+            }
+            problems[i].pb(topic_id[topic]);
+        }
     }
+    ll ans = 0;
+    FOR (mask, 1 << n) {
+        if (__builtin_popcount(mask) != k) continue;
+        vector<ll> topics(sz(topic_id));
+        bool ok = true;
+        FOR (i, n) {
+            if (mask & (1 << i)) {
+                for (ll topic : problems[i]) {
+                    topics[topic]++;
+                    if (topics[topic] > k / 2) {
+                        ok = false;
+                        break;
+                    }
+                }
+            }
+            if (!ok) break;
+        }
+        if (ok) ans++;
+    }
+    cout << ans << '\n';
 
     return 0;
 }

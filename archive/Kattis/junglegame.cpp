@@ -53,11 +53,40 @@ int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
 
-    ll t; cin >> t;
-    while (t--) {
-        ll n; cin >> n;
-        vector<ll> a(n);
-        FOR (i, n) cin >> a[i];
+    ll n; cin >> n;
+    vector<pll> avoid(n);
+    // vector<bitset<10001>> ref(10001);
+    // for (auto &x : ref) x.set();
+    vector<vector<bool>> ref(n + 1, vector<bool>(n + 1, 1));
+    for (auto &e : avoid) {
+        cin >> e.f >> e.s;
+        if (e.f % 2 == 0 && e.s % 2 == 0) {
+            ref[e.f / 2][e.s / 2] = 0;
+        }
+    }
+    vector<pll> res;
+    for (ll sum = 2 * n; sum >= 2; sum--) {
+        for (ll x = 1; x <= n; x++) {
+            ll y = sum - x;
+            if (y > n || y < 1) continue;
+            if (ref[x][y]) {
+                res.pb({x, y});
+                if (sz(res) == n) break;
+                for (auto &e : avoid) {
+                    ll nx = e.f - x, ny = e.s - y;
+                    if (nx < 1 || ny < 1) continue;
+                    if (nx > n || ny > n) continue;
+                    ref[nx][ny] = 0;
+                }
+            }
+        }
+        if (sz(res) == n) break;
+    }
+    if (sz(res) == n) {
+        cout << "YES\n";
+        for (auto &e : res) cout << e.f << ' ' << e.s << '\n';
+    } else {
+        cout << "NO\n";
     }
 
     return 0;

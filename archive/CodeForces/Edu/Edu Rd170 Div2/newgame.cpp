@@ -32,8 +32,8 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-#define f first
-#define s second
+// #define x first
+// #define y second
 
 #define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
 #define FOR1(x, e) for (ll x = 1; x < (ll)e; x++)
@@ -55,9 +55,38 @@ int main() {
 
     ll t; cin >> t;
     while (t--) {
-        ll n; cin >> n;
+        ll n, k; cin >> n >> k;
         vector<ll> a(n);
-        FOR (i, n) cin >> a[i];
+        map<ll, ll> cnt_map;
+        FOR (i, n) {
+            cin >> a[i];
+            cnt_map[a[i]]++;
+        }
+        vector<ll> unq, cnt;
+        for (auto& p : cnt_map) {
+            unq.pb(p.first);
+            cnt.pb(p.second);
+        }
+        ll m = unq.size(), res = 0, l = 0;
+        while (l < m) {
+            ll r = l;
+            while (r + 1 < m && unq[r + 1] == unq[r] + 1) {
+                r++;
+            }
+            ll len = r - l + 1;
+            vector<ll> seg_cnt(cnt.begin() + l, cnt.begin() + r + 1);
+            ll sum = 0, start = 0;
+            FOR (end, len) {
+                sum += seg_cnt[end];
+                while (end - start + 1 > k) {
+                    sum -= seg_cnt[start];
+                    start++;
+                }
+                if (sum > res) res = sum;
+            }
+            l = r + 1;
+        }
+        cout << res << '\n';
     }
 
     return 0;

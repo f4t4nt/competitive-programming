@@ -32,8 +32,8 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-#define f first
-#define s second
+// #define f first
+// #define s second
 
 #define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
 #define FOR1(x, e) for (ll x = 1; x < (ll)e; x++)
@@ -49,16 +49,34 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+void solve() {
+    ll len, q; cin >> len >> q;
+    str ref(len, '*');
+    bool ok = true;
+    while (q--) {
+        ll i; cin >> i; i--;
+        str s; cin >> s;
+        FOR (j, sz(s)) {
+            if (s[j] != '*') {
+                if (ref[i + j] != '*' && ref[i + j] != s[j]) {
+                    ref[i + j] = '?';
+                    ok = false;
+                    break;
+                } else ref[i + j] = s[j];
+            } else i = len - sz(s);
+        }
+    }
+    FOR (i, len) if (ref[i] == '*') ok = false;
+    if (ok) cout << ref << '\n';
+    else cout << "IMPOSSIBLE\n";
+}
+
 int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
 
     ll t; cin >> t;
-    while (t--) {
-        ll n; cin >> n;
-        vector<ll> a(n);
-        FOR (i, n) cin >> a[i];
-    }
+    while (t--) solve();
 
     return 0;
 }

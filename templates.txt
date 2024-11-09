@@ -102,39 +102,73 @@ while (lo < hi) {
 
 //--------------------------------------------------
 
+// maximal matching - left side: [0, lhs_cnt), right side: [0, rhs_cnt)
+vector<ll> matching(rhs_cnt, -1);
+vector<bool> vis_lhs(lhs_cnt), vis_rhs(rhs_cnt);
+
+FOR (u, lhs_cnt) {
+    for (ll v : adj[u]) {
+        if (matching[v] == -1) {
+            matching[v] = u;
+            vis_lhs[u] = true;
+            break;
+        }
+    }
+}
+
+function<bool(ll)> bpm = [&](ll u) {
+    for (ll v : adj[u]) {
+        if (!vis_rhs[v]) {
+            vis_rhs[v] = true;
+            if (matching[v] == -1 || bpm(matching[v])) {
+                matching[v] = u;
+                return true;
+            }
+        }
+    }
+    return false;
+};
+
+FOR (u, lhs_cnt) if (!vis_lhs[u]) {
+    fill(all(vis_rhs), false);
+    bpm(u);
+}
+
+//--------------------------------------------------
+
 struct BIT {
     vector<ll> tree; ll n;
     BIT(ll n) : n(n) { tree.resize(n + 1); }
-    void update(ll idx, ll val) {
+    void upd(ll idx, ll val) {
         idx++;
         while (idx <= n)
         { tree[idx] += val; idx += idx & (-idx); }
     }
-    ll query(ll idx) {
+    ll qry(ll idx) {
         idx++; ll sum = 0;
         while (idx > 0)
         { sum += tree[idx]; idx -= idx & (-idx); }
         return sum;
     }
-    ll query(ll l, ll r) { return query(r) - query(l - 1); }
+    ll qry(ll l, ll r) { return qry(r) - qry(l - 1); } // [l, r]
 };
 
 struct BIT2d {
     vector<BIT> tree;
     ll n, m;
     BIT2d(ll n, ll m) : n(n), m(m) { tree.resize(n + 1, BIT(m)); }
-    void update(ll x, ll y, ll val) {
+    void upd(ll x, ll y, ll val) {
         x++;
         while (x <= n)
-        { tree[x].update(y, val); x += x & (-x); }
+        { tree[x].upd(y, val); x += x & (-x); }
     }
-    ll query(ll x, ll y) {
+    ll qry(ll x, ll y) {
         x++; ll sum = 0;
         while (x > 0) { sum += tree[x].query(y); x -= x & (-x); }
         return sum;
     }
-    ll query(ll x1, ll y1, ll x2, ll y2)
-    { return query(x2, y2) - query(x1 - 1, y2) - query(x2, y1 - 1) + query(x1 - 1, y1 - 1); }
+    ll qry(ll x1, ll y1, ll x2, ll y2)
+    { return qry(x2, y2) - qry(x1 - 1, y2) - qry(x2, y1 - 1) + qry(x1 - 1, y1 - 1); }
 };
 
 //--------------------------------------------------
@@ -1117,49 +1151,64 @@ struct Simplex {
 //--------------------------------------------------
 
 struct SuffixArray {
-    str s;
-    ll n, alpha = 256;
-    vector<ll> sorted_shifts;
+    ll n; str s;
+    vector<ll> sa, lcp;
 
-    SuffixArray(str s) : s(s), n(sz(s)) {
-        s += '$', n++; // $ is important
-        sorted_shifts = sort_cyclic_shifts();
+    SuffixArray(str &s) : n(sz(s) + 1), s(s + '$'), sa(n - 1), lcp(n - 1) {
+        vector<pair<pll, ll>> suffs(n);
+        FOR (i, n) suffs[i] = { { s[i], s[i] }, i };
+        ssort(suffs);
+        vector<ll> equiv(n);
+        FOR1 (i, n) {
+            auto [c_val, cs] = suffs[i];
+            auto [p_val, ps] = suffs[i - 1];
+            equiv[cs] = equiv[ps] + (c_val > p_val);
+        }
+        for (ll idx = 1; idx < n; idx *= 2) {
+            for (auto &[val, s] : suffs)
+                val = { equiv[s], equiv[(s + idx) % n] };
+            radix_sort(suffs);
+            FOR (i, n - 1) {
+                auto [p_val, ps] = suffs[i];
+                auto [c_val, cs] = suffs[i + 1];
+                equiv[cs] = equiv[ps] + (c_val > p_val);
+            }
+        }
+        // --- for lcp ---
+        vector<ll> idxs(n);
+        FOR (i, n) idxs[suffs[i].s] = i;
+        ll start_at = 0;
+        FOR (i, n - 1) {
+            ll prv = suffs[idxs[i] - 1].s,
+                cur = start_at;
+            while (s[i + cur] == s[prv + cur]) cur++;
+            lcp[idxs[i] - 1] = cur;
+            start_at = max(0LL, cur - 1);
+        }
+        // ---------------
+        n--; // account for $
+        this->s.pop_back();
+        FOR (i, n) sa[i] = suffs[i + 1].s;
     }
 
-    vector<ll> sort_cyclic_shifts() {
-        vector<ll> p(n), c(n), cnt(max(n, alpha), 0);
-        FOR (i, n) cnt[s[i] - 'a']++;
-        FOB (i, 1, alpha) cnt[i] += cnt[i - 1];
-        FOR (i, n) p[--cnt[s[i] - 'a']] = i;
-        c[p[0]] = 0;
-        ll classes = 1;
-        FOB (i, 1, n) {
-            if (s[p[i]] != s[p[i - 1]]) classes++;
-            c[p[i]] = classes - 1;
+    void radix_sort(vector<pair<pll, ll>> &arr) {
+        for (ll i : {2, 1}) {
+            auto key = [&](const pair<pll, ll> &x) {
+                return i == 1 ? x.f.f : x.f.s;
+            };
+            ll mx = 0;
+            for (auto &i : arr) mx = max(mx, key(i));
+            vector<ll> occs(mx + 1);
+            for (auto &i : arr) occs[key(i)]++;
+            vector<ll> start(mx + 1);
+            FOR (i, mx) start[i + 1] = start[i] + occs[i];
+            vector<pair<pll, ll>> new_arr(n);
+            for (auto &i : arr) new_arr[start[key(i)]++] = i;
+            arr = new_arr;
         }
-        vector<ll> pn(n), cn(n);
-        for (ll h = 0; (1 << h) < n; h++) {
-            FOR (i, n) {
-                pn[i] = p[i] - (1 << h);
-                if (pn[i] < 0) pn[i] += n;
-            }
-            fill(cnt.begin(), cnt.begin() + classes, 0);
-            FOR (i, n) cnt[c[pn[i]]]++;
-            FOB (i, 1, classes) cnt[i] += cnt[i - 1];
-            FORR (i, n) p[--cnt[c[pn[i]]]] = pn[i];
-            cn[p[0]] = 0;
-            classes = 1;
-            FOB (i, 1, n) {
-                pll cur = {c[p[i]], c[(p[i] + (1 << h)) % n]};
-                pll prev = {c[p[i - 1]], c[(p[i - 1] + (1 << h)) % n]};
-                if (cur != prev) classes++;
-                cn[p[i]] = classes - 1;
-            }
-            c.swap(cn);
-        }
-        p.erase(p.begin()); // remove $
-        return p;
     }
+
+    // to get lcp of i-th and j-th suffixes, use RMQ
 };
 
 //--------------------------------------------------
@@ -1583,6 +1632,8 @@ pld proj(pld p0, pld p1, pld p2) { // proj p2 onto p0p1
 // if moving +1 with probability p, probability to reach N before 0 from k is:
 // if p=0.5:    P(k) = k / N
 // else:        q := 1 - p, P(k) = (1 - (q / p)^k) / (1 - (q / p)^N)
+
+//--------------------------------------------------
 
 #include <iostream>
 #include <set>

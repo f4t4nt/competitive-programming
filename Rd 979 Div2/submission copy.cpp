@@ -32,11 +32,11 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-#define f first
-#define s second
+// #define x first
+// #define y second
 
 #define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
-#define FOR1(x, e) for (ll x = 1; x < (ll)e; x++)
+#define FOR1(x, e) for (ll x = 1; x <= (ll)e; x++)
 #define FORR(x, e) for (ll x = (ll)e - 1; x >= 0; x--)
 
 #ifdef LOCAL
@@ -56,8 +56,12 @@ int main() {
     ll t; cin >> t;
     while (t--) {
         ll n; cin >> n;
-        vector<ll> a(n);
-        FOR (i, n) cin >> a[i];
+        if (n == 1) cout << "0\n";
+        else {
+            str s(n, '0');
+            s[n / 2] = '1';
+            cout << s << '\n';
+        }
     }
 
     return 0;

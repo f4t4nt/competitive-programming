@@ -1,1 +1,5 @@
-test 1 passed; 0.073862ms
+test 1 passed; 0.046561ms
+test 2 passed; 0.009858ms
+test 3 passed; 0.018176ms
+test 4 passed; 92.238122ms
+test 5 passed; 7184.799548ms

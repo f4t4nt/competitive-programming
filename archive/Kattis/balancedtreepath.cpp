@@ -49,34 +49,59 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-ld solve(ll &n, vector<ld> &v) {
-    vector<pair<ld, ll>> ref;
-    FORR (i, n) {
-        ref.pb({v[i], 1});
-        while (sz(ref) > 1 && ref[sz(ref) - 2].first <= ref[sz(ref) - 1].first) {
-            ref[sz(ref) - 2].first = (ref[sz(ref) - 2].first * ref[sz(ref) - 2].second + ref[sz(ref) - 1].first * ref[sz(ref) - 1].second) /
-                (ref[sz(ref) - 2].second + ref[sz(ref) - 1].second);
-            ref[sz(ref) - 2].second += ref[sz(ref) - 1].second;
-            ref.pop_back();
+void dfs(ll u, ll p, ll &ans, str &ref, str &stk, vector<vector<ll>> &adj) {
+    ch cur = ref[u];
+    if (cur == '(' || cur == '[' || cur == '{') {
+        stk.pb(cur);
+    } elif (cur == ')' && !stk.empty() && stk.back() == '(') {
+        stk.pop_back();
+    } elif (cur == ']' && !stk.empty() && stk.back() == '[') {
+        stk.pop_back();
+    } elif (cur == '}' && !stk.empty() && stk.back() == '{') {
+        stk.pop_back();
+    } else {
+        return;
+    }
+    if (stk.empty()) {
+        ans++;
+    }
+    for (ll v : adj[u]) {
+        if (v != p) {
+            dfs(v, u, ans, ref, stk, adj);
         }
     }
-    vector<ld> conv;
-    FORR (i, sz(ref)) FOR (j, ref[i].second) conv.pb(ref[i].first);
-    ld rv = 0;
-    FOR (i, n) rv += (v[i] - conv[i]) * (v[i] - conv[i]);
-    return rv;
+    if (cur == '(' || cur == '[' || cur == '{') {
+        stk.pop_back();
+    } elif (cur == ')') {
+        stk.pb('(');
+    } elif (cur == ']') {
+        stk.pb('[');
+    } elif (cur == '}') {
+        stk.pb('{');
+    }
 }
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(0);
-    cout.tie(0);
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
 
     ll n; cin >> n;
-    vector<ld> x(n), y(n);
-    FOR (i, n) cin >> x[i] >> y[i];
-    ld rvx = solve(n, x), rvy = solve(n, y), rv = rvx + rvy;
-    cout << fixed << setprecision(10) << rv << '\n';
+    str ref; cin >> ref;
+    vector<vector<ll>> adj(n);
+    FOR (i, n - 1) {
+        ll u, v; cin >> u >> v;
+        u--, v--;
+        adj[u].pb(v);
+        adj[v].pb(u);
+    }
+
+    ll ans = 0;
+    str stk;
+    FOR (i, n) {
+        stk.clear();
+        dfs(i, -1, ans, ref, stk, adj);
+    }
+    cout << ans << '\n';
 
     return 0;
 }
