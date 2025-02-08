@@ -32,11 +32,11 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-// #define x first
-// #define y second
+#define x first
+#define y second
 
 #define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
-#define FOR1(x, e) for (ll x = 1; x <= (ll)e; x++)
+#define FOR1(x, e) for (ll x = 1; x < (ll)e; x++)
 #define FORR(x, e) for (ll x = (ll)e - 1; x >= 0; x--)
 
 #ifdef LOCAL
@@ -55,14 +55,29 @@ int main() {
 
     ll t; cin >> t;
     while (t--) {
-        ll n, mx = 0, mn = 1e9; cin >> n;
-        vector<ll> a(n);
-        FOR (i, n) {
-            cin >> a[i];
-            mx = max(a[i], mx);
-            mn = min(a[i], mn);
+        ll n, m; cin >> n >> m;
+        vector<pair<vector<ll>, ll>> a(n, {vector<ll>(m), 0});
+        FOR(i, n) {
+            FOR(j, m) cin >> a[i].x[j];
+            ssort(a[i].x);
+            a[i].y = i;
         }
-        cout << (n - 1) * (mx - mn) << '\n';
+        ssort(a);
+        bool ok = true;
+        FOR (i, n) {
+            FOR (j, m) {
+                if (a[i].x[j] % n != i) {
+                    ok = false;
+                    break;
+                }
+            }
+        }
+        if (ok) {
+            FOR(i, n) cout << a[i].y + 1 << ' ';
+            cout << '\n';
+        } else {
+            cout << -1 << '\n';
+        }
     }
 
     return 0;

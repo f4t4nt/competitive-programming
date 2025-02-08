@@ -51,24 +51,26 @@ int main() {
 
     ll t; cin >> t;
     while (t--) {
-        ll n; cin >> n;
-        vector<vector<ll>> a(n, vector<ll>(n));
-        for (auto &ai : a) for (ll &aij : ai) cin >> aij;
-        vector<ll> suff(n);
-        for (ll i = 0; i < n; i++) {
-            for (ll j = n - 1; j >= 0; j--) {
-                if (a[i][j] != 1) break;
-                suff[i]++;
-            }
-        }
-        multiset<ll> s(all(suff));
-        ll ans = 0;
-        for (ll si : s) {
-            if (si >= ans) {
+        ll n, k; cin >> n >> k;
+        vector<ll> a(n);
+        for (ll &x : a) cin >> x;
+        if (n == k) {
+            ll ans = 1;
+            for (ll i = 1; i < n; i += 2) {
+                if (a[i] != ans) break;
                 ans++;
             }
+            cout << ans << '\n';
+        } else {
+            bool one = false;
+            for (ll i = 1; i <= n - k + 1; i++) {
+                if (a[i] != 1) {
+                    one = true;
+                    break;
+                }
+            }
+            cout << (one ? 1 : 2) << '\n';
         }
-        cout << min(ans, n) << '\n';
     }
 
     return 0;

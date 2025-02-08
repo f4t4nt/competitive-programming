@@ -32,8 +32,12 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-#define f first
-#define s second
+// #define x first
+// #define y second
+
+#define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
+#define FOR1(x, e) for (ll x = 1; x < (ll)e; x++)
+#define FORR(x, e) for (ll x = (ll)e - 1; x >= 0; x--)
 
 #ifdef LOCAL
 #include "tester.cpp"
@@ -49,27 +53,17 @@ int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
 
-    ll t; cin >> t;
-    while (t--) {
-        ll n; cin >> n;
-        vector<vector<ll>> a(n, vector<ll>(n));
-        for (auto &ai : a) for (ll &aij : ai) cin >> aij;
-        vector<ll> suff(n);
-        for (ll i = 0; i < n; i++) {
-            for (ll j = n - 1; j >= 0; j--) {
-                if (a[i][j] != 1) break;
-                suff[i]++;
-            }
-        }
-        multiset<ll> s(all(suff));
-        ll ans = 0;
-        for (ll si : s) {
-            if (si >= ans) {
-                ans++;
-            }
-        }
-        cout << min(ans, n) << '\n';
+    str a, b; cin >> a >> b;
+    if (sz(a) < sz(b)) a = str(sz(b) - sz(a), '0') + a;
+    if (sz(b) < sz(a)) b = str(sz(a) - sz(b), '0') + b;
+    ll ans = 0, i = 0;
+    while (i < sz(a)) {
+        if (a[i] != b[i]) break;
+        else ans += a[i] == '1';
+        i++;
     }
+    ans += sz(a) - i;
+    cout << ans << '\n';
 
     return 0;
 }

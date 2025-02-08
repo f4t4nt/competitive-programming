@@ -56,6 +56,7 @@ ll dir(Point a, Point b, Point c) {
         return 0;
     }
 }
+
 bool point_on_segment(Point p, Point a, Point b) {
     if (dir(p, a, b) != 0) {
         return false;

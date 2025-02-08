@@ -35,6 +35,10 @@ using indexed_set = tree<
 #define f first
 #define s second
 
+#define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
+#define FOR1(x, e) for (ll x = 1; x < (ll)e; x++)
+#define FORR(x, e) for (ll x = (ll)e - 1; x >= 0; x--)
+
 #ifdef LOCAL
 #include "tester.cpp"
 #define main test_main
@@ -48,28 +52,19 @@ string test_file_name = "tests";
 int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-
-    ll t; cin >> t;
-    while (t--) {
-        ll n; cin >> n;
-        vector<vector<ll>> a(n, vector<ll>(n));
-        for (auto &ai : a) for (ll &aij : ai) cin >> aij;
-        vector<ll> suff(n);
-        for (ll i = 0; i < n; i++) {
-            for (ll j = n - 1; j >= 0; j--) {
-                if (a[i][j] != 1) break;
-                suff[i]++;
-            }
+ 
+    ll n; cin >> n;
+    ll cnt = 0;
+    FOR (i, 3) {
+        vector<ll> tmp(n);
+        bool ok = false;
+        FOR (j, n) {
+            cin >> tmp[j];
+            if (tmp[j] == 7) ok = true;
         }
-        multiset<ll> s(all(suff));
-        ll ans = 0;
-        for (ll si : s) {
-            if (si >= ans) {
-                ans++;
-            }
-        }
-        cout << min(ans, n) << '\n';
+        if (ok) cnt++;
     }
+    cout << (cnt == 3 ? 777 : 0) << '\n';
 
     return 0;
 }

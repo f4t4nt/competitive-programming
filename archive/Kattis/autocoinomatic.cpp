@@ -32,8 +32,12 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-#define f first
-#define s second
+// #define x first
+// #define y second
+
+#define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
+#define FOR1(x, e) for (ll x = 1; x < (ll)e; x++)
+#define FORR(x, e) for (ll x = (ll)e - 1; x >= 0; x--)
 
 #ifdef LOCAL
 #include "tester.cpp"
@@ -45,31 +49,39 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+const ll MAXQ = 1e5 + 5;
+
 int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
 
-    ll t; cin >> t;
-    while (t--) {
-        ll n; cin >> n;
-        vector<vector<ll>> a(n, vector<ll>(n));
-        for (auto &ai : a) for (ll &aij : ai) cin >> aij;
-        vector<ll> suff(n);
-        for (ll i = 0; i < n; i++) {
-            for (ll j = n - 1; j >= 0; j--) {
-                if (a[i][j] != 1) break;
-                suff[i]++;
-            }
-        }
-        multiset<ll> s(all(suff));
-        ll ans = 0;
-        for (ll si : s) {
-            if (si >= ans) {
-                ans++;
-            }
-        }
-        cout << min(ans, n) << '\n';
+    ll n, m; cin >> n >> m;
+    vector<ll> d0(n);
+    FOR (i, n) cin >> d0[i];
+    set<ll> d(all(d0));
+    vector<pair<ch, ll>> queries(m);
+    FOR (i, m) {
+        cin >> queries[i].first >> queries[i].second;
+        if (queries[i].first == 'X') d.erase(queries[i].second);
     }
+    vector<ll> dp(MAXQ, 1e9);
+    dp[0] = 0;
+    for (ll x : d) FOR (i, MAXQ - x) {
+        dp[i + x] = min(dp[i + x], dp[i] + 1);
+    }
+    vector<ll> ans(m);
+    for (ll i = m - 1; i >= 0; i--) {
+        auto [c, x] = queries[i];
+        if (c == 'X') {
+            d.insert(x);
+            FOR (j, MAXQ - x) {
+                dp[j + x] = min(dp[j + x], dp[j] + 1);
+            }
+        } else {
+            ans[i] = dp[x] == 1e9 ? -1 : dp[x];
+        }
+    }
+    for (ll x : ans) if (x) cout << x << '\n';
 
     return 0;
 }

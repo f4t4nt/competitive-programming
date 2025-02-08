@@ -36,7 +36,7 @@ using indexed_set = tree<
 // #define y second
 
 #define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
-#define FOR1(x, e) for (ll x = 1; x <= (ll)e; x++)
+#define FOR1(x, e) for (ll x = 1; x < (ll)e; x++)
 #define FORR(x, e) for (ll x = (ll)e - 1; x >= 0; x--)
 
 #ifdef LOCAL
@@ -55,17 +55,18 @@ int main() {
 
     ll t; cin >> t;
     while (t--) {
-        ll n; cin >> n;
-        str s; cin >> s;
-        if (s[0] == '1' || s.back() == '1') cout << "YES\n";
-        else {
-            bool ok = false;
-            FOR (i, n - 1) if (s[i] == '1' && s[i] == s[i + 1]) {
-                ok = true;
-                break;
-            }
-            cout << (ok ? "YES" : "NO") << '\n';
+        ll l, r; cin >> l >> r;
+        ll mx = 0;
+        while (r / (1LL << mx) * (1LL << mx) > l) mx++;
+        mx--;
+        ll a = r / (1LL << mx) * (1LL << mx), b = a - 1, c = b;
+        while (mx >= 0) {
+            if (b - (1LL << mx) >= l) b -= (1LL << mx);
+            mx--;
         }
+        if (b == c) b = a + 1;
+        cout << a << ' ' << b << ' ' << c << '\n';
+        // cout << (a ^ b) + (b ^ c) + (c ^ a) << '\n';
     }
 
     return 0;

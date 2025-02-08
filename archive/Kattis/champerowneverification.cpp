@@ -35,6 +35,10 @@ using indexed_set = tree<
 #define f first
 #define s second
 
+#define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
+#define FOR1(x, e) for (ll x = 1; x < (ll)e; x++)
+#define FORR(x, e) for (ll x = (ll)e - 1; x >= 0; x--)
+
 #ifdef LOCAL
 #include "tester.cpp"
 #define main test_main
@@ -48,28 +52,23 @@ string test_file_name = "tests";
 int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-
-    ll t; cin >> t;
-    while (t--) {
-        ll n; cin >> n;
-        vector<vector<ll>> a(n, vector<ll>(n));
-        for (auto &ai : a) for (ll &aij : ai) cin >> aij;
-        vector<ll> suff(n);
-        for (ll i = 0; i < n; i++) {
-            for (ll j = n - 1; j >= 0; j--) {
-                if (a[i][j] != 1) break;
-                suff[i]++;
-            }
-        }
-        multiset<ll> s(all(suff));
-        ll ans = 0;
-        for (ll si : s) {
-            if (si >= ans) {
-                ans++;
-            }
-        }
-        cout << min(ans, n) << '\n';
-    }
-
+ 
+    ll n; cin >> n;
+    map<ll, ll> ref = {
+        {1, 1},
+        {12, 2},
+        {123, 3},
+        {1234, 4},
+        {12345, 5},
+        {123456, 6},
+        {1234567, 7},
+        {12345678, 8},
+        {123456789, 9},
+        {12345678910, 10}
+    };
+    if (ref.count(n)) cout << ref[n];
+    else cout << -1;
+    cout << '\n';
+ 
     return 0;
 }

@@ -35,6 +35,10 @@ using indexed_set = tree<
 #define f first
 #define s second
 
+#define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
+#define FOR1(x, e) for (ll x = 1; x < (ll)e; x++)
+#define FORR(x, e) for (ll x = (ll)e - 1; x >= 0; x--)
+
 #ifdef LOCAL
 #include "tester.cpp"
 #define main test_main
@@ -52,23 +56,21 @@ int main() {
     ll t; cin >> t;
     while (t--) {
         ll n; cin >> n;
-        vector<vector<ll>> a(n, vector<ll>(n));
-        for (auto &ai : a) for (ll &aij : ai) cin >> aij;
-        vector<ll> suff(n);
-        for (ll i = 0; i < n; i++) {
-            for (ll j = n - 1; j >= 0; j--) {
-                if (a[i][j] != 1) break;
-                suff[i]++;
-            }
+        vector<ll> a(n), b(n);
+        FOR(i, n) cin >> a[i];
+        FOR(i, n) cin >> b[i];
+        if (n == 3) {
+            cout << "NO\n";
+            continue;
         }
-        multiset<ll> s(all(suff));
-        ll ans = 0;
-        for (ll si : s) {
-            if (si >= ans) {
-                ans++;
-            }
+        set<ll> a_s(all(a)), b_s(all(b));
+        if (sz(a_s) >= 3 || sz(b_s) >= 3) {
+            cout << "YES\n";
+        } elif (sz(a_s) >= 2 && sz(b_s) >= 2) {
+            cout << "YES\n";
+        } else {
+            cout << "NO\n";
         }
-        cout << min(ans, n) << '\n';
     }
 
     return 0;

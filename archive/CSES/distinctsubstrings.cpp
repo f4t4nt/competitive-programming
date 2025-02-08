@@ -86,7 +86,6 @@ struct SuffixArray {
         }
         // ---------------
         n--; // account for $
-        this->s.pop_back();
         FOR (i, n) sa[i] = suffs[i + 1].s;
     }
 
@@ -106,39 +105,8 @@ struct SuffixArray {
             arr = new_arr;
         }
     }
-};
 
-struct SegTree {
-    ll n; vector<ll> data, lazy;
-    SegTree (ll n) : n(n), data(4 * n), lazy(4 * n) {}
-    void push(ll i, ll l, ll r) {
-        data[i] += (r - l) * lazy[i];
-        if (r - l > 1) {
-            lazy[2 * i] += lazy[i];
-            lazy[2 * i + 1] += lazy[i];
-        }
-        lazy[i] = 0;
-    }
-    void upd(ll ul, ll ur, ll val, ll i = 1, ll l = 0, ll r = -1) { // [ul, ur)
-        if (r == -1) r = n; push(i, l, r);
-        if (ur <= l || r <= ul) return;
-        if (ul <= l && r <= ur) {
-            lazy[i] += val;
-            push(i, l, r);
-            return;
-        }
-        ll m = (l + r) / 2;
-        upd(ul, ur, val, 2 * i, l, m);
-        upd(ul, ur, val, 2 * i + 1, m, r);
-        data[i] = data[2 * i] + data[2 * i + 1];
-    }
-    ll qry(ll ql, ll qr, ll i = 1, ll l = 0, ll r = -1) {
-        if (r == -1) r = n; push(i, l, r);
-        if (qr <= l || r <= ql) return 0;
-        if (ql <= l && r <= qr) return data[i];
-        ll m = (l + r) / 2;
-        return qry(ql, qr, 2 * i, l, m) + qry(ql, qr, 2 * i + 1, m, r);
-    }
+    // to get lcp of i-th and j-th suffixes, use RMQ
 };
 
 int main() {
@@ -146,17 +114,15 @@ int main() {
     cin.tie(0), cout.tie(0);
 
     str s; cin >> s;
-    SuffixArray sa(s);
     ll n = sz(s);
-    SegTree st(n);
-    FOR (i, n) {
-        ll lo = sa.sa[i] + sa.lcp[i], hi = n;
-        st.upd(lo, hi, 1);
-    }
-    map<ch, ll> res;
-    res['1'] = 0;
-    FOR (i, n) res[s[i]] += st.qry(i, i + 1);
-    for (auto [k, v] : res) cout << k << ' ' << v << '\n';
+    // vector<str> substrs(n);
+    // FOR (i, n) substrs[i] = s.substr(i);
+    // ssort(substrs);
+    // FOR (i, n) cerr << substrs[i] << '\n';
+    SuffixArray sa(s);
+    ll ans = n * (n + 1) / 2;
+    FOR (i, n) ans -= sa.lcp[i];
+    cout << ans << '\n';
 
     return 0;
 }

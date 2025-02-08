@@ -32,8 +32,12 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-#define f first
-#define s second
+#define x first
+#define y second
+
+#define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
+#define FOR1(x, e) for (ll x = 1; x < (ll)e; x++)
+#define FORR(x, e) for (ll x = (ll)e - 1; x >= 0; x--)
 
 #ifdef LOCAL
 #include "tester.cpp"
@@ -51,24 +55,24 @@ int main() {
 
     ll t; cin >> t;
     while (t--) {
-        ll n; cin >> n;
-        vector<vector<ll>> a(n, vector<ll>(n));
-        for (auto &ai : a) for (ll &aij : ai) cin >> aij;
-        vector<ll> suff(n);
-        for (ll i = 0; i < n; i++) {
-            for (ll j = n - 1; j >= 0; j--) {
-                if (a[i][j] != 1) break;
-                suff[i]++;
-            }
+        ll n, k; cin >> n >> k;
+        vector<ll> x(n);
+        map<ll, ll> cnts;
+        FOR(i, n) {
+            cin >> x[i];
+            cnts[x[i]]++;
         }
-        multiset<ll> s(all(suff));
         ll ans = 0;
-        for (ll si : s) {
-            if (si >= ans) {
-                ans++;
+        for (auto [a, cnt] : cnts) {
+            ll b = k - a;
+            if (b < a) break;
+            if (a == b) {
+                ans += cnt / 2;
+            } else {
+                ans += min(cnt, cnts[b]);
             }
         }
-        cout << min(ans, n) << '\n';
+        cout << ans << '\n';
     }
 
     return 0;

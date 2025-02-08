@@ -69,7 +69,7 @@ int main() {
     std::priority_queue<pll, vector<pll>, greater<>> pq;
     pq.push({0, v0});
     while (!pq.empty()) {
-        auto [d, v] = pq.top(); pq.pop();
+        auto [d, u] = pq.top(); pq.pop();
         if (d > dist[u]) continue;
         FORE (elem, adj[u]) {
             auto [v, w] = elem;
@@ -917,9 +917,10 @@ ll poww(ll x, ll p) {
 
 struct SCCs {
     ll n, idx, scc_cnt;
-    vector<vector<ll>> adj,
-        adj_scc; // [0]: snk, [-1]: src
+    vector<vector<ll>> adj;
+    vector<set<ll>> adj_scc; // [0]: snk, [-1]: src
     vector<ll> ord, low, ids;
+    vector<bitset<50000>> dp; // max scc_cnt = 50000
     vector<bool> on_stack;
     stack<ll> stk;
 
@@ -931,17 +932,34 @@ struct SCCs {
         ids = vector<ll>(n, -1);
         on_stack = vector<bool>(n, false);
         FOR (u, n) if (ord[u] == -1) dfs(u);
-        adj_scc = vector<vector<ll>>(scc_cnt);
-        FOR (u, n) FORE (v, adj[u]) if (ids[u] != ids[v]) {
-            adj_scc[ids[u]].pb(ids[v]);
+        adj_scc = vector<set<ll>>(scc_cnt);
+        FOR (u, n) for (ll v : adj[u]) if (ids[u] != ids[v]) {
+            adj_scc[ids[u]].insert(ids[v]);
         }
+        vector<bool> vis(scc_cnt, false);
+        dp = vector<bitset<50000>>(scc_cnt);
+        FOR (u, scc_cnt) if (!vis[u]) dfs2(u, vis);
+    }
+
+    void dfs2(ll u, vector<bool> &vis) {
+        vis[u] = true;
+        for (ll v : adj_scc[u]) {
+            if (!vis[v]) dfs2(v, vis);
+            dp[u] |= dp[v];
+        }
+        dp[u][u] = 1;
+    }
+
+    bool u_to_v(ll u, ll v) {
+        u = ids[u], v = ids[v];
+        return dp[u][v];
     }
 
     void dfs(ll u) {
         ord[u] = low[u] = idx++;
         stk.push(u);
         on_stack[u] = true;
-        FORE (v, adj[u]) {
+        for (ll v : adj[u]) {
             if (ord[v] == -1) dfs(v), low[u] = min(low[u], low[v]);
             elif (on_stack[v]) low[u] = min(low[u], ord[v]);
         }
@@ -989,6 +1007,14 @@ struct SegTree {
         ll m = (l + r) / 2;
         upd(ul, ur, val, 2 * i, l, m);
         upd(ul, ur, val, 2 * i + 1, m, r);
+        data[i] = data[2 * i] + data[2 * i + 1];
+    }
+    void updi(ll ui, ll val, ll i = 1, ll l = 0, ll r = -1) {
+        if (r == -1) r = n; push(i, l, r);
+        if (r - l == 1) { data[i] = val; return; }
+        ll m = (l + r) / 2;
+        if (ui < m) updi(ui, val, 2 * i, l, m);
+        else updi(ui, val, 2 * i + 1, m, r);
         data[i] = data[2 * i] + data[2 * i + 1];
     }
     ll qry(ll ql, ll qr, ll i = 1, ll l = 0, ll r = -1) {
@@ -1589,6 +1615,51 @@ struct Trie {
             children[si] = new Trie(s[i]);
         }
         children[si]->insert(i + 1, s);
+    }
+};
+
+
+//--------------------------------------------------
+
+struct TwoSat {
+    ll n; vector<vector<ll>> qr;
+    vector<ll> values; // 0: false, 1: true (only holds if solve() returns true)
+    vector<ll> val, comp, z; ll time = 0;
+    TwoSat(ll n) : n(n), qr(2 * n) {}
+    void either(ll f, ll j) { // ts.either(0, ~3) 0 is true or 3 is false
+        f = max(2 * f, -1 - 2 * f);
+        j = max(2 * j, -1 - 2 * j);
+        qr[f].pb(j ^ 1);
+        qr[j].pb(f ^ 1);
+    }
+    void set_value(ll x) { either(x, x); } // ts.set_value(2) 2 is true
+    void at_most_one(const vector<ll>& li) { // ts.at_most_one({0, ~1, 2}) <= 1 of 0, ~1, 2 is true
+        if (sz(li) < 2) return;
+        ll cur = ~li[0];
+        for (ll i = 2; i < sz(li); i++) {
+            ll next = li[i];
+            ll v = n++;
+            either(cur, ~v);
+            either(next, ~v);
+            cur = ~v;
+        }
+        either(cur, ~li[1]);
+    }
+    ll dfs(ll i) {
+        ll low = val[i] = ++time, x; z.pb(i);
+        for (ll j : qr[i]) if (!comp[j]) low = min(low, val[j] ?: dfs(j));
+        if (low == val[i]) do {
+            x = z.back(); z.pop_back();
+            comp[x] = low;
+            if (values[x >> 1] == -1) values[x >> 1] = x & 1;
+        } while (x != i);
+        return val[i] = low;
+    }
+    bool solve() {
+        values.assign(n, -1); val.assign(2 * n, 0); comp = val;
+        FOR (i, 2 * n) if (!comp[i]) dfs(i);
+        FOR (i, n) if (comp[2 * i] == comp[2 * i + 1]) return 0;
+        return 1;
     }
 };
 
