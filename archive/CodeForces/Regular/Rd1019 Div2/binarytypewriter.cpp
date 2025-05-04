@@ -27,13 +27,13 @@ using indexed_set = tree<
 
 #define pb push_back
 #define elif else if
-#define sz(C) (ll) C.size()
+#define sz(C) (ll)C.size()
 #define all(C) C.begin(), C.end()
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-// #define f first
-// #define s second
+// #define x first
+// #define y second
 
 #ifdef LOCAL
 #include "tester.cpp"
@@ -52,24 +52,27 @@ int main() {
     ll t; cin >> t;
     while (t--) {
         ll n; cin >> n;
-        str s, t; cin >> s >> t;
-        map<pair<ch, ch>, ll> cnt;
-        for (ll i = 0; i < n; i++) {
-            ll j = n - i - 1;
-            if (s[i] < t[j]) swap(s[i], t[j]);
-            cnt[{s[i], t[j]}]++;
+        str s; cin >> s;
+        ll ans = n + (s[0] == '1'), del = (s[n - 1]=='1') - (s[0] == '1');
+        for (ll i = 1; i < n; i++) ans += (s[i] != s[i - 1]);
+        ll cnt01 = 0, cnt10 = 0;
+        for (ll i = 1; i < n; i++) {
+            if (s[i - 1] == '0' && s[i] == '1') cnt01++;
+            if (s[i - 1] == '1' && s[i] == '0') cnt10++;
         }
-        bool ok = true, mid = false;
-        for (auto& [k, v] : cnt) {
-            if (v & 1) {
-                if (mid || k.first != k.second) {
-                    ok = false;
-                    break;
-                }
-                mid = true;
-            }
+        if (max(cnt01, cnt10) >= 2) del = min(del, -2LL);
+        for (ll i = 1; i < n; i++) {
+            ll t1 = s[0] != s[i],
+                t2 = s[i - 1] != s[i],
+                t3 = s[i - 1] == '1',
+                t4 = s[0] == '1';
+            del = min(del, t1 - t2 + t3 - t4);
         }
-        cout << (ok ? "YES" : "NO") << '\n';
+        for (ll i = 1; i < n; i++)
+            del = min(del, (ll) (s[i - 1] != s[n - 1]) - (s[i - 1] != s[i]));
+        del = min(del, 0LL);
+        ans += del;
+        cout << ans << '\n';
     }
 
     return 0;

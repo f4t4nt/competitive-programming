@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+
 using namespace std;
 
 typedef long long ll;
@@ -15,11 +16,10 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 #include <bits/extc++.h>
 using namespace __gnu_pbds;
 
-template<typename T>
 using indexed_set = tree<
-    T,
+    ll,
     null_type,
-    less<T>,
+    less<ll>,
     rb_tree_tag,
     tree_order_statistics_node_update>;
 
@@ -32,8 +32,8 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-// #define f first
-// #define s second
+#define f first
+#define s second
 
 #ifdef LOCAL
 #include "tester.cpp"
@@ -45,31 +45,43 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+struct SegTree {
+    ll n;
+    SegTree (ll n) : n(n) {}
+    void qry(ll ql, ll qr, vector<pll> &ref, ll i = 1, ll l = 0, ll r = -1) {
+        if (r == -1) r = n;
+        if (qr <= l || r <= ql) return;
+        if (ql <= l && r <= qr) {
+            ref.pb({l, r});
+            return;
+        }
+        ll m = (l + r) / 2;
+        qry(ql, qr, ref, 2 * i, l, m);
+        qry(ql, qr, ref, 2 * i + 1, m, r);
+    }
+};
+
 int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
 
+    SegTree st(1 << 20);
+
     ll t; cin >> t;
     while (t--) {
-        ll n; cin >> n;
-        str s, t; cin >> s >> t;
-        map<pair<ch, ch>, ll> cnt;
-        for (ll i = 0; i < n; i++) {
-            ll j = n - i - 1;
-            if (s[i] < t[j]) swap(s[i], t[j]);
-            cnt[{s[i], t[j]}]++;
-        }
-        bool ok = true, mid = false;
-        for (auto& [k, v] : cnt) {
-            if (v & 1) {
-                if (mid || k.first != k.second) {
-                    ok = false;
-                    break;
-                }
-                mid = true;
+        ll l1, l2, r1, r2; cin >> l1 >> r1 >> l2 >> r2;
+        vector<pll> ref1, ref2;
+        st.qry(l1, r1, ref1);
+        st.qry(l2, r2, ref2);
+        ll ans = 0;
+        for (auto [f1, s1] : ref1) {
+            ll rng1 = s1 - f1;
+            for (auto [f2, s2] : ref2) {
+                ll rng2 = s2 - f2;
+                ans += max(rng1, rng2) / min(rng1, rng2);
             }
         }
-        cout << (ok ? "YES" : "NO") << '\n';
+        cout << ans << '\n';
     }
 
     return 0;

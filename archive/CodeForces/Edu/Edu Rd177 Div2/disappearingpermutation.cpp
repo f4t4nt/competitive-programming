@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+
 using namespace std;
 
 typedef long long ll;
@@ -15,11 +16,10 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 #include <bits/extc++.h>
 using namespace __gnu_pbds;
 
-template<typename T>
 using indexed_set = tree<
-    T,
+    ll,
     null_type,
-    less<T>,
+    less<ll>,
     rb_tree_tag,
     tree_order_statistics_node_update>;
 
@@ -32,8 +32,8 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-// #define f first
-// #define s second
+#define f first
+#define s second
 
 #ifdef LOCAL
 #include "tester.cpp"
@@ -52,24 +52,40 @@ int main() {
     ll t; cin >> t;
     while (t--) {
         ll n; cin >> n;
-        str s, t; cin >> s >> t;
-        map<pair<ch, ch>, ll> cnt;
+        vector<ll> p(n), d(n), ids(n), szs;
+        for (ll &pi : p) cin >> pi;
+        for (ll &di : d) cin >> di;
+        vector<bool> vis(n);
+        ll id = 0;
         for (ll i = 0; i < n; i++) {
-            ll j = n - i - 1;
-            if (s[i] < t[j]) swap(s[i], t[j]);
-            cnt[{s[i], t[j]}]++;
-        }
-        bool ok = true, mid = false;
-        for (auto& [k, v] : cnt) {
-            if (v & 1) {
-                if (mid || k.first != k.second) {
-                    ok = false;
-                    break;
+            if (!vis[i]) {
+                ll cur = i;
+                vector<ll> curCycle;
+                while (!vis[cur]) {
+                    vis[cur] = true;
+                    curCycle.pb(cur);
+                    cur = p[cur] - 1;
                 }
-                mid = true;
+                for (ll index : curCycle) ids[index] = id;
+                szs.pb(sz(curCycle));
+                id++;
             }
         }
-        cout << (ok ? "YES" : "NO") << '\n';
+        vector<ll> intact(id, true), ans(n), rem(n);
+        ll sum = n;
+        for (ll i = 0; i < n; i++) {
+            ll pos = d[i] - 1;
+            rem[pos] = true;
+            ll cId = ids[pos];
+            if (cId != -1 && intact[cId]) {
+                intact[cId] = false;
+                sum -= szs[cId];
+            }
+            ll operations = n - sum;
+            ans[i] = operations;
+        }
+        for (ll &ai : ans) cout << ai << ' ';
+        cout << '\n';
     }
 
     return 0;

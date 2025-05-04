@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+
 using namespace std;
 
 typedef long long ll;
@@ -15,8 +16,7 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 #include <bits/extc++.h>
 using namespace __gnu_pbds;
 
-template<typename T>
-using indexed_set = tree<
+template<typename T> using indexed_set = tree<
     T,
     null_type,
     less<T>,
@@ -49,28 +49,22 @@ int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
 
-    ll t; cin >> t;
-    while (t--) {
-        ll n; cin >> n;
-        str s, t; cin >> s >> t;
-        map<pair<ch, ch>, ll> cnt;
-        for (ll i = 0; i < n; i++) {
-            ll j = n - i - 1;
-            if (s[i] < t[j]) swap(s[i], t[j]);
-            cnt[{s[i], t[j]}]++;
+    ll n; cin >> n;
+    str s; cin >> s;
+    vector<ll> pre(n + 1), ref = {0, 1, 1, -2};
+    for (ll i = 0; i < n; i++)
+        pre[i + 1] = pre[i] + (s[i] == '1' ? -3 : 1);    
+    vector<indexed_set<pll>> sets(4);
+    ll ans = 0;
+    for (ll i = 0; i <= n; i++) {
+        for (ll j = 0; j < 4; j++) {
+            ll k = (i - j + 4) % 4;
+            ll bound = pre[i] - ref[k];
+            ans += sets[j].order_of_key({bound, -1});
         }
-        bool ok = true, mid = false;
-        for (auto& [k, v] : cnt) {
-            if (v & 1) {
-                if (mid || k.first != k.second) {
-                    ok = false;
-                    break;
-                }
-                mid = true;
-            }
-        }
-        cout << (ok ? "YES" : "NO") << '\n';
+        sets[i % 4].insert({pre[i], i});
     }
+    cout << ans << '\n';
 
     return 0;
 }

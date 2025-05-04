@@ -32,8 +32,8 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-// #define f first
-// #define s second
+#define f first
+#define s second
 
 #ifdef LOCAL
 #include "tester.cpp"
@@ -45,6 +45,12 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+bool beats(ll x, ll y, ll n) {
+    if (x == 1 && y == n) return true;
+    if (x == n && y == 1) return false;
+    return x > y;
+}
+
 int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
@@ -52,24 +58,27 @@ int main() {
     ll t; cin >> t;
     while (t--) {
         ll n; cin >> n;
-        str s, t; cin >> s >> t;
-        map<pair<ch, ch>, ll> cnt;
+        str s; cin >> s;
+        vector<ll> A, B;
         for (ll i = 0; i < n; i++) {
-            ll j = n - i - 1;
-            if (s[i] < t[j]) swap(s[i], t[j]);
-            cnt[{s[i], t[j]}]++;
+            if (s[i] == 'A') A.pb(i + 1);
+            else B.pb(i + 1);
         }
-        bool ok = true, mid = false;
-        for (auto& [k, v] : cnt) {
-            if (v & 1) {
-                if (mid || k.first != k.second) {
-                    ok = false;
+        bool alice = false;
+        for (ll a : A) {
+            bool safe = true;
+            for (ll b : B) {
+                if (beats(b, a, n)) {
+                    safe = false;
                     break;
                 }
-                mid = true;
+            }
+            if (safe) {
+                alice = true;
+                break;
             }
         }
-        cout << (ok ? "YES" : "NO") << '\n';
+        cout << (alice ? "Alice" : "Bob") << '\n';
     }
 
     return 0;

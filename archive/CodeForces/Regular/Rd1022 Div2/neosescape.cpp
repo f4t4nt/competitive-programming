@@ -32,8 +32,8 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-// #define f first
-// #define s second
+#define f first
+#define s second
 
 #ifdef LOCAL
 #include "tester.cpp"
@@ -52,24 +52,17 @@ int main() {
     ll t; cin >> t;
     while (t--) {
         ll n; cin >> n;
-        str s, t; cin >> s >> t;
-        map<pair<ch, ch>, ll> cnt;
+        vector<ll> a(n);
+        for (ll &x : a) cin >> x;
+        a.erase(unique(all(a)), a.end());
+        n = sz(a);
+        ll ans = 0;
         for (ll i = 0; i < n; i++) {
-            ll j = n - i - 1;
-            if (s[i] < t[j]) swap(s[i], t[j]);
-            cnt[{s[i], t[j]}]++;
-        }
-        bool ok = true, mid = false;
-        for (auto& [k, v] : cnt) {
-            if (v & 1) {
-                if (mid || k.first != k.second) {
-                    ok = false;
-                    break;
-                }
-                mid = true;
+            if ((i == 0 || a[i] > a[i - 1]) && (i == n - 1 || a[i] > a[i + 1])) {
+                ans++;
             }
         }
-        cout << (ok ? "YES" : "NO") << '\n';
+        cout << ans << '\n';
     }
 
     return 0;

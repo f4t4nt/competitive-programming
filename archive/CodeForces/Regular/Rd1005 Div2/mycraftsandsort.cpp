@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+
 using namespace std;
 
 typedef long long ll;
@@ -15,11 +16,10 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 #include <bits/extc++.h>
 using namespace __gnu_pbds;
 
-template<typename T>
 using indexed_set = tree<
-    T,
+    ll,
     null_type,
-    less<T>,
+    less<ll>,
     rb_tree_tag,
     tree_order_statistics_node_update>;
 
@@ -32,8 +32,8 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-// #define f first
-// #define s second
+#define f first
+#define s second
 
 #ifdef LOCAL
 #include "tester.cpp"
@@ -45,6 +45,8 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+const ll MOD = 998244353;
+
 int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
@@ -52,24 +54,46 @@ int main() {
     ll t; cin >> t;
     while (t--) {
         ll n; cin >> n;
-        str s, t; cin >> s >> t;
-        map<pair<ch, ch>, ll> cnt;
+        vector<ll> p(n), c(n), q(n);
+        map<ll, ll> ranges;
         for (ll i = 0; i < n; i++) {
-            ll j = n - i - 1;
-            if (s[i] < t[j]) swap(s[i], t[j]);
-            cnt[{s[i], t[j]}]++;
+            cin >> p[i];
+            p[i]--;
+            q[p[i]] = i;
         }
-        bool ok = true, mid = false;
-        for (auto& [k, v] : cnt) {
-            if (v & 1) {
-                if (mid || k.first != k.second) {
-                    ok = false;
-                    break;
-                }
-                mid = true;
+        for (ll &ci : c) {
+            cin >> ci;
+            ci--;
+        }
+        {
+            ll i = 0, j = 0;
+            while (i < n) {
+                while (j < n && c[j] == c[i]) j++;
+                ranges[i] = j - i;
+                i = j;
             }
         }
-        cout << (ok ? "YES" : "NO") << '\n';
+        ll ans = 1;
+        for (ll pi = 0; pi < n; pi++) {
+            ll i = q[pi];
+            auto it = ranges.upper_bound(i);
+            assert(it != ranges.begin());
+            it--;
+            ans = (ans * it->s) % MOD;
+            it->s--;
+            if (it->s == 0) {
+                auto nxt = next(it);
+                ranges.erase(it);
+                if (nxt != ranges.end() && nxt != ranges.begin()) {
+                    auto prv = prev(nxt);
+                    if (c[prv->f] == c[nxt->f]) {
+                        ranges[prv->f] += nxt->s;
+                        ranges.erase(nxt);
+                    }
+                }
+            }
+        }
+        cout << ans << '\n';
     }
 
     return 0;

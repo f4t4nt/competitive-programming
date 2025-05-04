@@ -27,7 +27,7 @@ using indexed_set = tree<
 
 #define pb push_back
 #define elif else if
-#define sz(C) (ll) C.size()
+#define sz(C) (ll)C.size()
 #define all(C) C.begin(), C.end()
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
@@ -52,24 +52,40 @@ int main() {
     ll t; cin >> t;
     while (t--) {
         ll n; cin >> n;
-        str s, t; cin >> s >> t;
-        map<pair<ch, ch>, ll> cnt;
-        for (ll i = 0; i < n; i++) {
-            ll j = n - i - 1;
-            if (s[i] < t[j]) swap(s[i], t[j]);
-            cnt[{s[i], t[j]}]++;
+        str s; cin >> s;
+        if (n == 1) {
+            cout << (s == "0" ? 0 : 1) << '\n';
+            continue;
         }
-        bool ok = true, mid = false;
-        for (auto& [k, v] : cnt) {
-            if (v & 1) {
-                if (mid || k.first != k.second) {
-                    ok = false;
-                    break;
+        vector<pll> ranges;
+        {
+            ll l = 0, r = 0;
+            while (l < n) {
+                while (l < n && s[l] == '1') l++;
+                r = l;
+                while (r < n && s[r] == '0') r++;
+                if (l < n) {
+                    ranges.pb({l, r});
+                    l = r;
                 }
-                mid = true;
             }
         }
-        cout << (ok ? "YES" : "NO") << '\n';
+        pll prv = {-1, 0};
+        ll ans = 1;
+        for (auto [l, r] : ranges) {
+            ll top = (r - l) * (l + r - 1) / 2,
+                bot = (r - l) * (n - 1) - top;
+            if (l > 0) {
+                if (prv.first == l - 1) top += prv.second;
+                else top++;
+            }
+            if (r < n) {
+                bot++;
+                prv = {r, bot};
+            }
+            ans = max({ans, top, bot});
+        }
+        cout << ans << '\n';
     }
 
     return 0;

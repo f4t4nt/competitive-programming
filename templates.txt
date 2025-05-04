@@ -1,24 +1,25 @@
 #include <bits/stdc++.h>
-
 using namespace std;
 
 typedef long long ll;
+typedef unsigned long long ull;
+typedef pair<ll, ll> pll;
+typedef complex<long double> cd;
 typedef long double ld;
+typedef pair<ld, ld> pld;
 typedef char ch;
 typedef string str;
-typedef pair<ll, ll> pll;
-typedef pair<ld, ld> pld;
-typedef complex<long double> cd;
 
 mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 
 #include <bits/extc++.h>
 using namespace __gnu_pbds;
 
+template<typename T>
 using indexed_set = tree<
-    pll,
+    T,
     null_type,
-    less<pll>,
+    less<T>,
     rb_tree_tag,
     tree_order_statistics_node_update>;
 // indexed_set s; (change pll above to desired type)
@@ -30,25 +31,19 @@ using indexed_set = tree<
 // __builtin_clz(x) -> number of leading zeros
 // for ll, use __builtin_popcountll, __builtin_clzll
 
-#define pb push_back // to concatenate, use v1.insert(v1.end(), all(v2))
+#define pb push_back
 #define elif else if
 #define sz(C) (ll) C.size()
 #define all(C) C.begin(), C.end()
-#define f first
-#define s second
+#define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-#define flip(C) reverse(all(C))
-
-#define FOR(x, e) for (ll x = 0; x < (ll)e; x++)
-#define FORR(x, e) for (ll x = (ll)e - 1; x >= 0; x--)
-#define FOB(x, b, e) for (auto x = b; x < e; x++)
-#define FORE(x, C) for (auto &x : C)
 
 int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
-    auto start = chrono::steady_clock::now(); auto end = chrono::steady_clock::now();
+    auto start = chrono::steady_clock::now();
+    auto end = chrono::steady_clock::now();
     double diff = chrono::duration<double, milli>(end - start).count();
 }
 
@@ -904,6 +899,38 @@ struct Matrix { // mat[i] is row i
 
 //--------------------------------------------------
 
+struct mll {
+    ll v;
+    mll(): v(0) {}
+    mll(ll _v) { v = (_v % MOD + MOD) % MOD; }
+    explicit operator ll() const { return v; }
+    mll& operator+=(const mll &o) { v += o.v; if (v >= MOD) v -= MOD; return *this; }
+    mll& operator-=(const mll &o) { v -= o.v; if (v < 0) v += MOD; return *this; }
+    mll& operator*=(const mll &o) { v = (ll)(v * o.v % MOD); return *this; }
+    mll& operator/=(const mll &o) { return *this *= o.inv(); }
+    friend mll operator+(mll a, const mll &b) { return a += b; }
+    friend mll operator-(mll a, const mll &b) { return a -= b; }
+    friend mll operator*(mll a, const mll &b) { return a *= b; }
+    friend mll operator/(mll a, const mll &b) { return a /= b; }
+    mll operator-() const { return mll(-v); }
+    bool operator==(const mll &o) const { return v == o.v; }
+    bool operator!=(const mll &o) const { return v != o.v; }
+    static mll pow(mll a, ll e) {
+        mll r = 1;
+        while (e > 0) {
+            if (e & 1) r *= a;
+            a *= a;
+            e >>= 1;
+        }
+        return r;
+    }
+    mll inv() const { return pow(*this, MOD - 2); }
+    friend ostream& operator<<(ostream &os, const mll &m) { return os << m.v; }
+    friend istream& operator>>(istream &is, mll &m) { ll x; is >> x; m = mll(x); return is; }
+};
+
+//--------------------------------------------------
+
 ll poww(ll x, ll p) {
     ll rv = 1;
     while (p) {
@@ -987,6 +1014,17 @@ struct SegTree {
         if (r - l == 1) return data[i] = raw[l];
         ll m = (l + r) / 2;
         return data[i] = build(raw, 2 * i, l, m) + build(raw, 2 * i + 1, m, r);
+    }
+    void fill(vector<ll> &vec, ll i = 1, ll l = 0, ll r = -1) {
+        assert(sz(vec) == n);
+        if (r == -1) r = n; push(i, l, r);
+        if (r - l == 1) vec[l] = data[i];
+        else {
+            ll m = (l + r) / 2;
+            fill(vec, 2 * i, l, m);
+            fill(vec, 2 * i + 1, m, r);
+        }
+        return;
     }
     void push(ll i, ll l, ll r) {
         data[i] += (r - l) * lazy[i];
@@ -1488,13 +1526,15 @@ auto dfs = [&](auto &&self, ll u, ll p) -> void {
 vector<ll> top_sort(vector<vector<ll>> &adj, vector<ll> &deg) { // deg is in-degree
     ll n = sz(adj);
     vector<ll> ord; queue<ll> q;
-    FOR (i, n) if (deg[i] == 0) q.push(i);
+    for (ll i = 0; i < n; i++)
+        if (deg[i] == 0) q.push(i);
     while (!q.empty()) {
         ll u = q.front(); q.pop();
         ord.pb(u);
-        FORE (v, adj[u]) if (--deg[v] == 0) q.push(v);
+        for (ll v : adj[u])
+            if (--deg[v] == 0) q.push(v);
     }
-    return ord; // check sz(ord) < n for cycle
+    return ord;
 }
 
 //--------------------------------------------------
@@ -1617,7 +1657,6 @@ struct Trie {
         children[si]->insert(i + 1, s);
     }
 };
-
 
 //--------------------------------------------------
 

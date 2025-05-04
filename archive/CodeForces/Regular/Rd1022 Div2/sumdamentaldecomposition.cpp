@@ -32,8 +32,8 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-// #define f first
-// #define s second
+#define f first
+#define s second
 
 #ifdef LOCAL
 #include "tester.cpp"
@@ -51,25 +51,16 @@ int main() {
 
     ll t; cin >> t;
     while (t--) {
-        ll n; cin >> n;
-        str s, t; cin >> s >> t;
-        map<pair<ch, ch>, ll> cnt;
-        for (ll i = 0; i < n; i++) {
-            ll j = n - i - 1;
-            if (s[i] < t[j]) swap(s[i], t[j]);
-            cnt[{s[i], t[j]}]++;
-        }
-        bool ok = true, mid = false;
-        for (auto& [k, v] : cnt) {
-            if (v & 1) {
-                if (mid || k.first != k.second) {
-                    ok = false;
-                    break;
-                }
-                mid = true;
-            }
-        }
-        cout << (ok ? "YES" : "NO") << '\n';
+        ll n, x; cin >> n >> x;
+        ll b = __builtin_popcountll(x);
+        if (n == 1) cout << (x == 0 ? -1 : x) << '\n';
+        elif (n <= b) cout << x << '\n';
+        elif (n & 1 && x == 0) cout << n + 3 << '\n';
+        elif (n & 1 && x == 1) cout << n << '\n';
+        elif (n & 1) cout << (n - b + 1) / 2 * 2 + x << '\n';
+        elif (x == 0) cout << n << '\n';
+        elif (x == 1) cout << n + 3 << '\n';
+        else cout << (n - b + 1) / 2 * 2 + x << '\n';
     }
 
     return 0;

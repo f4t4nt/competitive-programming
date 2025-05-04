@@ -32,8 +32,8 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-// #define f first
-// #define s second
+#define f first
+#define s second
 
 #ifdef LOCAL
 #include "tester.cpp"
@@ -45,31 +45,45 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+const ll MAX = 6e6;
+vector<ll> primes, prime_sum = {0};
+bitset<MAX + 1> is_comp;
+
+ll solve(ll n) {
+    vector<ll> a(n), pre(n + 1);
+    for (ll &x : a) cin >> x;
+    rsort(a);
+    for (ll i = 0; i < n; i++) {
+        pre[i + 1] = pre[i] + a[i];
+    }
+    ll best = 0;
+    for (ll m = n; m >= 0; m--) {
+        if (prime_sum[m] <= pre[m]) {
+            best = m;
+            break;
+        }
+    }
+    return n - best;
+}
+
 int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
 
+    for (ll p = 2; p <= MAX; p++) {
+        if (!is_comp[p]) {
+            primes.pb(p);
+            prime_sum.pb(prime_sum.back() + p);
+            for (ll q = p * 2; q <= MAX; q += p) {
+                is_comp[q] = 1;
+            }
+        }
+    }
+
     ll t; cin >> t;
     while (t--) {
         ll n; cin >> n;
-        str s, t; cin >> s >> t;
-        map<pair<ch, ch>, ll> cnt;
-        for (ll i = 0; i < n; i++) {
-            ll j = n - i - 1;
-            if (s[i] < t[j]) swap(s[i], t[j]);
-            cnt[{s[i], t[j]}]++;
-        }
-        bool ok = true, mid = false;
-        for (auto& [k, v] : cnt) {
-            if (v & 1) {
-                if (mid || k.first != k.second) {
-                    ok = false;
-                    break;
-                }
-                mid = true;
-            }
-        }
-        cout << (ok ? "YES" : "NO") << '\n';
+        cout << solve(n) << '\n';
     }
 
     return 0;

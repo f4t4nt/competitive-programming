@@ -27,13 +27,11 @@ using indexed_set = tree<
 
 #define pb push_back
 #define elif else if
-#define sz(C) (ll) C.size()
+#define sz(C) (ll)C.size()
 #define all(C) C.begin(), C.end()
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-// #define f first
-// #define s second
 
 #ifdef LOCAL
 #include "tester.cpp"
@@ -49,28 +47,34 @@ int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
 
-    ll t; cin >> t;
-    while (t--) {
-        ll n; cin >> n;
-        str s, t; cin >> s >> t;
-        map<pair<ch, ch>, ll> cnt;
-        for (ll i = 0; i < n; i++) {
-            ll j = n - i - 1;
-            if (s[i] < t[j]) swap(s[i], t[j]);
-            cnt[{s[i], t[j]}]++;
-        }
-        bool ok = true, mid = false;
-        for (auto& [k, v] : cnt) {
-            if (v & 1) {
-                if (mid || k.first != k.second) {
-                    ok = false;
-                    break;
-                }
-                mid = true;
-            }
-        }
-        cout << (ok ? "YES" : "NO") << '\n';
+    ll n, m, t; cin >> n >> m >> t;
+    vector<ll> a(n), pre(n + 1), nxt(n, -1), prv(n, -1);
+    for (ll i = 0; i < n; i++) {
+        cin >> a[i];
+        pre[i + 1] = pre[i] + a[i];
     }
+    while (m--) {
+        ll i; cin >> i; i--;
+        nxt[i] = prv[i] = i;
+    }
+    for (ll i = 1; i < n; i++)
+        if (nxt[i] == -1) nxt[i] = nxt[i - 1];
+    for (ll i = n - 2; i >= 0; i--)
+        if (prv[i] == -1) prv[i] = prv[i + 1];
+    ll ans = 0;
+    for (ll i = 0; i < n; i++) {
+        ll j = nxt[i];
+        if (j != -1) {
+            ll rem = t - (pre[i] - pre[j]);
+            if (rem >= 0) ans = max(ans, i - j + rem / a[i]);
+        }
+        j = prv[i];
+        if (j != -1) {
+            ll rem = t - (pre[j + 1] - pre[i + 1]);
+            if (rem >= 0) ans = max(ans, j - i + rem / a[i]);
+        }
+    }
+    cout << ans << '\n';
 
     return 0;
 }

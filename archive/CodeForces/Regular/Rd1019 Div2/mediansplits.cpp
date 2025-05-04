@@ -27,13 +27,13 @@ using indexed_set = tree<
 
 #define pb push_back
 #define elif else if
-#define sz(C) (ll) C.size()
+#define sz(C) (ll)C.size()
 #define all(C) C.begin(), C.end()
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-// #define f first
-// #define s second
+// #define x first
+// #define y second
 
 #ifdef LOCAL
 #include "tester.cpp"
@@ -45,31 +45,44 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+bool eval(ll n, vector<ll> &pre) {
+    ll mn = pre[1], mx = pre[1];
+    for (ll i = 2; i < n; i++) {
+        // 011
+        if (pre[i] - mn >= 0 && pre[n] - pre[i] >= 0) {
+            return true;
+        }
+        // 101
+        if (mx >= 0 && pre[n] - pre[i] >= 0) {
+            return true;
+        }
+        mn = min(mn, pre[i]);
+        mx = max(mx, pre[i]);
+    }
+    return false;
+}
+
 int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
 
     ll t; cin >> t;
     while (t--) {
-        ll n; cin >> n;
-        str s, t; cin >> s >> t;
-        map<pair<ch, ch>, ll> cnt;
+        ll n, k; cin >> n >> k;
+        vector<ll> a(n), pre(n + 1);
         for (ll i = 0; i < n; i++) {
-            ll j = n - i - 1;
-            if (s[i] < t[j]) swap(s[i], t[j]);
-            cnt[{s[i], t[j]}]++;
+            cin >> a[i];
+            a[i] = (a[i] <= k) ? 1 : -1;
+            pre[i + 1] = pre[i] + a[i];
         }
-        bool ok = true, mid = false;
-        for (auto& [k, v] : cnt) {
-            if (v & 1) {
-                if (mid || k.first != k.second) {
-                    ok = false;
-                    break;
-                }
-                mid = true;
-            }
+        bool ok = eval(n, pre);
+        if (!ok) {
+            flip(a);
+            for (ll i = 0; i < n; i++)
+                pre[i + 1] = pre[i] + a[i];
+            ok = eval(n, pre);
         }
-        cout << (ok ? "YES" : "NO") << '\n';
+        cout << (ok ? "YES\n" : "NO\n");
     }
 
     return 0;

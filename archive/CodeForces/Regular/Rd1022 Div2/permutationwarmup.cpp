@@ -32,8 +32,8 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-// #define f first
-// #define s second
+#define f first
+#define s second
 
 #ifdef LOCAL
 #include "tester.cpp"
@@ -45,6 +45,20 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+ll eval(ll n) {
+    vector<ll> perm(n);
+    iota(all(perm), 1);
+    set<ll> s;
+    do {
+        ll sum = 0;
+        for (ll i = 0; i < n; i++) {
+            sum += abs(perm[i] - (i + 1));
+        }
+        s.insert(sum);
+    } while (next_permutation(all(perm)));
+    return sz(s);
+}
+
 int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
@@ -52,24 +66,7 @@ int main() {
     ll t; cin >> t;
     while (t--) {
         ll n; cin >> n;
-        str s, t; cin >> s >> t;
-        map<pair<ch, ch>, ll> cnt;
-        for (ll i = 0; i < n; i++) {
-            ll j = n - i - 1;
-            if (s[i] < t[j]) swap(s[i], t[j]);
-            cnt[{s[i], t[j]}]++;
-        }
-        bool ok = true, mid = false;
-        for (auto& [k, v] : cnt) {
-            if (v & 1) {
-                if (mid || k.first != k.second) {
-                    ok = false;
-                    break;
-                }
-                mid = true;
-            }
-        }
-        cout << (ok ? "YES" : "NO") << '\n';
+        cout << 1 + n * n / 4 << '\n';
     }
 
     return 0;

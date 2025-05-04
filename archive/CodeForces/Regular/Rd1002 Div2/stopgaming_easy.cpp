@@ -27,13 +27,11 @@ using indexed_set = tree<
 
 #define pb push_back
 #define elif else if
-#define sz(C) (ll) C.size()
+#define sz(C) (ll)C.size()
 #define all(C) C.begin(), C.end()
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-// #define f first
-// #define s second
 
 #ifdef LOCAL
 #include "tester.cpp"
@@ -51,25 +49,29 @@ int main() {
 
     ll t; cin >> t;
     while (t--) {
-        ll n; cin >> n;
-        str s, t; cin >> s >> t;
-        map<pair<ch, ch>, ll> cnt;
-        for (ll i = 0; i < n; i++) {
-            ll j = n - i - 1;
-            if (s[i] < t[j]) swap(s[i], t[j]);
-            cnt[{s[i], t[j]}]++;
+        ll n, m; cin >> n >> m;
+        vector<ll> a(n * m + 1), b = a;
+        for (ll i = 1; i <= n * m; i++) cin >> a[i];
+        for (ll i = 1; i <= n * m; i++) cin >> b[i];
+        vector<ll> apos(2 * n * m + 1, -1), bpos = apos;
+        for (ll i = 1; i <= n * m; i++) bpos[b[i]] = i;
+        for (ll i = 1; i <= n * m; i++) {
+            if (bpos[a[i]] == -1) break;
+            apos[i] = bpos[a[i]];
         }
-        bool ok = true, mid = false;
-        for (auto& [k, v] : cnt) {
-            if (v & 1) {
-                if (mid || k.first != k.second) {
-                    ok = false;
-                    break;
-                }
-                mid = true;
-            }
+        apos[0] = 0;
+        ll skip = 0, pre = 0;
+        bool prv = true;
+        for (ll i = 1; i <= n * m; i++) {
+            if (apos[i - 1] > apos[i]) break;
+            ll d = apos[i] - apos[i - 1] - 1;
+            if (prv) skip += d;
+            elif (d > 0) break;
+            if ((i + skip) / m > (i - 1) / m) prv = true;
+            else prv = false;
+            if (prv) pre = i;
         }
-        cout << (ok ? "YES" : "NO") << '\n';
+        cout << n * m - pre << '\n';
     }
 
     return 0;

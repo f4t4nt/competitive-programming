@@ -1,4 +1,5 @@
 #include <bits/stdc++.h>
+
 using namespace std;
 
 typedef long long ll;
@@ -15,11 +16,10 @@ mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
 #include <bits/extc++.h>
 using namespace __gnu_pbds;
 
-template<typename T>
 using indexed_set = tree<
-    T,
+    ll,
     null_type,
-    less<T>,
+    less<ll>,
     rb_tree_tag,
     tree_order_statistics_node_update>;
 
@@ -45,31 +45,38 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+const ll MOD = 998244353;
+
+ll poww(ll a, ll b) {
+    ll rv = 1;
+    while (b) {
+        if (b & 1) rv = rv * a % MOD;
+        a = a * a % MOD;
+        b >>= 1;
+    }
+    return rv;
+}
+
 int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
 
     ll t; cin >> t;
     while (t--) {
-        ll n; cin >> n;
-        str s, t; cin >> s >> t;
-        map<pair<ch, ch>, ll> cnt;
-        for (ll i = 0; i < n; i++) {
-            ll j = n - i - 1;
-            if (s[i] < t[j]) swap(s[i], t[j]);
-            cnt[{s[i], t[j]}]++;
+        ll n, q; cin >> n >> q;
+        str ss; cin >> ss;
+        vector<ll> s(n);
+        for (ll i = 0; i < n; i++) s[i] = ss[i] == '1';
+        ll cnt0 = n - accumulate(all(s), 0LL),
+            tmp = poww(2, n - 4 + MOD - 1);
+        while (q--) {
+            ll i; cin >> i; i--;
+            cnt0 += 2 * s[i] - 1;
+            s[i] ^= 1;
+            ll ans = tmp * (n * (n + 1) % MOD - 4 * cnt0 * n % MOD + 4 * cnt0 * cnt0 % MOD - 2) % MOD;
+            ans = (ans + MOD) % MOD;
+            cout << ans << '\n';
         }
-        bool ok = true, mid = false;
-        for (auto& [k, v] : cnt) {
-            if (v & 1) {
-                if (mid || k.first != k.second) {
-                    ok = false;
-                    break;
-                }
-                mid = true;
-            }
-        }
-        cout << (ok ? "YES" : "NO") << '\n';
     }
 
     return 0;

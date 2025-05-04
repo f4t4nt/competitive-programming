@@ -32,8 +32,8 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-// #define f first
-// #define s second
+#define f first
+#define s second
 
 #ifdef LOCAL
 #include "tester.cpp"
@@ -52,24 +52,27 @@ int main() {
     ll t; cin >> t;
     while (t--) {
         ll n; cin >> n;
-        str s, t; cin >> s >> t;
-        map<pair<ch, ch>, ll> cnt;
-        for (ll i = 0; i < n; i++) {
-            ll j = n - i - 1;
-            if (s[i] < t[j]) swap(s[i], t[j]);
-            cnt[{s[i], t[j]}]++;
+        vector<ll> a(n), pre_mx(n + 1), pre_sum(n + 1, 0);
+        for (ll i = 0; i < n; ++i) {
+            cin >> a[i];
+            pre_sum[i + 1] = pre_sum[i] + a[i];
+            pre_mx[i + 1] = max(pre_mx[i], a[i]);
         }
-        bool ok = true, mid = false;
-        for (auto& [k, v] : cnt) {
-            if (v & 1) {
-                if (mid || k.first != k.second) {
-                    ok = false;
-                    break;
-                }
-                mid = true;
+        ll tot = pre_sum[n];
+        vector<ll> ans(n);
+        for (ll k = 1; k <= n; ++k) {
+            ll idx = n - k,
+                sk = tot - pre_sum[idx],
+                delta = 0;
+            if (idx > 0) {
+                ll best = pre_mx[idx];
+                delta = max<ll>(0, best - a[idx]);
             }
+
+            ans[k - 1] = sk + delta;
         }
-        cout << (ok ? "YES" : "NO") << '\n';
+        for (ll x : ans) cout << x << ' ';
+        cout << '\n';
     }
 
     return 0;

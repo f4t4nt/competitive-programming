@@ -32,8 +32,8 @@ using indexed_set = tree<
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-// #define f first
-// #define s second
+#define f first
+#define s second
 
 #ifdef LOCAL
 #include "tester.cpp"
@@ -49,27 +49,47 @@ int main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0), cout.tie(0);
 
-    ll t; cin >> t;
-    while (t--) {
-        ll n; cin >> n;
-        str s, t; cin >> s >> t;
-        map<pair<ch, ch>, ll> cnt;
-        for (ll i = 0; i < n; i++) {
-            ll j = n - i - 1;
-            if (s[i] < t[j]) swap(s[i], t[j]);
-            cnt[{s[i], t[j]}]++;
-        }
-        bool ok = true, mid = false;
-        for (auto& [k, v] : cnt) {
-            if (v & 1) {
-                if (mid || k.first != k.second) {
-                    ok = false;
-                    break;
-                }
-                mid = true;
+    ll n, k; cin >> n >> k;
+    str s; cin >> s;
+
+    vector<vector<ll>> pos(26);
+    for (ll i = 0; i < n; i++)
+        pos[s[i] - 'a'].pb(i);
+
+    vector<ll> dist(n + 2, 1), nxt(26, -1);
+    for (ll pos = n - 1; pos >= 0; pos--) {
+        nxt[s[pos] - 'a'] = pos;
+        bool missing = false;
+        for (ll c = 0; c < k; c++) {
+            if (nxt[c] == -1) {
+                missing = true;
+                break;
             }
         }
-        cout << (ok ? "YES" : "NO") << '\n';
+        if (missing) dist[pos] = 1;
+        else {
+            ll best = 1e18;
+            for (ll c = 0; c < k; c++)
+                best = min(best, dist[nxt[c] + 1]);
+            dist[pos] = 1 + best;
+        }
+    }
+
+    ll q; cin >> q;
+    while (q--) {
+        str t; cin >> t;
+        ll cur = -1;
+        bool ok = true;
+        for (char ch : t) {
+            auto &v = pos[ch - 'a'];
+            auto it = lower_bound(all(v), cur + 1);
+            if (it == v.end()) {
+                ok = false;
+                break;
+            }
+            cur = *it;
+        }
+        cout << (ok ? dist[cur + 1] : 0) << '\n';
     }
 
     return 0;

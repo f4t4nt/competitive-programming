@@ -27,13 +27,13 @@ using indexed_set = tree<
 
 #define pb push_back
 #define elif else if
-#define sz(C) (ll) C.size()
+#define sz(C) (ll)C.size()
 #define all(C) C.begin(), C.end()
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-// #define f first
-// #define s second
+#define x first
+#define y second
 
 #ifdef LOCAL
 #include "tester.cpp"
@@ -52,24 +52,22 @@ int main() {
     ll t; cin >> t;
     while (t--) {
         ll n; cin >> n;
-        str s, t; cin >> s >> t;
-        map<pair<ch, ch>, ll> cnt;
+        map<ll, ll> xcnt, scnt;
         for (ll i = 0; i < n; i++) {
-            ll j = n - i - 1;
-            if (s[i] < t[j]) swap(s[i], t[j]);
-            cnt[{s[i], t[j]}]++;
+            ll x, y; cin >> x >> y;
+            xcnt[x]++;
+            scnt[x + y]++;
         }
-        bool ok = true, mid = false;
-        for (auto& [k, v] : cnt) {
-            if (v & 1) {
-                if (mid || k.first != k.second) {
-                    ok = false;
-                    break;
-                }
-                mid = true;
-            }
+        pll ans = {0, 0};
+        for (auto& [x, c] : xcnt) if (c & 1) {
+            ans.x = x;
+            break;
         }
-        cout << (ok ? "YES" : "NO") << '\n';
+        for (auto& [s, c] : scnt) if (c & 1) {
+            ans.y = s - ans.x;
+            break;
+        }
+        cout << ans.x << ' ' << ans.y << '\n';
     }
 
     return 0;
