@@ -16,36 +16,37 @@ typedef string str;
 
 #define FOR(x, e) for (ll x = 0; x < (ll) e; x++)
 
+const ll INF = 1e18;
+
 struct Edge {
     ll s, t, cap = 0, cost = 0, flow = 0;
 };
 
 struct Dinic {
-    ll n; vector<Edge> edges;
-    vector<vector<ll>> adj;
-    vector<ll> lvl, ptr;
+    ll n;                       // |V|
+    vector<Edge> edges;         // forward & reverse; reverse index = e ^ 1
+    vector<vector<ll>> adj;     // adjacency list of edge indices
+    vector<ll> lvl, ptr;        // BFS level graph & current-arc optimisation
     queue<ll> q;
 
-    Dinic(ll n, vector<Edge> &edges0) :
-        n(n), adj(n), lvl(n), ptr(n) {
-        ll i = 0;
-        for (auto e : edges0) {
-            edges.pb(e);
-            edges.pb({e.t, e.s});
-            adj[e.s].pb(i++);
-            adj[e.t].pb(i++);
+    // constructor; expects only forward edges
+    Dinic(ll _n, vector<Edge> &_e) :
+        n(_n), adj(_n), lvl(_n), ptr(_n)
+    {
+        for (auto &e : _e) {
+            adj[e.s].pb(sz(edges)); edges.pb(e);            // forward
+            adj[e.t].pb(sz(edges)); edges.pb({ e.t, e.s }); // reverse
         }
     }
 
+    // builds the level graph, returns false if t is unreachable from s
     bool bfs(ll s, ll t) {
-        lvl.assign(n, -1); lvl[s] = 0;
-        q.push(s);
-        while(!q.empty()) {
-            ll v = q.front();
-            q.pop();
-            for (auto e : adj[v]) {
-                ll u = edges[e].t;
-                if (lvl[u] != -1 || edges[e].cap <= edges[e].flow) continue;
+        lvl.assign(n, -1); lvl[s] = 0; q.push(s);
+        while (!q.empty()) {
+            ll v = q.front(); q.pop();
+            for (ll id : adj[v]) {
+                ll u = edges[id].t;
+                if (lvl[u] != -1 || edges[id].cap <= edges[id].flow) continue;
                 lvl[u] = lvl[v] + 1;
                 q.push(u);
             }
@@ -53,29 +54,55 @@ struct Dinic {
         return lvl[t] != -1;
     }
 
+    // sends blocking flow along the level graph, returns amount of flow actually pushed
     ll dfs(ll v, ll t, ll f) {
-        if (v == t || f == 0) return f;
+        if (!f || v == t) return f;
         for (ll &cid = ptr[v]; cid < sz(adj[v]); cid++) {
-            ll e = adj[v][cid];
-            ll u = edges[e].t;
-            if (lvl[v] + 1 != lvl[u]) continue;
-            ll pushed = dfs(u, t, min(f, edges[e].cap - edges[e].flow));
+            ll id = adj[v][cid], u = edges[id].t;
+            if (lvl[u] != lvl[v] + 1) continue;
+            ll pushed = dfs(u, t, min(f, edges[id].cap-edges[id].flow));
             if (pushed) {
-                edges[e].flow += pushed;
-                edges[e ^ 1].flow -= pushed;
+                edges[id].flow      += pushed;
+                edges[id ^ 1].flow  -= pushed;
                 return pushed;
             }
         }
         return 0;
     }
 
+    // computes the maximum s-t flow
+    // O(E sqrt V) typical, O(E V) worst-case
     ll max_flow(ll s, ll t) {
         ll flow = 0;
         while (bfs(s, t)) {
             ptr.assign(n, 0);
-            while (ll pushed = dfs(s, t, __LONG_LONG_MAX__)) flow += pushed;
+            while (ll pushed = dfs(s, t, INF)) flow += pushed;
         }
         return flow;
+    }
+
+    // edges crossing (reachable -> unreachable) form a minimum s-t cut
+    vector<pll> min_cut(ll s, ll t) {
+        bfs(s, t);
+        vector<pll> cut;
+        for (auto &e : edges)
+            if (lvl[e.s] != -1 && lvl[e.t] == -1 && e.cap > 0)
+                cut.pb({ e.s, e.t });
+        return cut;
+    }
+
+    // assumes path is a simple list of vertices currently present
+    // in the residual graph; reduces flow by f along that path
+    void undo_flow(vector<ll> path, ll f) {
+        for (ll i = 0; i + 1 < path.size(); i++) {
+            for (ll e : adj[path[i]]) if (edges[e].t == path[i + 1]) {
+                edges[e].flow     -= f;
+                edges[e ^ 1].flow += f;
+                assert(edges[e].flow      <= edges[e].cap);
+                assert(edges[e ^ 1].flow  <= edges[e ^ 1].cap);
+                break;
+            }
+        }
     }
 };
 

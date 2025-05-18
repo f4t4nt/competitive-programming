@@ -792,11 +792,11 @@ vector<ll> lis(vector<ll> a) {
 
 pll manacher(str &s) { // largest palindrome, returns {len, idx}
     str t = "$#";
-    FORE (c, s) { t += c; t += '#'; }
+    for (ch c : s) t += c, t += '#';
     ll n = sz(t);
     ll center = 0, max_rad = -1, rad;
     vector<ll> p(n);
-    FOR (i, n) {
+    for (ll i = 1; i < n; i++) {
         if (i <= max_rad) rad = min(p[2 * center - i], max_rad - i);
         else rad = 0;
         while (i - rad - 1 >= 0 && i + rad + 1 < n && t[i - rad - 1] == t[i + rad + 1]) rad++;
@@ -807,9 +807,11 @@ pll manacher(str &s) { // largest palindrome, returns {len, idx}
         }
     }
     ll len = 0, idx = 0;
-    FOR (i, n) if (p[i] > len) {
-        len = p[i];
-        idx = i;
+    for (ll i = 1; i < n; i++) {
+        if (p[i] > len) {
+            len = p[i];
+            idx = i;
+        }
     }
     return {len, (idx - len) / 2};
 }

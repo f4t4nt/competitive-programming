@@ -51,94 +51,96 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
-const ll INF = 1e18;
+const ll INF = 1e9;
 
 struct Edge { ll s, t, cap = 0, cost = 0, flow = 0; };
 
 struct MinCostMaxFlow {
-    ll n, m; vector<Edge> edges;
-    vector<vector<ll>> adj;
-    vector<ll> dist, pi, vis;
-    vector<pll> par;
+    ll n;                       // number of vertices
+    vector<Edge> edges;         // both directions (reverse cost = –cost)
+    vector<vector<ll>> adj;     // adjacency (edge indices)
 
-    MinCostMaxFlow(ll n, vector<Edge> &edges0) :
-        n(n), m(sz(edges0)), adj(n),
-        vis(n), dist(n), pi(n), par(n) {
-        FORE (e, edges0) {
-            adj[e.s].pb(sz(edges));
-            edges.pb(e);
-            adj[e.t].pb(sz(edges));
-            edges.pb({e.t, e.s});
+    vector<ll> dist, pi;        // D'Esopo-Johnson potentials
+    vector<ll> vis;             // visited in Dijkstra
+    vector<ll> par;             // predecessor edge on shortest path
+
+    // constructor; expects only forward edges
+    MinCostMaxFlow(ll _n, vector<Edge> &_e) :
+        n(_n), adj(_n),
+        dist(_n), pi(_n), vis(_n), par(_n)
+    {
+        for (auto &e : _e) {
+            adj[e.s].pb(sz(edges)); edges.pb(e);                            // forward
+            adj[e.t].pb(sz(edges)); edges.pb({ e.t, e.s, 0, -e.cost });     // reverse
         }
     }
 
-    void path(ll s) {
-        vis.assign(n, false);
+    // Bellman–Ford to initialise Johnson potentials if negative costs exist
+    void set_pi(ll s) {
+        pi.assign(n, INF);
+        pi[s] = 0;
+        bool changed = true;
+        for (ll it = 0; it < n && changed; it++) {
+            changed = false;
+            for (auto &e : edges)
+                if (e.cap && pi[e.s] < INF && pi[e.s] + e.cost<pi[e.t]) {
+                    pi[e.t] = pi[e.s] + e.cost; changed = true;
+                }
+        }
+    }
+
+    // Dijkstra; returns true if sink is reachable
+    bool dijkstra(ll s, ll t) {
+        vis.assign(n, 0);
         dist.assign(n, INF);
-        dist[s] = 0; ll di;
+        dist[s] = 0;
 
-        __gnu_pbds::priority_queue<pll, greater<>> pq;
-        vector<decltype(pq)::point_iterator> its(n);
-        pq.push({0, s});
-
-        auto relax = [&](ll t, ll e, ll cap, ll cost, ll dir) {
-            ll val = di - pi[t] + cost;
-            if (cap && val < dist[t]) {
-                dist[t] = val;
-                par[t] = {e, dir};
-                if (its[t] == pq.end()) its[t] = pq.push({val, t});
-                else pq.modify(its[t], {val, t});
-            }
-        };
+        using PQ = __gnu_pbds::priority_queue<pll, greater<>>;
+        PQ pq; vector<PQ::point_iterator> its(n, pq.end());
+        its[s] = pq.push({0, s});
 
         while (!pq.empty()) {
-            s = pq.top().s; pq.pop();
-            vis[s] = 1; di = dist[s] + pi[s];
-            FORE (e, adj[s]) {
-                ll t = edges[e].t;
-                if (!vis[t]) relax(t, e, edges[e].cap - edges[e].flow, edges[e].cost, 1);
-            }
-            FORE (e, adj[s]) {
-                ll t = edges[e].t;
-                if (!vis[t]) relax(t, e, edges[e ^ 1].flow, -edges[e ^ 1].cost, 0);
-            }
-        }
-
-        FOR (i, n) pi[i] = min(pi[i] + dist[i], INF);
-    }
-
-    pll max_flow(ll s, ll t) {
-        ll flow = 0, cost = 0;
-        while (path(s), vis[t]) {
-            ll f = INF;
-            for (ll p, r, x = t; tie(p, r) = par[x], x != s; x = edges[p].s) {
-                f = min(f, r ? edges[p].cap - edges[p].flow : edges[p ^ 1].flow);
-            }
-            flow += f;
-            for (ll p, r, x = t; tie(p, r) = par[x], x != s; x = edges[p].s) {
-                if (r) edges[p].flow += f;
-                else edges[p ^ 1].flow -= f;
-            }
-        }
-        FORE (e, edges) cost += e.flow * e.cost;
-        return {flow, cost};
-    }
-
-    void set_pi(ll s) { // for negative costs
-        pi.assign(n, INF); pi[s] = 0;
-        ll it = n, ch = 1, v;
-        while (ch-- && it--) {
-            FOR (i, n) {
-                if (pi[i] == INF) continue;
-                FORE (e, adj[i]) {
-                    if (edges[e].cap && (v = pi[i] + edges[e].cost) < pi[edges[e].t]) {
-                        pi[edges[e].t] = v;
-                        ch = 1;
-                    }
+            ll v = pq.top().second; pq.pop();
+            if (vis[v]) continue;
+            vis[v] = 1;
+            for (ll id : adj[v]) {
+                Edge &e = edges[id];
+                ll cap = e.cap - e.flow;
+                if (cap == 0) continue;
+                ll u = e.t;
+                ll rcost = e.cost + pi[v] - pi[u];
+                if (dist[v] + rcost < dist[u]) {
+                    dist[u] = dist[v] + rcost;
+                    par[u] = id;
+                    if (its[u] == pq.end()) its[u] = pq.push({ dist[u], u });
+                    else                    pq.modify(its[u], { dist[u], u });
                 }
             }
         }
-        assert(it >= 0);
+        for (ll v = 0; v < n; v++) if (dist[v] < INF) pi[v] += dist[v];
+        return vis[t];
+    }
+
+    // returns {max_flow , min_cost}
+    pll max_flow(ll s, ll t) {
+        ll flow = 0, cost = 0;
+        while (dijkstra(s, t)) {
+            ll f = INF;
+            // bottleneck
+            for (ll v = t; v != s; v = edges[par[v] ^ 1].t)
+                f = min(f, edges[par[v]].cap - edges[par[v]].flow);
+
+            // augment and accumulate cost on-the-fly
+            for (ll v = t; v != s; v = edges[par[v] ^ 1].t) {
+                ll id = par[v];
+                edges[id].flow     += f;
+                edges[id^1].flow   -= f;
+                cost               += f * edges[id].cost;
+            }
+
+            flow += f;
+        }
+        return { flow, cost };
     }
 };
 

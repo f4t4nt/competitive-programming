@@ -1,11 +1,21 @@
 #include <bits/stdc++.h>
-
 using namespace std;
 
-using ll = long long;
-using ld = long double;
-using ch = char;
-using str = string;
+typedef long long ll;
+typedef unsigned long long ull;
+typedef pair<ll, ll> pll;
+typedef long double ld;
+typedef complex<ld> cd;
+typedef pair<ld, ld> pld;
+typedef char ch;
+typedef string str;
+
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+
+#include <bits/extc++.h>
+using namespace __gnu_pbds;
+
+#pragma GCC target("popcnt,lzcnt")
 
 #define pb push_back
 #define elif else if
@@ -14,11 +24,8 @@ using str = string;
 #define flip(C) reverse(all(C))
 #define ssort(C) sort(all(C))
 #define rsort(C) sort(all(C), greater<>())
-
-#define FOR(x, e) for(ll x = 0; x < (ll) e; x++)
-#define FORR(x, e) for(ll x = (ll) e - 1; x >= 0; x--)
-#define FOB(x, b, e) for(auto x = b; x < e; x++)
-#define FORE(x, C) for(auto &x : C)
+#define f first
+#define s second
 
 #ifdef LOCAL
 #include "tester.cpp"
@@ -30,41 +37,41 @@ string test_file_name = "tests";
 #define cout fout
 #endif
 
+const ll INF = 1e18;
+
+// directed edge in the residual graph
+// - cap  = residual capacity on this edge (forward edge gets original cap)
+// - cost = 0 here (kept for symmetry with MCMF template)
+// - flow = current flow (can be < 0 on a reverse edge)
 struct Edge {
-    ll s, t, cap, cost;
+    ll s, t, cap = 0, cost = 0, flow = 0;
 };
 
-struct Dinic { 
-    ll n, m = 0;
-    vector<vector<ll>> adj, caps, flows;
-    vector<set<ll>> outs;
-    vector<ll> lvl, ptr;
+struct Dinic {
+    ll n;                       // |V|
+    vector<Edge> edges;         // forward & reverse; reverse index = e ^ 1
+    vector<vector<ll>> adj;     // adjacency list of edge indices
+    vector<ll> lvl, ptr;        // BFS level graph & current-arc optimisation
     queue<ll> q;
 
-    Dinic(ll n, vector<Edge> &edges) :
-        n(n), adj(n),
-        caps(n, vector<ll>(n)),
-        flows(n, vector<ll>(n)),
-        outs(n)
+    // constructor; expects only forward edges
+    Dinic(ll _n, vector<Edge> &_e) :
+        n(_n), adj(_n), lvl(_n), ptr(_n)
     {
-        FORE (e, edges) {
-            adj[e.s].pb(e.t);
-            adj[e.t].pb(e.s);
-            caps[e.s][e.t] = e.cap;
+        for (auto &e : _e) {
+            adj[e.s].pb(sz(edges)); edges.pb(e);            // forward
+            adj[e.t].pb(sz(edges)); edges.pb({ e.t, e.s }); // reverse
         }
     }
 
+    // builds the level graph, returns false if t is unreachable from s
     bool bfs(ll s, ll t) {
-        lvl.assign(n, -1);
-        lvl[s] = 0;
-        q.push(s);
+        lvl.assign(n, -1); lvl[s] = 0; q.push(s);
         while (!q.empty()) {
-            ll v = q.front();
-            q.pop();
-            FORE (u, adj[v]) {
-                if (lvl[u] != -1 || caps[v][u] <= flows[v][u]) {
-                    continue;
-                }
+            ll v = q.front(); q.pop();
+            for (ll id : adj[v]) {
+                ll u = edges[id].t;
+                if (lvl[u] != -1 || edges[id].cap <= edges[id].flow) continue;
                 lvl[u] = lvl[v] + 1;
                 q.push(u);
             }
@@ -72,87 +79,92 @@ struct Dinic {
         return lvl[t] != -1;
     }
 
+    // sends blocking flow along the level graph, returns amount of flow actually pushed
     ll dfs(ll v, ll t, ll f) {
-        if (v == t || f == 0) {
-            return f;
-        }
+        if (!f || v == t) return f;
         for (ll &cid = ptr[v]; cid < sz(adj[v]); cid++) {
-            ll u = adj[v][cid];
-            if (lvl[v] + 1 != lvl[u] || caps[v][u] <= flows[v][u]) {
-                continue;
+            ll id = adj[v][cid], u = edges[id].t;
+            if (lvl[u] != lvl[v] + 1) continue;
+            ll pushed = dfs(u, t, min(f, edges[id].cap-edges[id].flow));
+            if (pushed) {
+                edges[id].flow      += pushed;
+                edges[id ^ 1].flow  -= pushed;
+                return pushed;
             }
-            ll tr = dfs(u, t, min(f, caps[v][u] - flows[v][u]));
-            if (caps[v][u] == 0) {
-                outs[u].erase(v);
-            } else {
-                outs[v].insert(u);
-            }
-            if (tr == 0) {
-                if (caps[v][u] == 0) {
-                    outs[u].insert(v);
-                } else {
-                    outs[v].erase(u);
-                }
-                continue;
-            }
-            flows[v][u] += tr;
-            flows[u][v] -= tr;
-            return tr;
         }
         return 0;
     }
 
+    // computes the maximum s-t flow
+    // O(E sqrt V) typical, O(E V) worst-case
     ll max_flow(ll s, ll t) {
-        flows.assign(n, vector<ll>(n));
         ll flow = 0;
-        while (true) {
-            if (!bfs(s, t)) {
-                break;
-            }
+        while (bfs(s, t)) {
             ptr.assign(n, 0);
-            while (ll pushed = dfs(s, t, LLONG_MAX)) {
-                flow += pushed;
-            }
+            while (ll pushed = dfs(s, t, INF)) flow += pushed;
         }
         return flow;
     }
 
-    void dfs2(ll v, vector<ll> &path) {
-        if (v == n - 1) {
-            return;
-        }
-        FORE (u, outs[v]) {
-            if (flows[v][u] > 0) {
-                path.pb(u);
-                dfs2(u, path);
-                return;
+    // edges crossing (reachable -> unreachable) form a minimum s-t cut
+    vector<pll> min_cut(ll s, ll t) {
+        bfs(s, t);
+        vector<pll> cut;
+        for (auto &e : edges)
+            if (lvl[e.s] != -1 && lvl[e.t] == -1 && e.cap > 0)
+                cut.pb({ e.s, e.t });
+        return cut;
+    }
+
+    // assumes path is a simple list of vertices currently present
+    // in the residual graph; reduces flow by f along that path
+    void undo_flow(vector<ll> path, ll f) {
+        for (ll i = 0; i + 1 < sz(path); i++) {
+            for (ll e : adj[path[i]]) if (edges[e].t == path[i + 1]) {
+                edges[e].flow     -= f;
+                edges[e ^ 1].flow += f;
+                assert(edges[e].flow      <= edges[e].cap);
+                assert(edges[e ^ 1].flow  <= edges[e ^ 1].cap);
+                break;
             }
         }
     }
 
-    void get_paths(vector<vector<ll>> &paths) {
-        while (!outs[0].empty()) {
-            vector<ll> path = {0};
-            dfs2(0, path);
-            FOR (i, sz(path) - 1) {
-                outs[path[i]].erase(path[i + 1]);
+    // retrieves all paths from source to sink
+    void get_paths(ll s, ll t, ll flow, vector<vector<ll>> &paths) {
+        vector<ll> ptr(n);
+        vector<vector<ll>> adjv(n);
+        for (auto &e : edges)
+            if (e.cap > 0 && e.flow > 0)
+                adjv[e.s].pb(e.t);
+
+        function<bool(ll, vector<ll>&)> dfs = [&](ll v, vector<ll> &path) {
+            path.pb(v);
+            if (v == t) return true;
+            while (ptr[v] < sz(adjv[v])) {
+                ll u = adjv[v][ptr[v]++];
+                if (dfs(u, path)) return true;
             }
+            path.pop_back();
+            return false;
+        };
+
+        for (ll i = 0; i < flow; i++) {
+            vector<ll> path;
+            assert(dfs(s, path));
             paths.pb(path);
         }
     }
 };
 
 int main() {
-    ios_base::sync_with_stdio(false);
-    cin.tie(nullptr);
-    cout.tie(nullptr);
+    ios_base::sync_with_stdio(0);
+    cin.tie(0), cout.tie(0);
 
-    ll n, m;
-    cin >> n >> m;
+    ll n, m; cin >> n >> m;
     vector<Edge> edges;
-    FOR (i, m) {
-        ll a, b;
-        cin >> a >> b;
+    for (ll i = 0; i < m; i++) {
+        ll a, b; cin >> a >> b;
         a--, b--;
         edges.pb({a, b, 1});
     }
@@ -160,13 +172,11 @@ int main() {
     ll flow = dinic.max_flow(0, n - 1);
     cout << flow << '\n';
     vector<vector<ll>> paths;
-    dinic.get_paths(paths);
+    dinic.get_paths(0, n - 1, flow, paths);
     assert(sz(paths) == flow);
-    FORE (path, paths) {
+    for (auto &path : paths) {
         cout << sz(path) << '\n';
-        FORE (v, path) {
-            cout << v + 1 << ' ';
-        }
+        for (ll v : path) cout << v + 1 << ' ';
         cout << '\n';
     }
 
