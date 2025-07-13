@@ -12,7 +12,7 @@ struct Kuhn {
     ll nL, nR;
     vector<vector<ll>> &adj;        // external adjacency (avoids copy)
 
-    vector<ll> match_l, match_r;    // LHS→RHS, RHS→LHS (-1 = free)
+    vector<ll> match_l, match_r;    // LHS -> RHS, RHS -> LHS (-1 = free)
     vector<ll> seen;                // visitation timestamp array
     ll iter = 1;                    // current DFS stamp
     ll matched = 0;                 // size of current matching

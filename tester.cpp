@@ -11,7 +11,7 @@ bool RESULT_ONLY = false;
 // 0: don't show diff
 // 1: show only diff
 // 2: show all lines
-int SHOW_DIFF = 1;
+int SHOW_DIFF = 0;
 const int DIFF_WIDTH = 20;
 
 void trim(string& str)

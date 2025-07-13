@@ -4,8 +4,8 @@ using namespace std;
 typedef long long ll;
 typedef unsigned long long ull;
 typedef pair<ll, ll> pll;
-typedef complex<long double> cd;
 typedef long double ld;
+typedef complex<ld> cd;
 typedef pair<ld, ld> pld;
 typedef char ch;
 typedef string str;
@@ -22,7 +22,6 @@ using indexed_set = tree<
     less<T>,
     rb_tree_tag,
     tree_order_statistics_node_update>;
-// indexed_set s; (change pll above to desired type)
 // s.order_of_key(x) -> number of elements < x
 // s.find_by_order(x) -> iterator to the x-th element (0-indexed)
 
