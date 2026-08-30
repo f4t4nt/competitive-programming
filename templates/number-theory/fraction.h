@@ -6,6 +6,14 @@ typedef long double ld;
 
 inline i128 iabs(i128 x) { return x < 0 ? -x : x; }
 
+// -----------------------------------------------------------------------------
+//  Fraction
+// -----------------------------------------------------------------------------
+//  Supports:   - + - * / with frac and i128, comparisons, unary -
+//              - << and >>, reads "n/d" or plain "n"
+//  Restrictions: - intermediate num * den products must fit in i128
+//  Notes:      - always normalized, den > 0
+// -----------------------------------------------------------------------------
 struct frac {
     i128 num, den;
 

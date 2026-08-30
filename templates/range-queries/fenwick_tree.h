@@ -3,6 +3,15 @@ using namespace std;
 
 typedef long long ll;
 
+// -----------------------------------------------------------------------------
+//  Fenwick Tree
+// -----------------------------------------------------------------------------
+//  Supports:   - upd(i, delta)  point add
+//              - pref(i)        prefix over [0, i]
+//              - qry(l, r)      range over [l, r] inclusive
+//  Restrictions: - qry needs inverse(); min/max style ops get pref only
+//  Complexity: O(log n) per op
+// -----------------------------------------------------------------------------
 template<class T>
 struct Fenwick {
     ll n;               // logical length (0-indexed externally)
@@ -43,6 +52,12 @@ struct Fenwick {
     }
 };
 
+// -----------------------------------------------------------------------------
+//  2D variant
+// -----------------------------------------------------------------------------
+//  Fenwick of Fenwicks over rows; upd / pref / qry take rectangle corners,
+//  O(log n log m) per op.
+// -----------------------------------------------------------------------------
 template<class T>
 struct Fenwick2D {
     ll n, m;                        // logical sizes (0-based)

@@ -1,11 +1,19 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+typedef long long ll;
+
 #define all(C) C.begin(), C.end()
 #define sz(C) (ll) C.size()
 
-typedef long long ll;
-
+// -----------------------------------------------------------------------------
+//  Disjoint Set Union
+// -----------------------------------------------------------------------------
+//  Supports:   - unite(a, b)  union by size, true if merged
+//              - get(x)       root of x, path compressed
+//              - same_set(a, b), size(x), reset(); cnt counts components
+//  Complexity: near O(1) amortized per operation
+// -----------------------------------------------------------------------------
 struct DSU {
     ll        cnt;  // current number of connected components
     vector<ll> e;   // parent / (-size) array
@@ -26,7 +34,7 @@ struct DSU {
         cnt = sz(e);
     }
 
-    // find + compress
+    // find + compress
     ll get(ll x) {
         return e[x] < 0 ? x : e[x] = get(e[x]);
     }

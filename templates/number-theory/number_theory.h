@@ -5,6 +5,12 @@ typedef long long ll;
 
 const ll MOD = 1e9 + 7;
 
+// -----------------------------------------------------------------------------
+//  Modular Arithmetic (mll)
+// -----------------------------------------------------------------------------
+//  Supports:   - + - * /, pow(a, e), inv(), << and >>
+//  Restrictions: - MOD must be prime for inv and /
+// -----------------------------------------------------------------------------
 struct mll {
     ll v;
     mll(): v(0) {}
@@ -35,10 +41,21 @@ struct mll {
     friend istream& operator>>(istream &is, mll &m) { ll x; is >> x; m = mll(x); return is; }
 };
 
+// -----------------------------------------------------------------------------
+//  Combinatorics Tables
+// -----------------------------------------------------------------------------
+//  Supports:   - choose(n, k), perm(n, k), choose_lucas(n, k) huge n, k
+//              - fac, ifac, inv, catalan, der, H tables up to N
+//              - build_stir1(S), then stir1[n][k] = permutations of n with
+//                k cycles
+//              - dlog(a, b)  discrete log, baby-step giant-step
+//  Complexity: O(N) build, dlog O(sqrt(MOD))
+// -----------------------------------------------------------------------------
 struct NumTheory {
     ll N;
     vector<mll> fac, ifac, inv;
     vector<mll> catalan, der, H;
+    vector<vector<mll>> stir1;   // stir1[n][k] = # of permutations of n with k cycles
 
     NumTheory(ll _N): N(_N),
         fac(N + 1), ifac(N + 1), inv(N + 1),
@@ -64,6 +81,15 @@ struct NumTheory {
         // harmonic numbers H_n = sum (1 / i)
         H[0] = 0;
         for (ll i = 1; i <= N; i++) H[i] = H[i - 1] + inv[i];
+    }
+
+    // unsigned Stirling numbers of the first kind, O(S^2), call before use
+    void build_stir1(ll S) {
+        stir1.assign(S + 1, vector<mll>(S + 1));
+        stir1[0][0] = 1;
+        for (ll n = 1; n <= S; n++)
+            for (ll k = 1; k <= n; k++)
+                stir1[n][k] = stir1[n - 1][k - 1] + mll(n - 1) * stir1[n - 1][k];
     }
 
     mll choose(ll n, ll k) {

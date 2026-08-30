@@ -6,6 +6,13 @@ typedef long long ll;
 #define pb push_back
 #define sz(C) (ll) C.size()
 
+// -----------------------------------------------------------------------------
+//  Topological Sort (Kahn)
+// -----------------------------------------------------------------------------
+//  Returns:    vertices in topological order; shorter than n iff a cycle
+//  Notes:      - pass deg to reuse a precomputed in-degree array
+//  Complexity: O(n + m)
+// -----------------------------------------------------------------------------
 vector<ll> top_sort(vector<vector<ll>> &adj, vector<ll> deg = {}) { // deg is in-degree
     if (deg.empty()) {
         deg.resize(sz(adj));

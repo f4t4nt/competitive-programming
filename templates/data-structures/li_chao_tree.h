@@ -9,7 +9,7 @@ typedef long long ll;
 const ll INF = 4e18;
 
 // -----------------------------------------------------------------------------
-//  Li Chao segment tree - fully‑dynamic convex hull trick
+//  Li Chao segment tree - fully-dynamic convex hull trick
 // -----------------------------------------------------------------------------
 //  Supports:    - add_line(m, b)   (insert y = mx + b)
 //               - query(x)         (min_y at integer x)
@@ -40,7 +40,7 @@ struct LiChao {
     // insert y = mx + b
     void add_line(ll m, ll b) { add_line(root, X_MIN, X_MAX, Line(m, b)); }
 
-    // insert a pre‑built Line
+    // insert a pre-built Line
     void add_line(Line nw) { add_line(root, X_MIN, X_MAX, nw); }
 
     // query minimum y at integer x

@@ -3,6 +3,15 @@ using namespace std;
 
 typedef long long ll;
 
+// -----------------------------------------------------------------------------
+//  Segment Tree
+// -----------------------------------------------------------------------------
+//  Supports:   - updi(i, val)  point update, leaf += val
+//              - qry(l, r)     combine over [l, r)
+//              - qryi(i), build(raw), fill(vec)
+//  Notes:      - edit combine and def_val together, e.g. min with +inf
+//  Complexity: O(n) build, O(log n) per op
+// -----------------------------------------------------------------------------
 template<class T>
 struct SegTree {
     ll n, N;                // logical and padded length

@@ -3,11 +3,15 @@ using namespace std;
 
 typedef long long ll;
 
-// Hopcroft-Karp: maximum matching in a bipartite graph
-// - LHS nodes: 0 .. nL-1
-// - RHS nodes: 0 .. nR-1
-// - adj[u]   : list of neighbours of u in LHS
-// Worst case time complexity: O(E * sqrt(V))
+// -----------------------------------------------------------------------------
+//  Hopcroft-Karp Maximum Bipartite Matching
+// -----------------------------------------------------------------------------
+//  Supports:   - solve()  matching size
+//              - match_l / match_r  LHS -> RHS / RHS -> LHS, -1 = free
+//  Restrictions: - adj[u] lists RHS neighbours of LHS u, held by
+//                reference
+//  Complexity: O(E sqrt V)
+// -----------------------------------------------------------------------------
 struct HopcroftKarp {
     ll nL, nR;
     vector<vector<ll>> &adj;

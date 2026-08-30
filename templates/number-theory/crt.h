@@ -4,6 +4,15 @@ using namespace std;
 typedef long long ll;
 typedef pair<ll, ll> pll;
 
+// -----------------------------------------------------------------------------
+//  Chinese Remainder Theorem
+// -----------------------------------------------------------------------------
+//  Supports:   - crt(m, n, a, b)       merge two congruences, -1 if none
+//              - solve_crt(mods_rems)  fold a system, {x, mod} or {-1, -1}
+//              - bezout(a, b), gcd, lcm
+//  Restrictions: - moduli need not be coprime, but the running lcm must
+//                fit in ll
+// -----------------------------------------------------------------------------
 // gcd(a, b)
 ll gcd(ll a, ll b) {
     return a == 0 ? b : gcd(b % a, a);

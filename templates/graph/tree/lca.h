@@ -30,6 +30,16 @@ struct SparseTable {
     }
 };
 
+// -----------------------------------------------------------------------------
+//  Lowest Common Ancestor (euler tour + sparse table)
+// -----------------------------------------------------------------------------
+//  Supports:   - lca(u, v), dist(u, v), is_anc(u, v)
+//              - disjoint(paths)  true iff the paths are pairwise
+//                vertex-disjoint
+//  Restrictions: - tree rooted at 0
+//  Notes:      - embeds its own SparseTable, combine = min by depth
+//  Complexity: O(n log n) build, O(1) per lca
+// -----------------------------------------------------------------------------
 struct LCA {
     ll n, timer = 0;
     vector<vector<ll>> adj;

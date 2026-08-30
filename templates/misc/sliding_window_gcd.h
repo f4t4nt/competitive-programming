@@ -4,6 +4,15 @@ using namespace std;
 typedef long long ll;
 typedef pair<ll, ll> pll;
 
+// -----------------------------------------------------------------------------
+//  Sliding Window GCD (two stacks)
+// -----------------------------------------------------------------------------
+//  Supports:   - push(x)  append x on the right
+//              - pop()    drop the leftmost element
+//              - get()    gcd of the window, 0 if empty
+//  Notes:      - swap __gcd for min, max, and, or for the same trick
+//  Complexity: O(1) amortized per operation
+// -----------------------------------------------------------------------------
 struct SlidingGCD {
     stack<pll> l, r;
 

@@ -69,7 +69,7 @@ struct ConvexHullTrick {
 
 // -----------------------------------------------------------------------------
 //  Binary-search variant (no monotone query order required)
-// --------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //  Same usage but query(x) is O(log n). Lines still must be added with
 //  increasing slope. Internally stores breakpoints to enable binary search.
 // -----------------------------------------------------------------------------

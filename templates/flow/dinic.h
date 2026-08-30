@@ -15,11 +15,21 @@ const ll INF = 1e18;
 // directed edge in the residual graph
 // - cap  = residual capacity on this edge (forward edge gets original cap)
 // - cost = 0 here (kept for symmetry with MCMF template)
-// - flow = current flow (can be < 0 on a reverse edge)
+// - flow = current flow (can be < 0 on a reverse edge)
 struct Edge {
     ll s, t, cap = 0, cost = 0, flow = 0;
 };
 
+// -----------------------------------------------------------------------------
+//  Dinic Max Flow
+// -----------------------------------------------------------------------------
+//  Supports:   - max_flow(s, t)
+//              - min_cut(s, t)  crossing edges of a minimum cut, call
+//                after max_flow
+//              - get_paths(s, t, flow, paths), undo_flow(path, f)
+//  Restrictions: - construct with forward edges only, reverses are added
+//  Complexity: O(V^2 E) worst case, O(E sqrt V) on unit capacities
+// -----------------------------------------------------------------------------
 struct Dinic {
     ll n;                       // |V|
     vector<Edge> edges;         // forward & reverse; reverse index = e ^ 1
@@ -69,7 +79,7 @@ struct Dinic {
     }
 
     // computes the maximum s-t flow
-    // O(E sqrt V) typical, O(E V) worst-case
+    // O(E sqrt V) typical, O(E V) worst-case
     ll max_flow(ll s, ll t) {
         ll flow = 0;
         while (bfs(s, t)) {

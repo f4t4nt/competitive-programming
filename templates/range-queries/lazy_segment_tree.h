@@ -3,6 +3,16 @@ using namespace std;
 
 typedef long long ll;
 
+// -----------------------------------------------------------------------------
+//  Lazy Segment Tree
+// -----------------------------------------------------------------------------
+//  Supports:   - upd(l, r, tag)  range update over [l, r)
+//              - qry(l, r)       combine over [l, r)
+//              - updi, qryi, build, fill
+//  Notes:      - edit combine / apply / compose together with def_val and
+//                def_tag
+//  Complexity: O(n) build, O(log n) per op
+// -----------------------------------------------------------------------------
 template<class T, class U = T>
 struct SegTree {
     ll n;               // logical length
@@ -75,7 +85,7 @@ struct SegTree {
 
     // range update [ul, ur)
     void upd(ll ul, ll ur, const U &val,
-             ll i = 1, ll l = 0, ll r = -1) { 
+             ll i = 1, ll l = 0, ll r = -1) {
         if (r == -1) r = N; push(i, l, r);
         if (ur <= l || r <= ul) return;
         if (ul <= l && r <= ur) {

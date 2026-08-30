@@ -7,6 +7,12 @@ typedef long long ll;
 
 const ll MAXN = 1e6 + 1;
 
+// -----------------------------------------------------------------------------
+//  Sieve of Eratosthenes
+// -----------------------------------------------------------------------------
+//  Returns:    all primes below MAXN
+//  Complexity: O(MAXN log log MAXN)
+// -----------------------------------------------------------------------------
 vector<ll> get_primes() {
     vector<ll> primes;
     bitset<MAXN> is_prime;

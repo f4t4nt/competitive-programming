@@ -6,6 +6,15 @@ typedef long long ll;
 #define pb push_back
 #define sz(C) (ll) C.size()
 
+// -----------------------------------------------------------------------------
+//  Persistent Segment Tree
+// -----------------------------------------------------------------------------
+//  Supports:   - upd(vid, i, delta)  point update on version vid, returns
+//                the new version id
+//              - qry(vid, l, r)      combine over [l, r] inclusive
+//  Notes:      - node arena starts at 20 n and doubles as needed
+//  Complexity: O(log n) time and space per update
+// -----------------------------------------------------------------------------
 template<class T, class U = T>
 struct PersistentSegTree {
     // helpers

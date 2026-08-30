@@ -10,8 +10,16 @@ typedef long double ld;
 
 const ld EPS = 1e-12;
 
-// Gauss-Jordan elimination, returns 0 if no solution, 1 if unique, -1 if infinitely many
-// Solves Ax = b for x
+// -----------------------------------------------------------------------------
+//  Gauss-Jordan Elimination
+// -----------------------------------------------------------------------------
+//  Solves:     Ax = b; returns 1 unique, -1 infinitely many, 0 none
+//  Supports:   - gauss_jordan_ld      ld matrix, partial pivoting
+//              - gauss_jordan_binary  xor system on bitsets
+//              - gauss_jordan_mod     mll matrix, paste number_theory.h
+//                too
+//  Complexity: O(n m min(n, m))
+// -----------------------------------------------------------------------------
 ll gauss_jordan_ld(vector<vector<ld>> &A, // n rows by m columns coefficient matrix
                    vector<ld>         &b, // n RHS values
                    vector<ld>         &x) // m-sized solution

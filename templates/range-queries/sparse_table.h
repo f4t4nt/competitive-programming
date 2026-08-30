@@ -3,6 +3,15 @@ using namespace std;
 
 typedef long long ll;
 
+// -----------------------------------------------------------------------------
+//  Sparse Table
+// -----------------------------------------------------------------------------
+//  Supports:   - qry(l, r)  combine over [l, r)
+//  Restrictions: - static array, build once, no updates
+//  Notes:      - idempotent ops (min, max, gcd) query in O(1) via two
+//                overlapping blocks; otherwise O(log n) disjoint blocks
+//  Complexity: O(n log n) build
+// -----------------------------------------------------------------------------
 template<class T>
 struct SparseTable {
     ll n, K;                // n = array size, K = floor(log2(n)) + 1

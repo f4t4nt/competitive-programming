@@ -7,13 +7,15 @@ typedef pair<ll, ll> pll;
 #define pb push_back
 #define sz(C) (ll) C.size()
 
-// -------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 //  Bridge-finding (Tarjan, DFS low-link)
-// -------------------------------------------------------------------------------
-//  Finds all edges that are bridges (removing the edge increases # of components)
-//  Works for undirected, connected or disconnected graphs; parallel edges handled
-//  Complexity: O(n + m) time,  O(n) memory.
-// -------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
+//  Returns:     all edges that are bridges (removing the edge increases the
+//               number of components)
+//  Supports:    undirected graphs, connected or disconnected; parallel edges
+//               handled
+//  Complexity:  O(n + m) time, O(n) memory
+// -----------------------------------------------------------------------------
 struct Bridges {
     ll n;                       // |V|
     vector<vector<ll>> &adj;    // external adjacency

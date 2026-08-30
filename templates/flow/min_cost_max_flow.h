@@ -15,11 +15,19 @@ const ll INF = 1e18;
 // directed edge in the residual graph
 // - cap  = residual capacity on this edge (forward edge gets original cap)
 // - cost = 0 here (kept for symmetry with MCMF template)
-// - flow = current flow (can be < 0 on a reverse edge)
+// - flow = current flow (can be < 0 on a reverse edge)
 struct Edge {
     ll s, t, cap = 0, cost = 0, flow = 0;
 };
 
+// -----------------------------------------------------------------------------
+//  Min Cost Max Flow (Johnson potentials + Dijkstra)
+// -----------------------------------------------------------------------------
+//  Supports:   - max_flow(s, t)  returns {max flow, min cost}
+//  Restrictions: - construct with forward edges only, reverses are added
+//              - call set_pi(s) first iff negative edge costs exist
+//  Complexity: O(F E log V)
+// -----------------------------------------------------------------------------
 struct MinCostMaxFlow {
     ll n;                       // |V|
     vector<Edge> edges;         // forward & reverse; reverse index = e ^ 1; reverse cost = -cost
@@ -87,7 +95,7 @@ struct MinCostMaxFlow {
     }
 
     // returns {max_flow , min_cost}
-    // O(F m log n)
+    // O(F m log n)
     pll max_flow(ll s, ll t) {
         ll flow = 0, cost = 0;
         while (dijkstra(s, t)) {
